@@ -529,18 +529,6 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-/* ---------------- 说明段 ---------------- */
-
-.note {
-  margin-top: 36px;
-  padding: 22px 24px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-.note h2 { margin: 0 0 10px; font-size: 16px; }
-.note p { margin: 8px 0 0; font-size: 14px; }
-
 /* ---------------- 广告与同意横幅：没有 ---------------- */
 
 /* ==================================================================
@@ -562,7 +550,6 @@ tbody tr:last-child td { border-bottom: 0; }
   .site-nav .lang { margin-left: 6px; padding: 0 4px 0 9px; gap: 4px; }
   th, td { padding: 8px 11px; font-size: 12.5px; }
   .bar { width: 34px; }
-  .note { padding: 18px 16px; }
   .panel-head, .panel-status { padding-left: 14px; padding-right: 14px; }
   .board-links .board-actions { padding-left: 14px; padding-right: 14px; }
   .skeleton span { margin-left: 14px; margin-right: 14px; }
