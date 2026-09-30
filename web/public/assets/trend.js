@@ -1483,6 +1483,199 @@ async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
 }
 
 /* ================================================================== */
+/* 面板：OpenRouter 模型用量榜                                          */
+/* ================================================================== */
+
+const OPENROUTER_RANKINGS_URL = 'https://openrouter.ai/api/frontend/v1/rankings/models';
+const OPENROUTER_MODELS_URL = 'https://openrouter.ai/api/v1/models';
+
+/**
+ * OpenRouter 的用量榜 —— **数据形状与口径**（2026-09-30 实测，见 docs/trend-sources.md）
+ *
+ * 接口给的是**按天的原始用量**：`{data: [{date, model_permaslug, variant,
+ * total_prompt_tokens, total_completion_tokens, count, ...}]}`，
+ * 7 天窗口、约 600 行。字段含义（不猜，都是实测确认的）：
+ *
+ *   · `model_permaslug` 才是**模型身份**；同一模型的 `standard` / `batch` / `free`
+ *     是**三行**，把它们当三个模型排是错的（榜单上会出现 "(batch)" 这种条目）。
+ *     所以下面按 model_permaslug 合并 —— 合并后也就自然没有了名字带 "(batch)" 的问题。
+ *   · `rankingMetricValue` 恰好等于 `total_prompt_tokens + total_completion_tokens`
+ *     （602/602 行相等，实测）。口径就是**按天 token 用量**，不是"请求数"、
+ *     也不是 OpenRouter 榜单页那个"share"百分比。
+ *   · 接口**不带模型显示名**，名字要另外取（见 openrouterNames）。
+ *
+ * 取最新一天的快照：`date` 是日粒度，同一天出现多次才是"一天内的多个样本"，
+ * 目前每个模型每天恰好一行，所以"同一天取最大"是安全的。
+ */
+export function openrouterBoard(rows) {
+  const list = Array.isArray(rows) ? rows : [];
+  if (!list.length) throw new Error(L('err.noBoard'));
+
+  const latest = list.reduce((m, r) => (String(r.date) > m ? String(r.date) : m), '');
+  const byModel = new Map();
+  for (const r of list) {
+    if (String(r.date) !== latest) continue; // 只要最新一天
+    const key = String(r.model_permaslug || r.variant_permaslug || '').trim();
+    if (!key) continue; // 实测有 1 行空 slug（不是模型，是"未归属"的合计）
+    const tokens = Number(r.rankingMetricValue ?? 0) || 0;
+    const reqs = Number(r.count ?? 0) || 0;
+    const cur = byModel.get(key) || { key, tokens: 0, requests: 0 };
+    // 同一模型的多个变体（standard/batch/free）在这里相加 —— 合并的正是那三行
+    cur.tokens += tokens;
+    cur.requests += reqs;
+    byModel.set(key, cur);
+  }
+
+  const out = [...byModel.values()];
+  if (!out.length) throw new Error(L('err.noBoard'));
+  const sum = out.reduce((a, r) => a + r.tokens, 0) || 1;
+  for (const r of out) r.share = (r.tokens / sum) * 100;
+  // 降序：榜的第一屏就该是最高的那些
+  out.sort((a, b) => b.tokens - a.tokens || a.key.localeCompare(b.key));
+  return { rows: out, date: latest, total: sum };
+}
+
+/**
+ * 用量行的名字 —— 与 `/api/v1/models` 的连接。
+ *
+ * 为什么不直接显示 slug：榜上出现 `typesafe/jev-1.13-20260917` 这种事很常见，
+ * 而清单里给的是 `Typesafe: Jev 1.13`。
+ *
+ * 匹配三级（实测覆盖率见 docs/trend-sources.md）：
+ *   1. `id` 精确相等；
+ *   2. `canonical_slug` 精确相等；
+ *   3. 把用量行的日期后缀（`-20260910`）去掉后与 canonical_slug 去后缀相等。
+ *
+ * **返回 null 就是真的没有**，调用方回落到 slug —— 不编一个名字出来。
+ * 清单只有 464 个模型（OpenRouter 的对话模型目录），而用量里含音频/视频/
+ * embedding 等**不在该目录里**的模型，所以必然有一小部分解析不到。
+ */
+export function openrouterNames(models) {
+  const byId = new Map();
+  const byCanon = new Map();
+  for (const m of Array.isArray(models) ? models : []) {
+    if (!m?.id) continue;
+    byId.set(String(m.id), m);
+    if (m.canonical_slug) byCanon.set(String(m.canonical_slug), m);
+  }
+  const stripDate = (s) => String(s).replace(/-\d{8}$/, '');
+  const cache = new Map();
+  return (slug) => {
+    if (cache.has(slug)) return cache.get(slug);
+    const name =
+      byId.get(slug)?.name ??
+      byCanon.get(slug)?.name ??
+      // 去日期后缀再匹配一次；`(batch)` 那条不优先取，优先要基座名
+      (() => {
+        const want = stripDate(slug);
+        let hit = null;
+        for (const [k, m] of byCanon) {
+          if (stripDate(k) === want) {
+            if (!/\(batch\)/i.test(m.name)) return m.name;
+            hit = hit || m.name;
+          }
+        }
+        return hit;
+      })() ??
+      null;
+    cache.set(slug, name);
+    return name;
+  };
+}
+
+/** 用量行的显示名：优先清单里的名字，取不到就回落成 slug 的主人/模型两段 */
+export function openrouterLabel(slug, nameOf) {
+  const name = nameOf?.(slug);
+  if (name) return name;
+  // 回落：`vendor/model-20260910` → 去掉厂商前缀与日期，剩下的当名字
+  const tail = String(slug).split('/').slice(1).join('/') || String(slug);
+  return tail.replace(/-\d{8}$/, '');
+}
+
+async function loadOpenRouter() {
+  const p = panel({
+    id: 'openrouter',
+    iconName: 'bolt',
+    title: L('p.openrouter.title'),
+    hint: L('p.openrouter.hint'),
+  });
+  p.status(L('st.loadingBig', { size: '420KB + 760KB' }), 'loading');
+  try {
+    // 两份数据：用量榜（主数据）+ 模型清单（只为了名字）
+    const [rankings, models] = await Promise.all([
+      cachedJson('openrouter-rankings', OPENROUTER_RANKINGS_URL),
+      cachedJson('openrouter-models', OPENROUTER_MODELS_URL),
+    ]);
+    const nameOf = openrouterNames(models?.data);
+    const { rows, date, total } = openrouterBoard(rankings?.data);
+    const day = date.slice(0, 10); // '2026-09-29 00:00:00' → '2026-09-29'
+
+    const withNames = rows.map((r) => ({
+      ...r,
+      label: openrouterLabel(r.key, nameOf),
+      named: Boolean(nameOf(r.key)),
+    }));
+
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows: withNames,
+      // 数据每天更新，说明里带上日期与总量：读者要能判断"这是哪一天的榜"
+      note: L('st.orWindow', { date: day, n: rows.length }),
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.model'),
+          field: 'label',
+          cell: (r) =>
+            // 点名字去 OpenRouter 上的模型页；取不到名字的那几个用 slug 当链接文字
+            `<a href="https://openrouter.ai/${encodeURI(r.key)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a>`,
+        },
+        {
+          label: L('col.orTokens'),
+          num: true,
+          field: 'tokens',
+          cell: (r) => `${bar(r.tokens, withNames[0]?.tokens)}${compact(r.tokens) ?? '—'}`,
+        },
+        {
+          label: L('col.orShare'),
+          num: true,
+          cls: 'col-2',
+          field: 'share',
+          cell: (r) => `${num(r.share, 1)}%`,
+        },
+        {
+          label: L('col.orRequests'),
+          num: true,
+          cls: 'col-2',
+          field: 'requests',
+          cell: (r) => compact(r.requests) ?? '—',
+        },
+      ],
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: ['label', 'key'],
+      placeholder: L('ui.searchModels'),
+      transform: withRank,
+      card: {
+        title: (r) => esc(r.label),
+        value: (r) =>
+          `<span class="v-num">${num(r.share, 1)}%</span> <span class="v-unit">${L('col.orShare')}</span>`,
+        meta: (r) =>
+          `<span class="tag">${compact(r.tokens) ?? '—'} tokens</span>` +
+          `<span class="tag">${compact(r.requests) ?? '—'} ${L('col.orRequests')}</span>` +
+          // 取不到清单名字的标一个 slug 标签：既不藏起来，也不假称它有名字
+          (r.named ? '' : `<span class="tag">${L('ui.orSlugOnly')}</span>`),
+        link: (r) => `https://openrouter.ai/${encodeURI(r.key)}`,
+      },
+    });
+    // 总量放在面板状态行里：它是"这是全站的盘"这个事实的一半
+    p.status(L('st.orTotal', { total: compact(total) ?? '—', date: day }), 'ok');
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/* ================================================================== */
 /* 启动                                                                */
 /* ================================================================== */
 
@@ -1527,6 +1720,7 @@ const BOARD_LOADERS = {
   papers: () => loadPapers(),
   repos: () => loadRepos('week'),
   newmodels: () => loadNewModels(),
+  openrouter: () => loadOpenRouter(),
   swebench: () => loadSweBench(),
 };
 

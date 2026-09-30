@@ -32,5 +32,6 @@ export const BOARD_IDS = [
   'papers',
   'repos',
   'newmodels',
+  'openrouter',
   'swebench',
 ];

@@ -22,6 +22,7 @@
 import {
   normalizeEval, parseFlatYamlList, bestAiderRows,
   rankPapers, rankRepos, flattenModelsDev, rankSweBench, sweBoardNames,
+  openrouterBoard, openrouterNames,
 } from '../web/public/assets/trend.js';
 
 /**
@@ -79,6 +80,10 @@ const EXTRA = [
 
 /** 面板 10：models.dev（4.8MB，只验证能否摊平，不打印内容） */
 const MODELS_DEV_URL = 'https://models.dev/api.json';
+
+/** 面板 12：OpenRouter（用量榜 + 模型清单，见下面的体检段） */
+const OPENROUTER_RANKINGS_URL = 'https://openrouter.ai/api/frontend/v1/rankings/models';
+const OPENROUTER_MODELS_URL = 'https://openrouter.ai/api/v1/models';
 
 /** 面板 11：SWE-bench（4MB）。★ 重点验证 resolved 的量纲没被上游改口径。 */
 const SWE_BENCH_URL =
@@ -151,6 +156,36 @@ for (const src of EXTRA) {
   } catch (e) {
     bad += 1;
     console.log(`     └ ❌ 解析失败：${e.message}`);
+  }
+}
+
+/* ---------------- 面板 12：OpenRouter 用量榜 ----------------
+ * 两个端点都要查，而且要点是**它们之间的关系**：
+ *   · 用量榜（rankings）—— 主数据，按天的模型用量；
+ *   · 模型清单（/api/v1/models）—— 只为拿显示名。
+ * 名字连接率是这里最值得打印的数：清单只有对话模型，用量里却含音频/视频/
+ * embedding，所以覆盖率是"这个面板好不好看"的实际指标。掉下去就说明
+ * 上游改了 slug 或缩了清单，而页面上只会表现为"某些行显示 slug"。
+ */
+{
+  const r = await probe('OpenRouter 用量', OPENROUTER_RANKINGS_URL);
+  const rm = await probe('OpenRouter 模型', OPENROUTER_MODELS_URL);
+  if (r?.res.ok) {
+    try {
+      const { rows, date, total } = openrouterBoard(JSON.parse(r.buf.toString('utf8')).data);
+      const nameOf = openrouterNames(rm?.res.ok ? JSON.parse(rm.buf.toString('utf8')).data : []);
+      // 覆盖率按**用量**加权，不按条数：读者关心的是"榜上大头的名字对不对"
+      const tok = (rr) => (nameOf(rr.key) ? rr.tokens : 0);
+      const named = rows.reduce((a, rr) => a + tok(rr), 0);
+      console.log(
+        `     └ ${date.slice(0, 10)} · ${rows.length} 个模型（已合并变体）· 总 ${(total / 1e12).toFixed(0)}T tokens；` +
+          `榜首 ${nameOf(rows[0]?.key) ?? rows[0]?.key} (${rows[0]?.share.toFixed(1)}%)`
+      );
+      console.log(`     └ 名字覆盖率（按用量）：${((named / (total || 1)) * 100).toFixed(1)}%`);
+    } catch (e) {
+      bad += 1;
+      console.log(`     └ ❌ 解析失败（上游格式可能已变）：${e.message}`);
+    }
   }
 }
 

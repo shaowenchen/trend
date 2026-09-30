@@ -15,6 +15,7 @@ import {
   normalizePaper, rankPapers, rankRepos, flattenModelsDev, fmtCost,
   rankSweBench, sweBoardNames, applyBoardState, groupOptions, controlsHtml,
   cardGrid, detailFromCols, detailRow,
+  openrouterBoard, openrouterNames, openrouterLabel,
 } from './trend.js';
 
 let pass = 0;
@@ -515,6 +516,94 @@ t('★ detailFromCols：详情字段与表格列同源，且跳过名次列', ()
   assert.ok(!body.includes('<dt>#</dt>'), '详情里不该有名次那一行');
   assert.match(body, /<dt>模型<\/dt>/);
   assert.match(body, /<dt>分数<\/dt>/);
+});
+
+/* ---------------- OpenRouter 用量榜 ---------------- */
+
+/**
+ * fixture 照抄真实的行形态（字段名与实测一致，见 docs/trend-sources.md）：
+ * 同一模型的 standard / batch / free 是**三行**，日期是 `YYYY-MM-DD 00:00:00`。
+ */
+const OR_ROWS = [
+  // 最新一天 D2
+  { date: '2026-09-29 00:00:00', model_permaslug: 'openai/gpt-5-20260901', variant: 'standard', rankingMetricValue: 1000, count: 10 },
+  { date: '2026-09-29 00:00:00', model_permaslug: 'openai/gpt-5-20260901', variant: 'batch', rankingMetricValue: 500, count: 5 },
+  { date: '2026-09-29 00:00:00', model_permaslug: 'openai/gpt-5-20260901', variant: 'free', rankingMetricValue: 100, count: 3 },
+  { date: '2026-09-29 00:00:00', model_permaslug: 'z-ai/glm-5-20260801', variant: 'standard', rankingMetricValue: 800, count: 7 },
+  { date: '2026-09-29 00:00:00', model_permaslug: '', variant: 'standard', rankingMetricValue: 999, count: 1 }, // 实测存在的空 slug
+  // 前一天 D1：不该进入榜单
+  { date: '2026-09-28 00:00:00', model_permaslug: 'openai/gpt-5-20260901', variant: 'standard', rankingMetricValue: 77777, count: 999 },
+];
+
+t('★ openrouterBoard：只用最新一天的数据（旧日期不能混进来）', () => {
+  const { rows, date, total } = openrouterBoard(OR_ROWS);
+  assert.equal(date, '2026-09-29 00:00:00');
+  assert.equal(total, 2400, `总量应为 1000+500+100+800，实得 ${total}`);
+  assert.equal(rows.length, 2, '应当是 2 个模型（空 slug 那行不算）');
+  // 77777 属于前一天：出现在任何一行上都说明窗口没卡住
+  assert.ok(!rows.some((r) => r.tokens === 77777), '混进了旧日期的用量');
+});
+
+t('★ openrouterBoard：同一模型的 standard/batch/free 合并成一行（否则榜上会出现带 (batch) 的三份）', () => {
+  const { rows } = openrouterBoard(OR_ROWS);
+  const gpt = rows.find((r) => r.key === 'openai/gpt-5-20260901');
+  assert.ok(gpt, '没找到合并后的模型');
+  assert.equal(gpt.tokens, 1000 + 500 + 100, '三个变体的 tokens 应当相加');
+  assert.equal(gpt.requests, 10 + 5 + 3, '请求数也应当相加');
+  assert.equal(rows.length, 2, '合并后不该有三行同模型的条目');
+});
+
+t('★ openrouterBoard：占比按合并后的总量算，且降序', () => {
+  const { rows, total } = openrouterBoard(OR_ROWS);
+  assert.equal(rows[0].key, 'openai/gpt-5-20260901', '用量最高的排最前');
+  assert.ok(Math.abs(rows[0].share - (1600 / total) * 100) < 1e-9, "GPT-5 那一行占 1600/2400");
+  const sum = rows.reduce((a, r) => a + r.share, 0);
+  assert.ok(Math.abs(sum - 100) < 1e-9, `占比之和应为 100，实得 ${sum}`);
+});
+
+t('openrouterBoard：空输入 / 非数组都抛错，不静默返回空榜', () => {
+  assert.throws(() => openrouterBoard([]), /没有解析出/);
+  assert.throws(() => openrouterBoard(null), /没有解析出/);
+  assert.throws(() => openrouterBoard([{ date: '2026-01-01', model_permaslug: '' }]), /没有解析出/);
+});
+
+const OR_MODELS = {
+  data: [
+    { id: 'openai/gpt-5-20260901', name: 'OpenAI: GPT-5', canonical_slug: 'openai/gpt-5-20260901' },
+    { id: 'z-ai/glm-5', name: 'Z.ai: GLM 5 (batch)', canonical_slug: 'z-ai/glm-5-20260801' },
+    { id: 'qwen/qwen3-8b', name: 'Qwen: Qwen3 8B', canonical_slug: 'qwen/qwen3-8b-20260101' },
+  ],
+};
+
+t('★ openrouterNames：id 精确命中优先，其次 canonical_slug', () => {
+  const nameOf = openrouterNames(OR_MODELS.data);
+  assert.equal(nameOf('openai/gpt-5-20260901'), 'OpenAI: GPT-5');
+  // 用量行给的是 z-ai/glm-5-20260801，清单 id 是 z-ai/glm-5、canonical 才是长的那串
+  assert.equal(nameOf('z-ai/glm-5-20260801'), 'Z.ai: GLM 5 (batch)');
+});
+
+t('★ openrouterNames：取不到就返回 null（不编名字）', () => {
+  const nameOf = openrouterNames(OR_MODELS.data);
+  assert.equal(nameOf('typesafe/jev-1.13-20260917'), null);
+  assert.equal(nameOf(''), null);
+  assert.equal(openrouterNames(undefined)('anything'), null);
+});
+
+t('★ openrouterNames：去日期后缀匹配时优先取非 (batch) 的名字', () => {
+  // 真实数据里同一个 canonical 可能只有 (batch) 那条在清单里；
+  // 但若两条都在，应当给读者基座名而不是 batch 名
+  const both = [
+    { id: 'x/m-1', name: 'X: M (batch)', canonical_slug: 'x/m-1-20260101' },
+    { id: 'x/m-2', name: 'X: M', canonical_slug: 'x/m-20260101' },
+  ];
+  assert.equal(openrouterNames(both)('x/m-20260101'), 'X: M');
+});
+
+t('★ openrouterLabel：有名字用名字，没名字回落成去日期去厂商的 slug', () => {
+  const nameOf = openrouterNames(OR_MODELS.data);
+  assert.equal(openrouterLabel('openai/gpt-5-20260901', nameOf), 'OpenAI: GPT-5');
+  // 取不到名字时，至少不要把 `vendor/` 前缀和日期一起甩给读者
+  assert.equal(openrouterLabel('typesafe/jev-1.13-20260917', nameOf), 'jev-1.13');
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

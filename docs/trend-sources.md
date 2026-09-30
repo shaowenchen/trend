@@ -28,7 +28,7 @@
 | 最新发布的模型 | `models.dev/api.json` | 200 JSON | `*` | ✅ 可直连，**4.8MB / 8080 个模型 → 点击才加载** |
 | SWE-bench | `raw.githubusercontent.com/swe-bench/swe-bench.github.io/master/data/leaderboards.json` | 200 JSON | `*` | ✅ 可直连，**4MB → 点击才加载** |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
-| ❌ OpenRouter 排名 | `openrouter.ai/api/v1/models` | 200 JSON | `*` | ⚠️ 能取，但**没有排名数据**（见 §4） |
+| 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
 | ❌ `/orderby`、`/filter`（datasets-server） | — | 404 / 500 | — | ❌ 不可用（见 §2） |
 
@@ -100,23 +100,52 @@ owner 的决定（2026-09-23）：**先不放**。
 
 ---
 
-## 4. OpenRouter 能取但没有排名
+## 4. OpenRouter 用量榜（2026-09-30 补上，推翻了上一版的结论）
 
-`openrouter.ai/api/v1/models` 有 CORS `*`、746KB、454 个模型，含 `pricing`（prompt/completion
-单价）、`context_length`、`architecture.modality`。但：
+上一版这里写的是"OpenRouter 能取但没有排名"，理由是 `/api/v1/models` 里没有排名字段。
+**那个结论对，但这个判断错了**：排名不在 `api/v1` 里，而在它站内榜单用的
+`api/frontend` 那一路。把 `/rankings` 页面的请求扒出来就看到了：
 
-- 响应里**没有任何排名/用量字段**（字段全表见下）；
-- `?order=top-weekly` 与 `?order=throughput-high-to-low` 返回的**首条完全一样**
-  （都是 `cohere/command-a-plus`）—— 排序参数被忽略，实际是按内部 id 排的。
+```
+https://openrouter.ai/api/frontend/v1/rankings/models     ← 用量榜（主数据）
+https://openrouter.ai/api/v1/models                       ← 模型清单（只为拿显示名）
+```
 
-字段（实测）：`id, canonical_slug, huggingface_face_id, name, created, description,
-context_length, architecture, pricing, top_provider, per_request_limits,
-supported_parameters, default_parameters, supported_voices, knowledge_cutoff,
-expiration_date, links, reasoning`。其中的 `links` 可能含它站点上的排序页链接，但那是**别的页面**，
-不是 API 的排名数据。
+两个都是 200、CORS `*`、**无需鉴权**（`/api/v1/models/user` 才要 key）。
+榜单页自己的代码是 `/api/frontend/*`，但那个前缀是我试出来的 ——
+所以找这类端点时的做法是"看它站内页面的请求"，不是猜路径。
 
-**结论**：OpenRouter 可以做一个"模型库 + 定价"面板（有价值，但不是"榜"）。
-owner 本轮未选，先不做。
+### 数据形状（实测，不是猜的）
+
+`rankings/models` 返回 `{data: [...]}`，每行是**某个模型某一天**的用量：
+
+| 字段 | 含义 |
+|---|---|
+| `date` | 日粒度，`"2026-09-29 00:00:00"`；窗口 **7 天** |
+| `model_permaslug` | **模型身份**（`deepseek/deepseek-v4.1-flash-20260910`） |
+| `variant` | `standard` / `batch` / `free` |
+| `variant_permaslug` | 上面两者拼起来（`…-20260910:batch`） |
+| `rankingMetricValue` | 该日 token 用量；**恰好等于** `total_prompt_tokens + total_completion_tokens`（602/602 行相等） |
+| `count` | 请求数 |
+
+### 三个必须处理的地方（都踩过）
+
+1. **同一模型是好几行。** `standard` / `batch` / `free` 各一行，按行排会得到
+   "GPT-5.6 Luna"、"GPT-5.6 Luna (batch)"这种把同一个模型拆成三份的榜。
+   所以按 `model_permaslug` 合并 —— 合并后也**顺带解决了**名字里的 `(batch)` 后缀
+   （清单里带 `(batch)` 的那条是另一个 id，见第 3 点）。
+2. **有 1 行 `model_permaslug` 是空串**（不是模型，是"未归属"的合计），要丢掉。
+3. **接口不带显示名。** 名字只能靠 `/api/v1/models` 连接，三级匹配：
+   `id` 精确 → `canonical_slug` 精确 → 去掉 `-YYYYMMDD` 后缀后相等。
+   清单**只有对话模型**（464 个），而用量里含音频/视频/embedding/rerank，
+   所以必然有一部分解析不到 —— 实测**按用量加权的覆盖率 97.7%**，
+   落到 slug 的那 2.3% 在页面上标一个「无显示名」标签，**不编名字**。
+
+`swebench` 那类"体量大所以点击才加载"的处理这里**不需要**：两个请求合计约
+1.1MB、一次往返，所以进页面就拉。
+
+`?order=top-weekly` 之类的排序参数确实被忽略（上一版测的没错），
+但那是 `api/v1` 的老结论，与用量榜无关。
 
 ---
 

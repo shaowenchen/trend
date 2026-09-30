@@ -68,6 +68,8 @@ const zh = {
   'p.repos.hint': '按本期新增星标排序',
   'p.newmodels.title': '最新发布的模型',
   'p.newmodels.hint': '数据较大（约 4.8MB），点击后才拉取',
+  'p.openrouter.title': 'OpenRouter 模型用量榜',
+  'p.openrouter.hint': '按 token 用量排序，日更；standard / batch / free 三种变体已合并',
   'p.swebench.title': 'SWE-bench（真实代码修复）',
   'p.swebench.hint': '数据较大（约 4MB），点击后才拉取',
 
@@ -97,6 +99,10 @@ const zh = {
   'col.votes': '点赞',
   'col.likes': '喜欢',
   'col.downloads': '下载',
+  // OpenRouter 面板专用：它是唯一按 **token 用量**口径的榜
+  'col.orTokens': 'Token 用量',
+  'col.orShare': '占比',
+  'col.orRequests': '请求数',
   'col.stars': '总星标',
   'col.gained': '本期新增',
   'col.trending': '趋势分',
@@ -107,6 +113,10 @@ const zh = {
   // ── 交互控件 ──
   'ui.search': '搜索…',
   'ui.searchModels': '按模型名搜索…',
+  // OpenRouter 面板：清单（/api/v1/models，464 个对话模型）覆盖不到的那部分
+  // 用量行（音频/视频/embedding 等）拿不到显示名，只能显示 slug —— 标一下，
+  // 免得读者以为那一行本来就是这么写的
+  'ui.orSlugOnly': '无显示名',
   'ui.searchApps': '按应用名搜索…',
   'ui.searchDatasets': '按数据集名搜索…',
   'ui.searchPapers': '按标题搜索…',
@@ -148,6 +158,9 @@ const zh = {
   'st.failed': '读取失败：{msg}',
   'st.bigDataHint': '点击下方按钮加载（该源数据较大，避免进页面就拉）',
   'st.loadingBig': '正在拉取 {size} 数据…',
+  // OpenRouter 面板：数据每天更新，读者要能判断'这是哪一天的榜'
+  'st.orWindow': '数据日期 {date} · {n} 个模型（standard/batch/free 已合并）',
+  'st.orTotal': '{date} 全平台 token 用量 {total}',
   'st.loadSwe': '加载 SWE-bench 榜',
   'st.loadModels': '加载最新发布模型',
   'st.rateLimited': '（上游接口不可用、跨域被拦或限流）',
@@ -212,6 +225,8 @@ const en = {
   'p.repos.hint': 'sorted by stars gained in the period',
   'p.newmodels.title': 'Latest model releases',
   'p.newmodels.hint': 'large payload (~4.8MB), loaded on click',
+  'p.openrouter.title': 'OpenRouter model usage',
+  'p.openrouter.hint': 'ranked by token usage, updated daily; standard / batch / free variants merged',
   'p.swebench.title': 'SWE-bench (real code fixes)',
   'p.swebench.hint': 'large payload (~4MB), loaded on click',
 
@@ -240,6 +255,10 @@ const en = {
   'col.votes': 'Upvotes',
   'col.likes': 'Likes',
   'col.downloads': 'Downloads',
+  // OpenRouter board only: the one board measured in **tokens consumed**
+  'col.orTokens': 'Tokens',
+  'col.orShare': 'Share',
+  'col.orRequests': 'Requests',
   'col.stars': 'Stars',
   'col.gained': 'Gained',
   'col.trending': 'Trending',
@@ -249,6 +268,9 @@ const en = {
 
   'ui.search': 'Search…',
   'ui.searchModels': 'Search models…',
+  // OpenRouter board: usage rows the model catalogue (464 chat models) does not
+  // cover — audio/video/embedding — have no display name, so they show a slug.
+  'ui.orSlugOnly': 'slug only',
   'ui.searchApps': 'Search apps…',
   'ui.searchDatasets': 'Search datasets…',
   'ui.searchPapers': 'Search titles…',
@@ -288,6 +310,9 @@ const en = {
   'st.failed': 'Failed: {msg}',
   'st.bigDataHint': 'Click the button below to load (large payload — kept out of first paint)',
   'st.loadingBig': 'Fetching {size}…',
+  // OpenRouter board: the data is daily, so the reader needs to know which day they see
+  'st.orWindow': 'data for {date} · {n} models (standard/batch/free merged)',
+  'st.orTotal': '{total} tokens across OpenRouter on {date}',
   'st.loadSwe': 'Load SWE-bench board',
   'st.loadModels': 'Load latest releases',
   'st.rateLimited': '(source unavailable, blocked by CORS, or rate-limited)',

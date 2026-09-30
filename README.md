@@ -16,18 +16,19 @@
 ## 页面
 
 **一个面板一页**：每条趋势（榜单）是一个独立地址，首页每张卡片正好对应一个 ——
-不把十一个面板堆在一页里。
+不把十二个面板堆在一页里。
 
 | 地址 | 作用 |
 |---|---|
-| `index.html` | 中文入口页：十一个面板的入口卡片 |
+| `index.html` | 中文入口页：十二个面板的入口卡片 |
 | `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
 | `eval.html` `aider.html` | 评测与编程能力榜 |
 | `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
 | `newmodels.html` `swebench.html` | 大体积榜（点击后才拉取） |
+| `openrouter.html` | OpenRouter 模型用量榜（约 1.1MB，进页面就拉） |
 | `en/…` | 以上每一个的英文版，文件名相同 |
 
-页头只有**两样**：左上角「首页」，右上角切换语言。十一个榜单不进页头 ——
+页头只有**两样**：左上角「首页」，右上角切换语言。十二个榜单不进页头 ——
 它们就是首页的入口卡片（下面一格一张卡），页头再列一遍等于同一份目录出现两次。
 页面**下方**另有一条由 `trend.js` 生成的 `.board-links`，列出全部面板并带
 「刷新数据」按钮 —— 那是"看完了换下一个"的那条路。
@@ -56,7 +57,7 @@
 > `site.test.js` 要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」），
 > 以及两条"英文页里不许有中文 / 中文页里不许有整句英文"的断言。
 
-## 十一个面板
+## 十二个面板
 
 每个面板都有自己的页面（下表第一列即地址的文件名去掉 `.html`）：
 
@@ -72,6 +73,7 @@
 | 每日论文热榜 | `papers` | HF `daily_papers` | 按点赞数排序 |
 | 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
 | 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB 含 8000 个模型，**点击后才加载** |
+| OpenRouter 模型用量榜 | `openrouter` | `openrouter.ai/api/frontend/v1/rankings/models` + `/api/v1/models`（只为名字） | 按**当天 token 用量**排序，日更 7 天窗口；standard/batch/free **已合并**（见 `docs/trend-sources.md` §4） |
 | SWE-bench | `swebench` | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**点击后才加载** |
 
 页面靠 `<div id="panels" data-board="eval">` 指名自己要跑哪一个（`trend.js` 读它）。
@@ -109,7 +111,7 @@
 - **一个面板一页**：页面标题就是面板名（由 `trend.js` 渲染成 `<h1>`），
   没有另写一个 hero 标题 —— 一页一个 h1，且面板名只有字典一处来源。
 - **页头只有两样**：左边「首页」，右边切换语言（构建期生成，`src/site/nav.js` +
-  `{{SITE_NAV}}`，不是抄 24 份）。十一个榜单**不进页头** —— 它们已经在首页的
+  `{{SITE_NAV}}`，不是抄 24 份）。十二个榜单**不进页头** —— 它们已经在首页的
   入口卡片里各占一张卡，页头再列一遍就是同一份目录的第二次出现。
   语言切换**指向对应的那一页**（`repos.html` ↔ `en/repos.html`），
   换语言时读者留在原来的榜单上，而不是被丢回首页。
@@ -132,7 +134,7 @@
 | 约束 | 做法 | 为什么 |
 |---|---|---|
 | 占位符只能构建期落值 | 品牌名 `{{BRAND}}` 与 GTM 片段 `{{GTM}}` 由 `scripts/build-site.mjs` 替换 | 没有"响应时"这一层；发布物里残留占位符会直接让构建失败 |
-| 页面地址带 `.html` | `index.html`、`trend.html`、`en/trend.html` | Pages 没有 rewrite，无扩展名的 `/trend` 做不到 |
+| 页面地址带 `.html` | `index.html`、`eval.html`、`en/eval.html`… | Pages 没有 rewrite，无扩展名的 `/trend` 做不到 |
 | 需要绝对地址的标记一律没有 | 不写 canonical / hreflang / og:url / 站长验证 | 它们的地址只能来自"部署在哪里"，而本站刻意不写死域名（见下） |
 
 统计（Google Tag Manager）是**有**的：容器 ID 与部署地址无关，不违反上面任何一条。
@@ -207,8 +209,8 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 
 ```
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
-  index.html                      中文入口：十一个面板的入口卡片
-  <board>.html                    ★ 十一个中文面板页（eval.html、repos.html…）
+  index.html                      中文入口：十二个面板的入口卡片
+  <board>.html                    ★ 十二个中文面板页（eval.html、repos.html…）
   en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css
   assets/
