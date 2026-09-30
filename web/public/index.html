@@ -26,35 +26,39 @@
     <a class="brand" href="index.html">{{BRAND}}</a>
     <nav class="site-nav">
       <a href="trend.html">趋势大盘</a>
-      <a href="en/" hreflang="en" lang="en">English</a>
+      <a class="lang" href="en/" hreflang="en" lang="en"><span class="ic" data-icon="globe"><span class="sr-only">切换语言：</span></span>English</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="hero">
-    <h1>AI 趋势大盘</h1>
-    <p>把各家平台的 AI 榜单收进一个页面：模型趋势、社区热度、开源评测、编程能力。</p>
-    <p class="cta"><a class="btn" href="trend.html">进入趋势大盘 →</a></p>
-  </section>
-
-  <section class="grid-3">
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="trending"><span class="sr-only">趋势与热度</span></span>模型榜单</h2>
-      <p>HuggingFace 上正在流行的、最受喜欢的、下载最多的模型。</p>
-    </div>
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="trophy"><span class="sr-only">评测成绩</span></span>评测成绩</h2>
-      <p>开源模型的公开评测分数：IFEval、BBH、MATH、GPQA、MMLU-PRO。</p>
-    </div>
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="code"><span class="sr-only">编程能力</span></span>编程能力</h2>
-      <p>Aider Polyglot 榜与 SWE-bench：模型在真实代码任务上的通过率。</p>
-    </div>
-  </section>
-
-  <section class="note">
-    <p class="muted">榜单的排序与口径以各来源方为准。</p>
+  <!-- 首页不放正文：它的唯一作用是把人送进大盘。
+       卡片本身就是链接（整块可点），文案压到"标题 + 半句说明"。 -->
+  <section class="entry-grid">
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="trending"></span>
+      <span class="entry-body">
+        <span class="entry-title">趋势大盘</span>
+        <span class="entry-desc">十一个 AI 榜单：模型趋势、社区热度、开源评测、编程能力</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="trophy"></span>
+      <span class="entry-body">
+        <span class="entry-title">评测成绩</span>
+        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="code"></span>
+      <span class="entry-body">
+        <span class="entry-title">编程能力</span>
+        <span class="entry-desc">Aider Polyglot 与 SWE-bench 的真实代码任务通过率</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
   </section>
 </main>
 

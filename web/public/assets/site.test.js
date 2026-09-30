@@ -225,6 +225,35 @@ await test('双语互链：每个页面都有指向另一语言的链接', async
   }
 });
 
+await test('★ 首页每张入口卡片都是 <a>（整块可点、键盘一次 Tab 就到）', async () => {
+  // 这条盯的是一个**看不出来的**退化：把 `<a class="entry">` 换成
+  // `<div class="entry">`，样式一模一样，但既点不动、也 Tab 不到 ——
+  // 页面看起来完全正常，只有用键盘或读屏器的人发现进不去大盘。
+  const bad = [];
+  for (const rel of [PAGES.zh[0], PAGES.en[0]]) {
+    const html = await read(rel);
+    // 抓**完整的开标签**再过滤：`href` 在 `class` 前后都可能出现，
+    // 只匹配到 class 就收尾会漏掉 href，把正确的页面判成缺陷。
+    const opens = (html.match(/<(?:a|div)\b[^>]*>/g) || []).filter((tag) => /\bclass="entry"/.test(tag));
+    if (opens.length < 2) bad.push(`${rel}: 没找到入口卡片（${opens.length}）`);
+    for (const tag of opens) {
+      if (!tag.startsWith('<a')) bad.push(`${rel}: 入口卡片不是链接 —— ${tag}`);
+      else if (!/\bhref="[^"]+"/.test(tag)) bad.push(`${rel}: 入口卡片没有 href —— ${tag}`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('语言切换链接带地球图标，与普通导航项有区分的类名', async () => {
+  for (const rel of ALL_PAGES) {
+    assert.match(
+      await read(rel),
+      /<a class="lang"[^>]*>[\s\S]*?data-icon="globe"/,
+      `${rel} 的语言切换链接没有 lang 类或地球图标`
+    );
+  }
+});
+
 await test('★ 构建拒绝把产物目录设成仓库根或其祖先（否则会删掉源码）', () => {
   const root = path.resolve('/repo');
   assert.equal(assertSafeOutDir('/repo/dist', root), path.resolve('/repo/dist'));

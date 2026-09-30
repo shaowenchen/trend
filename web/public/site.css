@@ -173,6 +173,41 @@ a { color: var(--accent); }
 .site-nav a:hover { color: var(--ink); background: var(--bg); }
 .site-nav a.active { color: var(--ink); font-weight: 600; }
 
+/* ── 语言切换：与导航分家 ──────────────────────────────────
+ * 原来它和"首页/趋势大盘"是同一排、同样式的文字链接，于是读起来像三个并列的页面，
+ * 而实际上它是**另一种控件**：点击会换语言、跳到另一个地址。
+ *
+ * 三处让它自己说话：
+ *   · 前面一条竖分隔线，视觉上断开"导航"与"切换"；
+ *   · 地球图标 —— 站点本来就有内联 SVG（ui.js），这是同一个视觉语言，
+ *     比再写一个 "EN" 文字标签更省空间、也不用为两种语言各想一个缩写；
+ *   · 更克制的排布：图标 + 文字同组，hover 才抬起。
+ *
+ * 分隔线用 ::before 画，而不是在 HTML 里写一个空 <span>：它纯粹是装饰，
+ * 不该出现在无障碍树里（读屏器念"竖线"没有意义）。
+ */
+.site-nav .lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 14px;
+  padding-left: 14px;
+  position: relative;
+  white-space: nowrap;
+}
+.site-nav .lang::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 18px;
+  background: var(--line);
+}
+.site-nav .lang .ic { display: inline-flex; color: currentColor; }
+.site-nav .lang .ic svg { width: 15px; height: 15px; display: block; }
+
 /* 图标按钮（主题切换 / 刷新）：★ 触控目标不小于 44×44，手机上好点 */
 .icon-btn {
   display: inline-flex;
@@ -204,62 +239,93 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 }
 .site-footer p { margin: 4px 0; }
 
-/* ---------------- 首屏 ---------------- */
-
-.hero { padding: 48px 0 40px; text-align: center; }
-.hero h1 {
+/* ---------------- 首屏 ----------------
+ * 这一段现在只服务**大盘页**的紧凑首屏（`hero-compact`）：
+ * 首页改成了纯卡片（见下面的 .entry-grid），大标题 + 大按钮的样式没有调用方了。
+ */
+.hero-compact { text-align: left; padding: 34px 0 26px; }
+.hero-compact h1 {
   margin: 0 0 12px;
-  font-size: clamp(26px, 5vw, 34px); /* 窄屏自动收小，不用写断点 */
+  font-size: clamp(22px, 4.5vw, 27px); /* 窄屏自动收小，不用写断点 */
   line-height: 1.25;
   letter-spacing: -.6px;
 }
-.hero p { margin: 0 auto; max-width: 620px; color: var(--muted); }
-.hero-compact { text-align: left; padding: 34px 0 26px; }
-.hero-compact h1 { font-size: clamp(22px, 4.5vw, 27px); }
-.hero-compact p { margin: 0; }
-.cta { margin-top: 22px !important; }
+.hero-compact p { margin: 0; max-width: 620px; color: var(--muted); }
 
-.btn {
-  display: inline-block;
-  background: var(--accent);
-  color: var(--bg);
-  text-decoration: none;
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-weight: 600;
-}
-.btn:hover { opacity: .92; }
-
-/* ---------------- 入口页三卡 ---------------- */
-
-.grid-3 {
+/* ---------------- 入口卡片（首页）----------------
+ *
+ * 首页不放正文段落，只放卡片：这个页面的唯一作用是**把人送进大盘**，
+ * 而大段介绍会让"入口"变成"要读一遍才能走"的东西。
+ * 所以卡片本身就是链接 —— 整块可点，不用瞄准一小行字。
+ */
+.entry-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
-  gap: 16px;
-  margin: 8px 0 30px;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+  margin: 4px 0 8px;
 }
 
-.card-sm {
+/* 用一个 <a> 而不是"div 包 h2+p+a"：整块可点、键盘一次 Tab 就到、
+   读屏器把标题与说明作为链接名一起念出来 —— 三种都有，且不需要 JS。 */
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 20px 22px;
   box-shadow: var(--shadow);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
 }
-.card-sm h2 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-.card-sm p { margin: 0; color: var(--muted); font-size: 14px; }
-.card-sm .ic {
-  color: var(--accent);
-  width: 18px;
-  height: 18px;
+.entry:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
+}
+.entry:active { transform: translateY(0); }
+.entry .ic {
   flex: none;
-  /* ★ 必须让它成为一个可设宽高的盒子：inline 元素上的 width/height 不生效，
-   * 于是里面的 svg 会按默认 300×150 渲染。 */
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.card-sm .ic > svg { width: 100%; height: 100%; }
+.entry .ic > svg { width: 20px; height: 20px; }
+.entry .entry-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.entry .entry-title { font-weight: 600; font-size: 15px; }
+.entry .entry-desc { color: var(--muted); font-size: 13px; line-height: 1.45; }
+/* 末尾的箭头往右推，暗示"点了会去哪" */
+.entry .entry-go {
+  margin-left: auto;
+  flex: none;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+}
+.entry:hover .entry-go { color: var(--accent); }
+/* 键盘聚焦时给箭头同样的强调，否则焦点只在卡片上、看不出重点 */
+.entry:focus-visible .entry-go { color: var(--accent); }
+
+/* 小屏：图标缩小、字号收一档，让三张卡在 560px 下能一屏看完 */
+@media (max-width: 560px) {
+  .entry { padding: 15px 16px; gap: 12px; }
+  .entry .ic { width: 34px; height: 34px; border-radius: 10px; }
+  .entry .ic > svg { width: 18px; height: 18px; }
+  .entry .entry-title { font-size: 14.5px; }
+  .entry .entry-desc { font-size: 12.5px; }
+}
+
+/* 触屏没有 hover：别让抬起的位移"粘"在卡片上 */
+@media (hover: none) {
+  .entry:hover { transform: none; border-color: var(--line); box-shadow: var(--shadow); }
+}
 
 /* ---------------- 面板 ---------------- */
 
@@ -481,6 +547,8 @@ tbody tr:last-child td { border-bottom: 0; }
   .brand { font-size: 16px; }
   .site-nav { gap: 2px; font-size: 13.5px; }
   .site-nav a { padding: 8px 8px; }
+  /* 窄屏上分隔线的留白换成实在的空间：14px 的边距把导航挤得很紧 */
+  .site-nav .lang { margin-left: 8px; padding-left: 10px; gap: 4px; }
   th, td { padding: 8px 11px; font-size: 12.5px; }
   .bar { width: 34px; }
   .hero { padding: 32px 0 26px; }

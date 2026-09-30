@@ -20,35 +20,38 @@
     <a class="brand" href="index.html">{{BRAND}}</a>
     <nav class="site-nav">
       <a href="trend.html">Trend board</a>
-      <a href="../" hreflang="zh-CN" lang="zh-CN">中文</a>
+      <a class="lang" href="../" hreflang="zh-CN" lang="zh-CN"><span class="ic" data-icon="globe"><span class="sr-only">Switch language: </span></span>中文</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="hero">
-    <h1>AI Trend Board</h1>
-    <p>Model momentum, community heat, open-model scores, coding ability — in one page.</p>
-    <p class="cta"><a class="btn" href="trend.html">Open the trend board →</a></p>
-  </section>
-
-  <section class="grid-3">
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="trending"><span class="sr-only">Model charts</span></span>Model charts</h2>
-      <p>The models trending, most-liked and most-downloaded on HuggingFace.</p>
-    </div>
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="trophy"><span class="sr-only">Evaluation scores</span></span>Evaluation scores</h2>
-      <p>Public benchmark scores for open models: IFEval, BBH, MATH, GPQA, MMLU-PRO.</p>
-    </div>
-    <div class="card-sm">
-      <h2><span class="ic" data-icon="code"><span class="sr-only">Coding ability</span></span>Coding ability</h2>
-      <p>Aider Polyglot and SWE-bench: how models do on real code tasks.</p>
-    </div>
-  </section>
-
-  <section class="note">
-    <p class="muted">Rankings and methodology are the source providers’.</p>
+  <!-- Entry cards only — the page's one job is to hand the visitor the board. -->
+  <section class="entry-grid">
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="trending"></span>
+      <span class="entry-body">
+        <span class="entry-title">Trend board</span>
+        <span class="entry-desc">Eleven AI charts: model momentum, community heat, open-model scores, coding ability</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="trophy"></span>
+      <span class="entry-body">
+        <span class="entry-title">Evaluation scores</span>
+        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="trend.html">
+      <span class="ic" data-icon="code"></span>
+      <span class="entry-body">
+        <span class="entry-title">Coding ability</span>
+        <span class="entry-desc">Aider Polyglot and SWE-bench: pass rates on real code tasks</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
   </section>
 </main>
 

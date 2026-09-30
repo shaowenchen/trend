@@ -104,6 +104,11 @@ export const ICONS = {
     label: '刷新',
     path: '<path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 5v6h-6"/>',
   },
+  // 语言切换（地球）
+  globe: {
+    label: '切换语言',
+    path: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 010 18a14 14 0 010-18z"/>',
+  },
 };
 
 /** 渲染一个图标为内联 SVG 字符串。`cls` 用于加额外 class。 */
