@@ -722,4 +722,40 @@ t('flattenMedia：空输入不炸', () => {
   assert.deepEqual(flattenMedia({ data: [] }), []);
 });
 
+/* ---------------- cardGrid 的可选字段（真实故障复现） ---------------- */
+
+/**
+ * ★ 这一组对着一次真实故障：`cfg.meta` 没给的榜单（aaBench）在渲染卡片时
+ * 抛 `cfg.meta is not a function`，整块面板变成"读取失败"。
+ *
+ * 成因是一个看着像判空、其实先调用了的写法：`cfg.value(r) ? … : ''`
+ * —— `cfg.meta(r)` 在 `?` 之前就执行了。而 mountBoard 的详情路径用的是
+ * `cfg.card.meta ? … : ''`（先判存在），两处语义不一致，于是"省略 meta"
+ * 在详情里没事、在卡片上崩。
+ */
+t('★ cardGrid：没有 meta 时不能抛错（它就是那个真实故障）', () => {
+  const html = cardGrid([{ __rank: 1, name: 'X' }], {
+    title: (r) => esc(r.name),
+    value: (r) => r.name,
+    // 故意不给 meta —— 这正是 aaBench 原来的样子
+  });
+  assert.ok(html.includes('X'), '卡片没渲染出来');
+  assert.ok(!html.includes('card-meta'), '没有 meta 就不该产出那块 DOM');
+});
+
+t('★ cardGrid：没有 value 时也不能抛错', () => {
+  const html = cardGrid([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name) });
+  assert.ok(html.includes('X'));
+  assert.ok(!html.includes('card-value'));
+});
+
+t('cardGrid：title 是必需的（缺了就该炸，而不是渲染一张空卡）', () => {
+  assert.throws(() => cardGrid([{ name: 'X' }], {}), /is not a function/);
+});
+
+t('cardGrid：meta 返回空串时不产出那块 DOM（空标签会占位但没内容）', () => {
+  const html = cardGrid([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name), meta: () => '' });
+  assert.ok(!html.includes('card-meta'));
+});
+
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

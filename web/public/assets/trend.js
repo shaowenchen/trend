@@ -280,18 +280,33 @@ export function table(cols, rows, sort = null) {
  *   · 表格回答"第 47 名是谁 / 按成本排一下" —— 需要筛选、排序、看全量。
  * 两者解决的不是同一个问题，所以卡片在上、表格在下（表格可折叠）。
  */
+/**
+ * 卡片栅格。
+ *
+ * ## ★ value / meta 是**可选**的，判空必须在调用之前
+ * 早先这里写的是 `cfg.value(r) ? … : ''` ——看着像判空，其实**先调了再判**：
+ * `meta` 没给的榜单会在这里直接抛 `cfg.meta is not a function`，整块面板变成
+ * "读取失败"。而 `mountBoard` 的详情路径用的是 `cfg.card.meta ? … : ''`
+ * （先判存在再调），两处语义不一致，于是"省略 meta"在详情里没事、在卡片上崩。
+ * 现在两边一致：**先判函数是否存在，再调**。
+ *
+ * `title` 仍是必需的 —— 没有标题的卡片没有意义，缺了就该在开发时炸，
+ * 而不是渲染一张空卡。
+ */
 export function cardGrid(rows, cfg) {
   if (!rows.length) return `<p class="empty">${L('ui.noData')}</p>`;
   const cards = rows
     .map((r, i) => {
+      const value = cfg.value ? cfg.value(r) : '';
+      const meta = cfg.meta ? cfg.meta(r) : '';
       return (
         `<button class="card" type="button" data-card="${i}">` +
         `<span class="card-rank">${rankBadge(r.__rank ?? i + 1)}</span>` +
         `<span class="card-main">` +
         `<span class="card-title">${cfg.title(r)}</span>` +
-        (cfg.value(r) ? `<span class="card-value">${cfg.value(r)}</span>` : '') +
+        (value ? `<span class="card-value">${value}</span>` : '') +
         `</span>` +
-        (cfg.meta(r) ? `<span class="card-meta">${cfg.meta(r)}</span>` : '') +
+        (meta ? `<span class="card-meta">${meta}</span>` : '') +
         `</button>`
       );
     })
@@ -2005,6 +2020,9 @@ async function loadOrBenchmarks(view = 'intelligence') {
       card: {
         title: (r) => esc(r.name),
         value: (r) => `<span class="v-num">${num(r.score, 1)}</span> <span class="v-unit">${L('col.score')}</span>`,
+        // 这一榜只有"名字 + 分数"两个字段（AA 的原始数据里没有机构/日期），
+        // 所以没有可当标签的东西 —— 显式给空串，而不是省略（见 cardGrid 的说明）
+        meta: () => '',
         link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
       },
     });
