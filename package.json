@@ -1,0 +1,23 @@
+{
+  "name": "trend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AI 趋势大盘 —— 纯静态站，浏览器直连上游榜单接口，部署在 GitHub Pages",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node web/public/assets/i18n.test.js && node web/public/assets/ui.test.js && node web/public/assets/trend.test.js && node web/public/assets/site.test.js",
+    "test:site": "node web/public/assets/site.test.js",
+    "test:trend": "node web/public/assets/trend.test.js",
+    "test:ui": "node web/public/assets/ui.test.js",
+    "test:i18n": "node web/public/assets/i18n.test.js",
+    "test:live": "node scripts/live-check.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

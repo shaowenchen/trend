@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BRAND}} · AI 趋势大盘</title>
+<meta name="description" content="AI 趋势大盘：模型趋势榜、社区热榜、下载榜、开源模型评测榜与编程能力榜。">
+<base href="./">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">{{BRAND}}</a>
+    <nav class="site-nav">
+      <a href="index.html">首页</a>
+      <a href="en/trend.html" hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero hero-compact">
+    <h1>AI 趋势大盘</h1>
+    <p>模型趋势、社区热度、开源评测、编程能力。</p>
+    <p class="hero-actions">
+      <button class="btn-sm" type="button" id="refresh">
+        <span class="ic" data-icon="refresh"></span>刷新数据
+      </button>
+      <span class="muted" id="refresh-hint"></span>
+    </p>
+  </section>
+
+  <div id="panels"></div>
+
+  <section class="note">
+    <p class="muted">榜单的排序与口径以各来源方为准；评测榜的数据集最后更新于 2025-03。</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{{BRAND}} · 数据来源：HuggingFace · GitHub · models.dev</p>
+  </div>
+</footer>
+
+<script src="assets/trend.js" type="module"></script>
+<script src="assets/ui.js" type="module"></script>
+</body>
+</html>

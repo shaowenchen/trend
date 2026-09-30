@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BRAND}} · AI 趋势大盘</title>
+<meta name="description" content="{{BRAND}} 是一个 AI 趋势大盘：把各家平台的模型榜单与开源生态热度收进一个页面。">
+<!--
+  这个页面是**手写静态页**，由 GitHub Pages 直接发出，没有任何服务端。
+  因此这里刻意**没有** canonical / og:url / GTM / AdSense / 站长验证这些需要
+  按部署地址生成的标记 —— 它们原本由 aibox 的服务端按环境变量注入（见 docs/deploy.md）。
+
+  路径全部是**相对路径**（`site.css` 而不是 `/site.css`）：站点既可能挂在
+  `https://<用户名>.github.io/<仓库>/` 下，也可能挂在自定义域名的根下，
+  相对路径两种都能用，不需要任何 BASE_PATH 配置，也就不存在"换个域名整站白屏"。
+  下面这行 base 标签把这些相对路径钉在**本文件所在目录**上，与访问地址怎么写无关
+  （少了它，`/trend.html` 与 `/trend.html/` 这类地址会解析到不同的目录）。
+-->
+<base href="./">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">{{BRAND}}</a>
+    <nav class="site-nav">
+      <a href="trend.html">趋势大盘</a>
+      <a href="en/" hreflang="en" lang="en">English</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>AI 趋势大盘</h1>
+    <p>把各家平台的 AI 榜单收进一个页面：模型趋势、社区热度、开源评测、编程能力。</p>
+    <p class="cta"><a class="btn" href="trend.html">进入趋势大盘 →</a></p>
+  </section>
+
+  <section class="grid-3">
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="trending"><span class="sr-only">趋势与热度</span></span>模型榜单</h2>
+      <p>HuggingFace 上正在流行的、最受喜欢的、下载最多的模型。</p>
+    </div>
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="trophy"><span class="sr-only">评测成绩</span></span>评测成绩</h2>
+      <p>开源模型的公开评测分数：IFEval、BBH、MATH、GPQA、MMLU-PRO。</p>
+    </div>
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="code"><span class="sr-only">编程能力</span></span>编程能力</h2>
+      <p>Aider Polyglot 榜与 SWE-bench：模型在真实代码任务上的通过率。</p>
+    </div>
+  </section>
+
+  <section class="note">
+    <p class="muted">榜单的排序与口径以各来源方为准。</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{{BRAND}} · 数据来源：HuggingFace · GitHub · models.dev</p>
+  </div>
+</footer>
+
+<script src="assets/ui.js" type="module"></script>
+</body>
+</html>

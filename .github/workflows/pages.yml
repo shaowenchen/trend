@@ -1,0 +1,67 @@
+# 部署到 GitHub Pages
+#
+# 为什么用 Actions 而不是"从分支直接发布（Deploy from a branch）"：
+#   本站的页面里有 `{{BRAND}}` 占位符，必须**先构建**再发布（把占位符落成真值、
+#   把 `web/public/assets/*.test.js` 挡在发布物之外）。分支直发没有构建这一步，
+#   会把带占位符的源码页直接发出去 —— 访客看到的就是字面的 `{{BRAND}}`。
+#
+# 发布物是 `dist/`（由 scripts/build-site.mjs 生成），不是仓库根目录 ——
+# 所以 `.github/`、`docs/`、测试文件都不会被发布。
+#
+# ── 首次部署前必须做一次设置 ──
+# 仓库 Settings → Pages → Build and deployment → Source 选 **GitHub Actions**。
+# 选错了（比如留在 "Deploy from a branch"）这个工作流会在 deploy 步骤报错，
+# 而不是静默失败。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+# GITHUB_TOKEN 的最小权限：读仓库内容，写 Pages，拿 OIDC 令牌换部署地址
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时刻只允许一个部署；排队中的旧任务取消掉（推三次不该部署三遍）
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 站点零依赖（无 npm 包），但这个仓库有两种跑法，先显式声明版本。
+      # Node 20 起自带 `fs.cp` / 顶层 await / `node:test`，够用。
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 测试放在构建**之前**：门禁没过就不该产出发布物
+      # （site.test.js 会检查占位符、资源引用、语言串页等静态站最容易出的问题）
+      - name: 跑测试（含站点门禁）
+        run: npm test
+
+      - name: 构建 dist/
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

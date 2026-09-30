@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BRAND}} · AI Trend Board</title>
+<meta name="description" content="{{BRAND}} is an AI trend board: model charts, community heat, open-model evaluation scores and coding benchmarks in one page.">
+<!--
+  English page. Same notes as the Chinese one: hand-written static file served
+  straight by GitHub Pages, relative paths only, `<base href="./">` pins them to
+  this directory. The brand is a `{{BRAND}}` placeholder resolved at build time.
+-->
+<base href="./">
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">{{BRAND}}</a>
+    <nav class="site-nav">
+      <a href="trend.html">Trend board</a>
+      <a href="../" hreflang="zh-CN" lang="zh-CN">中文</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>AI Trend Board</h1>
+    <p>Model momentum, community heat, open-model scores, coding ability — in one page.</p>
+    <p class="cta"><a class="btn" href="trend.html">Open the trend board →</a></p>
+  </section>
+
+  <section class="grid-3">
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="trending"><span class="sr-only">Model charts</span></span>Model charts</h2>
+      <p>The models trending, most-liked and most-downloaded on HuggingFace.</p>
+    </div>
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="trophy"><span class="sr-only">Evaluation scores</span></span>Evaluation scores</h2>
+      <p>Public benchmark scores for open models: IFEval, BBH, MATH, GPQA, MMLU-PRO.</p>
+    </div>
+    <div class="card-sm">
+      <h2><span class="ic" data-icon="code"><span class="sr-only">Coding ability</span></span>Coding ability</h2>
+      <p>Aider Polyglot and SWE-bench: how models do on real code tasks.</p>
+    </div>
+  </section>
+
+  <section class="note">
+    <p class="muted">Rankings and methodology are the source providers’.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{{BRAND}} · Sources: HuggingFace · GitHub · models.dev</p>
+  </div>
+</footer>
+
+<script src="../assets/ui.js" type="module"></script>
+</body>
+</html>

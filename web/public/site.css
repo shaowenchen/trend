@@ -1,0 +1,843 @@
+/* trend 趋势站样式（自 aibox 移植）
+ *
+ * 只有一个页面类型（数据面板），所以刻意保持小：主题变量 + 布局 + 面板 + 表格 + 几处特例。
+ * 零依赖、无构建步骤 —— 与站点整体取向一致。
+ *
+ * ── 主题为什么只跟随系统（2026-09-23 起的既有决定）──
+ * 这里原来是"跟随系统 / 亮 / 暗"三态 + 页头一个切换按钮，需要一段内联脚本
+ * 在 `</head>` 之前写 `data-theme`（晚了就会闪白）。那个按钮被去掉了，
+ * 于是配色只由 `prefers-color-scheme` 决定：**无需 JS 参与，浏览器在首次绘制前
+ * 就定好了配色**，既没有闪烁，也不需要在 head 里插一段必须抢在绘制前跑的脚本。
+ *
+ * ── 颜色为什么要两套完整定义，而不是一套加滤镜 ──
+ * 靠 `filter: invert()` 反色会把上游卡片里的颜色、徽标、图片一起反掉，
+ * 也会让"已访问链接"的紫与正文糊在一起。这里是显式重定义语义变量。
+ */
+
+:root {
+  --ink: #18181b;
+  --muted: #71717a;
+  --line: #e4e4e7;
+  --bg: #fafafa;
+  --surface: #fff;
+  --accent: #4f46e5;
+  --accent-2: #7c3aed;
+  --accent-soft: #eef2ff;
+  --ok: #15803d;
+  --warn: #b45309;
+  --err: #b91c1c;
+  --gold: #d97706;
+  --silver: #64748b;
+  --bronze: #92400e;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(0, 0, 0, .05);
+  --skeleton: linear-gradient(90deg, #ececef 25%, #f5f5f7 50%, #ececef 75%);
+  /* 让原生控件（滚动条、表单、时间选择器）跟随主题 */
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --ink: #f4f4f5;
+  --muted: #a1a1aa;
+  --line: #2e2e33;
+  --bg: #101012;
+  --surface: #1a1a1e;
+  --accent: #a5b4fc;
+  --accent-2: #c4b5fd;
+  --accent-soft: #23233a;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --err: #f87171;
+  --gold: #fbbf24;
+  --silver: #94a3b8;
+  --bronze: #d97706;
+  --shadow: none;
+  --skeleton: linear-gradient(90deg, #232327 25%, #2c2c31 50%, #232327 75%);
+  color-scheme: dark;
+}
+
+/* 跟随系统（用户没手动选过时生效） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ink: #f4f4f5;
+    --muted: #a1a1aa;
+    --line: #2e2e33;
+    --bg: #101012;
+    --surface: #1a1a1e;
+    --accent: #a5b4fc;
+    --accent-2: #c4b5fd;
+    --accent-soft: #23233a;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --gold: #fbbf24;
+    --silver: #94a3b8;
+    --bronze: #d97706;
+    --shadow: none;
+    --skeleton: linear-gradient(90deg, #232327 25%, #2c2c31 50%, #232327 75%);
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* 图标兜底尺寸。
+ * icon() 产出的 svg 只有 viewBox、**不带 width/height**，所以在任何没有显式限尺的
+ * 上下文里都会退回默认的 300×150 —— 页面上表现为一个巨大的图形。
+ * 这条给所有图标一个合理默认；各处再用更具体的选择器覆盖成需要的尺寸。
+ * （2026-09-23：首页三卡的图标就踩了这个坑 —— 容器是 inline 元素，
+ *   宽高设了却不生效，于是 svg 撑成 300×150。） */
+svg {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -0.15em; /* 让图标与相邻文字在视觉基线上对齐 */
+}
+
+/* 小字号上下文里的图标显式给尺寸 —— 那里 1.15em 只有 13px 左右，
+ * 会显得比周围文字还轻，看不出是个图标。 */
+th svg,
+.tag svg,
+.rank svg { width: 12px; height: 12px; }
+
+html {
+  /* 手机上横屏时有安全区（刘海/圆角），留出内边距 */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.7 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* 主题切换时给一个短过渡，避免生硬跳变；reduced-motion 下会被关掉（见文末） */
+  transition: background-color .18s ease, color .18s ease;
+}
+
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
+}
+
+/* 视觉隐藏但可被读屏器读到（图标按钮的文本标签用它） */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------- 页头 / 页脚 ---------------- */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* 移动端滚动时不要连页头一起弹跳 */
+  transition: background-color .18s ease, border-color .18s ease;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 58px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -.2px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.site-nav a:hover { color: var(--ink); background: var(--bg); }
+.site-nav a.active { color: var(--ink); font-weight: 600; }
+
+/* 图标按钮（主题切换 / 刷新）：★ 触控目标不小于 44×44，手机上好点 */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.icon-btn:hover { color: var(--ink); border-color: var(--muted); background: var(--bg); }
+.icon-btn:active { transform: scale(.96); }
+.icon-btn svg { width: 19px; height: 19px; display: block; }
+/* 键盘可达性：只在键盘聚焦时显示焦点环 */
+.icon-btn:focus-visible,
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.site-footer {
+  margin-top: 56px;
+  padding: 26px 0 calc(40px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.site-footer p { margin: 4px 0; }
+
+/* ---------------- 首屏 ---------------- */
+
+.hero { padding: 48px 0 40px; text-align: center; }
+.hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(26px, 5vw, 34px); /* 窄屏自动收小，不用写断点 */
+  line-height: 1.25;
+  letter-spacing: -.6px;
+}
+.hero p { margin: 0 auto; max-width: 620px; color: var(--muted); }
+.hero-compact { text-align: left; padding: 34px 0 26px; }
+.hero-compact h1 { font-size: clamp(22px, 4.5vw, 27px); }
+.hero-compact p { margin: 0; }
+.cta { margin-top: 22px !important; }
+
+.btn {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  text-decoration: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.btn:hover { opacity: .92; }
+
+/* ---------------- 入口页三卡 ---------------- */
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 16px;
+  margin: 8px 0 30px;
+}
+
+.card-sm {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.card-sm h2 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.card-sm p { margin: 0; color: var(--muted); font-size: 14px; }
+.card-sm .ic {
+  color: var(--accent);
+  width: 18px;
+  height: 18px;
+  flex: none;
+  /* ★ 必须让它成为一个可设宽高的盒子：inline 元素上的 width/height 不生效，
+   * 于是里面的 svg 会按默认 300×150 渲染。 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-sm .ic > svg { width: 100%; height: 100%; }
+
+/* ---------------- 面板 ---------------- */
+
+#panels { display: flex; flex-direction: column; gap: 22px; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-head { padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
+.panel-head h2 {
+  margin: 0;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* 面板图标：SVG 而非 emoji（emoji 在 Windows/Android/iOS 上长得完全不同，
+ * 对"全端一致"来说是缺陷）。图标用 currentColor，自动跟随主题。 */
+.panel-icon {
+  color: var(--accent);
+  width: 19px;
+  height: 19px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.panel-icon svg { width: 100%; height: 100%; display: block; }
+.panel-hint { margin: 5px 0 0; font-size: 12.5px; color: var(--muted); }
+
+.panel-status {
+  margin: 0;
+  padding: 11px 20px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-status[hidden] { display: none; }
+.panel-status.ok { color: var(--ok); }
+.panel-status.warn { color: var(--warn); }
+.panel-status.err { color: var(--err); }
+/* 加载中：状态行前加一个旋转的圈，比纯文字更能说明"还在动" */
+.panel-status.loading::before {
+  content: '';
+  width: 12px; height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  flex: none;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------------- 表格（★ 全端适配的重点）----------------
+ * 评测榜有 9 列。窄屏下的做法不是把列压扁（数字会看不清），而是：
+ *   1. 允许横向滚动，2. **首列（模型名）与表头粘住** —— 否则向右滚两屏后
+ *   就不知道自己在看哪个模型了。这是移动端读多列表格的关键。
+ *   3. 窄屏收起次要列（`.col-2`，见文末断点），因为横向滚动手势
+ *   与页面纵向滚动在手机上体验割裂。
+ */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain; /* 滚到表尾不要把整个页面也带着动 */
+}
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+
+th, td {
+  padding: 9px 14px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 3;
+}
+
+/* 首列粘在左侧（含表头那一格，所以要更高的 z） */
+th:first-child, td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  z-index: 2;
+}
+th:first-child { z-index: 4; }
+/* 粘性首列右边加一条分隔阴影，滚动时能看出"这一列是浮在上面的" */
+td:first-child, th:first-child { box-shadow: 1px 0 0 var(--line); }
+
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:hover td { background: var(--bg); }
+tbody tr:hover td:first-child { background: var(--bg); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* 名次徽章：前三名用奖牌色，其余是普通序号 */
+.rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--bg);
+  color: var(--muted);
+}
+.rank.r1 { background: var(--gold); color: #1c1917; }
+.rank.r2 { background: var(--silver); color: #f8fafc; }
+.rank.r3 { background: var(--bronze); color: #fff7ed; }
+
+/* 迷你条形图：直观看出彼此差距。宽度相对**当前显示的这批行的最大值**，
+ * 所以它表达的是"相对高低"，不是一个绝对的分数刻度（这点在 README 里说明）。 */
+.bar {
+  display: inline-block;
+  vertical-align: middle;
+  width: 54px;
+  height: 6px;
+  margin-right: 7px;
+  border-radius: 3px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.bar > i {
+  display: block;
+  height: 100%;
+  width: var(--w, 0%);
+  border-radius: 3px;
+  background: var(--accent);
+  /* 入场时从 0 长到目标宽度，让"比较"这件事被看见 */
+  animation: grow .5s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes grow { from { width: 0; } to { width: var(--w, 0%); } }
+
+/* 任务标签 */
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 99px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* 方向箭头：涨/跌用颜色 + 图形双通道表达（不靠颜色单独承载信息，色盲可用） */
+.delta { font-size: 12px; margin-left: 5px; }
+.delta.up { color: var(--ok); }
+.delta.down { color: var(--err); }
+
+.empty { padding: 18px 20px; color: var(--muted); font-size: 14px; margin: 0; }
+
+/* 骨架屏：加载期间先铺几行灰条，让人知道"这里将会有内容"以及大致结构 */
+.skeleton { padding: 6px 0; }
+.skeleton span {
+  display: block;
+  height: 13px;
+  margin: 12px 20px;
+  border-radius: 6px;
+  background: var(--skeleton);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ---------------- 说明段 ---------------- */
+
+.note {
+  margin-top: 36px;
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.note h2 { margin: 0 0 10px; font-size: 16px; }
+.note p { margin: 8px 0 0; font-size: 14px; }
+
+/* ---------------- 广告与同意横幅：已删除 ----------------
+ * 这一版把 AdSense 与统计（GTM/GA4）整套去掉了，所以 `.ad*` 与 `#consent*`
+ * 的样式也一并删掉 —— 页面里已经没有任何元素带这些类名。
+ * 留一条说明而不是静默删干净，是为了让"样式去哪了"这个问题有答案：
+ * 它们不是丢了，是随功能一起移除的（原实现在 aibox 仓库的 site.css 里）。
+ */
+
+/* ==================================================================
+ * 全端适配：断点
+ * ================================================================== */
+
+/* 平板/小笔记本：把评测榜的次要列收起来，优先保证"模型名 + 平均分"可读 */
+@media (max-width: 860px) {
+  .col-2 { display: none; }
+}
+
+/* 手机：进一步收列，并把内边距收紧（窄屏上 20px 的留白占比太高） */
+@media (max-width: 560px) {
+  .wrap { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+  .header-inner { height: 54px; }
+  .brand { font-size: 16px; }
+  .site-nav { gap: 2px; font-size: 13.5px; }
+  .site-nav a { padding: 8px 8px; }
+  th, td { padding: 8px 11px; font-size: 12.5px; }
+  .bar { width: 34px; }
+  .hero { padding: 32px 0 26px; }
+  .note { padding: 18px 16px; }
+  .panel-head, .panel-status { padding-left: 14px; padding-right: 14px; }
+  .skeleton span { margin-left: 14px; margin-right: 14px; }
+}
+
+/* 触屏设备：hover 效果没有意义，还会"粘住"（点一下后样式一直留着） */
+@media (hover: none) {
+  tbody tr:hover td { background: transparent; }
+  tbody tr:hover td:first-child { background: var(--surface); }
+  .icon-btn:hover { color: var(--muted); border-color: var(--line); background: transparent; }
+  .site-nav a:hover { color: var(--muted); background: transparent; }
+}
+
+/* ★ 尊重系统的"减弱动态效果"设置。
+ * 这不是可选项：前庭功能敏感的用户会因为持续动画而眩晕/恶心。
+ * 一个到处都在动的趋势页，对他们是不可用，而不是不好看。 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  /* 条形图不再"长大"，直接显示最终宽度 */
+  .bar > i { width: var(--w, 0%); }
+}
+
+/* 打印：去掉装饰与粘性定位，只留数据 */
+@media print {
+  .site-header, .site-footer, .ad, .icon-btn { display: none; }
+  .panel { break-inside: avoid; box-shadow: none; }
+  th, td { position: static !important; }
+}
+
+/* ---------------- 首屏动作区（刷新按钮） ---------------- */
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px !important;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 9px 16px;
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 小号动作按钮（首屏的"刷新数据"）。
+ * 它是个次要动作，不该和主标题抢视线 —— 尺寸收到接近正文，
+ * 但仍保留 40px 的最小触控高度（手机上仍然好点）。 */
+.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  min-height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.btn-sm:hover { color: var(--ink); border-color: var(--muted); background: var(--surface); }
+.btn-sm:disabled { opacity: .55; cursor: default; }
+.btn-sm:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-sm .ic { display: inline-flex; color: currentColor; }
+.btn-sm .ic svg { width: 14px; height: 14px; display: block; }
+/* 刷新中让图标转起来，给一个"正在做事"的反馈 */
+.btn-sm:disabled .ic svg { animation: spin .8s linear infinite; }
+.btn-ghost:hover { border-color: var(--muted); background: var(--surface); }
+.btn-ghost:disabled { opacity: .55; cursor: default; }
+.btn-ghost .ic { display: inline-flex; color: var(--accent); }
+.btn-ghost .ic svg { width: 16px; height: 16px; display: block; }
+/* 刷新中让图标转起来，给一个"正在做事"的反馈 */
+.btn-ghost:disabled .ic svg { animation: spin .8s linear infinite; }
+
+/* ---------------- 面板内的切换片（GitHub 时间段 / 加载按钮） ---------------- */
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chip {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 13px;
+  min-height: 36px;
+  border-radius: 99px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.chip:hover { color: var(--ink); border-color: var(--muted); }
+.chip.on { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .chips { padding: 10px 14px; }
+}
+
+/* 触屏设备：chip 的 hover 同样会"粘住"，去掉 */
+@media (hover: none) {
+  .chip:hover { color: var(--muted); border-color: var(--line); }
+}
+
+/* ---------------- 过滤 / 排序（mountBoard 注入的控件） ---------------- */
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.controls input[type='search'],
+.controls select {
+  font: 13.5px/1.5 inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 8px 11px;
+  min-height: 38px;
+}
+.controls input[type='search'] { flex: 1 1 200px; min-width: 0; }
+.controls select { flex: 0 1 auto; max-width: 220px; }
+.controls input:focus,
+.controls select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+/* 原生 search 的清除按钮在暗色下会变成一个看不清的小黑叉 */
+.controls input[type='search']::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.board-count {
+  margin: 0;
+  padding: 8px 20px;
+  font-size: 12.5px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+
+/* 可排序表头：给出"这里能点"的视觉与光标提示 */
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--ink); }
+th.sorted { color: var(--accent); }
+th.sortable:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* 排序箭头用文字 ▲▼（在 td/th 的 nowrap 里不会换行） */
+th.sorted::after { content: ''; }
+
+@media (max-width: 560px) {
+  .controls { padding: 10px 14px; }
+  .controls input[type='search'] { flex: 1 1 100%; }
+  .controls select { max-width: none; width: 100%; }
+  .board-count { padding: 8px 14px; }
+}
+
+/* 触屏：表头 hover 无意义（但仍保留可点，因为点击排序在触屏上是有用的） */
+@media (hover: none) {
+  th.sortable:hover { color: var(--muted); }
+}
+
+/* ==================================================================
+ * 卡片（前 10 个）
+ * ==================================================================
+ * 布局用 grid 而非 flex：卡片内部是两层（名次 + 标题/分值，下面是标签），
+ * 用 flex 行会把右侧标签挤成一条窄柱 —— 两个标签就吃掉四成宽度。
+ */
+
+.cards {
+  display: grid;
+  /* 手机 1 列 → 平板 2 列 → 桌面 3 列。上限 3 列是刻意的：
+   * 再宽每张只剩名字，而"榜"的价值在于能横向比较前几名。 */
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'rank title'
+    'rank value'
+    'meta meta';
+  column-gap: 10px;
+  row-gap: 4px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 14px 11px;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.card:hover { border-color: var(--accent); background: var(--surface); }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.card-rank { grid-area: rank; display: inline-flex; }
+.card .rank { margin-top: 1px; }
+
+/* 中间层的两个 span 直接落到 grid 区域，不额外包一层盒子 */
+.card-main { display: contents; }
+
+.card-title {
+  grid-area: title;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.35;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-value {
+  grid-area: value;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.card-value .v-num {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.card-value .v-unit { font-size: 12px; }
+
+/* 标签行：横排在底部、自动换行（原来是右侧竖排窄栏，两个标签就把内容挤扁） */
+.card-meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+  min-width: 0;
+}
+.card-meta .tag { display: inline-flex; align-items: center; gap: 4px; }
+.card-meta .tag svg { width: 11px; height: 11px; }
+
+.cards-more {
+  margin: 0;
+  padding: 0 20px 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------------- 完整列表的折叠区 ---------------- */
+
+.more { border-top: 1px solid var(--line); }
+.more > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  font-size: 13.5px;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+.more > summary::-webkit-details-marker { display: none; }
+/* 用 CSS 画三角，不依赖某个字体的 "▸" 字形（各平台长得不一样） */
+.more > summary::before {
+  content: '';
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform .15s ease;
+}
+.more[open] > summary::before { transform: rotate(90deg); }
+.more > summary:hover { color: var(--ink); }
+.more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* ---------------- 详情层 ---------------- */
+
+.detail {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(80vh, 640px);
+  padding: 22px 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+  /* 面板内表格可横向滚，但详情本身不该被撑宽 */
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.detail::backdrop { background: rgba(0, 0, 0, .45); backdrop-filter: blur(1.5px); }
+.detail h2 {
+  margin: 0 30px 6px 0; /* 右边给关闭按钮留位 */
+  font-size: 18px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.detail-meta { margin: 0 0 14px; display: flex; gap: 6px; flex-wrap: wrap; }
+.detail-close-wrap { position: absolute; top: 14px; right: 14px; margin: 0; }
+.detail-close { width: 36px; height: 36px; }
+.detail-close svg { width: 16px; height: 16px; }
+
+.detail-list { margin: 0; }
+.detail-row {
+  display: flex;
+  gap: 14px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.detail-row:first-child { border-top: 0; }
+.detail-row dt { flex: none; width: 88px; color: var(--muted); font-size: 13px; }
+.detail-row dd {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+.detail-row dd .bar { margin-right: 6px; }
+
+.detail-link { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; }
+
+@media (max-width: 560px) {
+  .cards { padding: 12px 14px; gap: 9px; }
+  .cards-more, .more > summary { padding-left: 14px; padding-right: 14px; }
+  .detail { width: 100vw; max-width: 100vw; max-height: 88vh; margin: 0; border-radius: 16px 16px 0 0; align-self: flex-end; }
+  .detail-row dd { text-align: left; }
+  .detail-row { flex-direction: column; gap: 3px; }
+}
