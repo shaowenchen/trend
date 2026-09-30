@@ -11,7 +11,7 @@
  *   · 仓库里的 `web/public/*.html` 可以带占位符；
  *   · **发布出去的 HTML 里绝不能有**（`web/public/assets/site.test.js` 有一道门禁盯着）。
  */
-export const BRAND = 'trend';
+export const BRAND = 'Trend';
 
 /**
  * 手写静态页里写品牌名的方式：`{{BRAND}}`，由 `scripts/build-site.mjs` 替换。

@@ -156,21 +156,15 @@ const panelsRoot = typeof document === 'undefined' ? null : document.querySelect
  * 每个面板有自己的一页（`trending.html`、`eval.html`…），页面用
  * `<div id="panels" data-board="trending">` 声明自己要跑哪一个。
  * 所以这些 id 同时是三样东西：DOM 契约、页面文件名、导航链接的目标。
- * 改 id = 改地址，必须与 `SITE_FILES` 和导航一起改（`site.test.js` 盯着）。
+ * 改 id = 改地址，必须与发布集合和页头导航一起改（`site.test.js` 盯着）。
+ *
+ * 真值住在 `src/site/boards.js`：那三个消费者里有两个（构建脚本与站点测试）
+ * 在 Node 下运行，而本文件顶层会发请求，构建期 import 它并不合适。
+ * 这里再导出一次，是为了让运行时与测试继续从同一个地方取（也免得
+ * `./trend.js` 的既有引用者改 import）。
  */
-export const BOARD_IDS = [
-  'trending',
-  'liked',
-  'downloaded',
-  'eval',
-  'aider',
-  'spaces',
-  'datasets',
-  'papers',
-  'repos',
-  'newmodels',
-  'swebench',
-];
+export { BOARD_IDS } from '../../../src/site/boards.js';
+import { BOARD_IDS } from '../../../src/site/boards.js';
 
 /**
  * 本页要跑哪个面板：`data-board` 指名的那一个；**没写就是全部**。

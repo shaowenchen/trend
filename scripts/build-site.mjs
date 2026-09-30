@@ -37,30 +37,20 @@ import { fileURLToPath } from 'node:url';
 
 import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/brand.js';
 import { injectGtm } from '../src/site/gtm.js';
+import { BOARD_IDS } from '../src/site/boards.js';
+import { injectNav, NAV_PLACEHOLDER } from '../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
  * 发布集合 —— **白名单**，相对 `web/public/`。
  *
- * 面板页是"一个面板一页"：每个 `assets/trend.js` 里 `BOARD_IDS` 列出的 id
+ * 面板页是"一个面板一页"：每个 `src/site/boards.js` 里 `BOARD_IDS` 列出的 id
  * 对应一个中文页与一个 `en/` 下的英文页。这份清单必须与它**完全对齐** ——
  * 少登记一页，那一页本地能点、线上 404；多登记一个不存在的 id，构建会因为
  * 读不到文件而失败（`site.test.js` 另有一条断言比对两者）。
  */
-const BOARD_PAGES = [
-  'trending',
-  'liked',
-  'downloaded',
-  'eval',
-  'aider',
-  'spaces',
-  'datasets',
-  'papers',
-  'repos',
-  'newmodels',
-  'swebench',
-];
+const BOARD_PAGES = BOARD_IDS;
 
 export const SITE_FILES = [
   'index.html',
@@ -176,7 +166,14 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
   const files = {};
   for (const rel of SITE_FILES) {
     const buf = await fs.readFile(path.join(srcDir, rel), 'utf8');
-    files[rel] = injectGtm(injectBrand(buf, BRAND));
+    // 页头导航按文件的语言、层级与所属榜单落值：中文页在根、英文页在 `en/` 下，
+    // 于是同一份导航要落成两套相对路径；而语言切换要指向**对应的那一页**，
+    // 所以还要知道本页是哪个榜单（首页为 null）。见 `src/site/nav.js`。
+    const isEn = rel === 'en/index.html' || rel.startsWith('en/');
+    const id = path.basename(rel, '.html');
+    const boardId = id === 'index' ? null : id;
+    const nav = injectNav(buf, isEn ? 'en' : 'zh', isEn ? '../' : '', BRAND, boardId);
+    files[rel] = injectGtm(injectBrand(nav, BRAND));
   }
 
   const problems = [];

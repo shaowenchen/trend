@@ -171,25 +171,31 @@ await test('每个页面都用 <base href="./"> 把相对路径钉在自己的�
 
 /* ---------------- 5. 品牌名唯一来源 ---------------- */
 
-await test('★ 页面里不写死品牌名，一律用 {{BRAND}} 占位', async () => {
+/**
+ * 品牌名与页头导航都是**构建期**落值的，所以这两条断言看的是**发布物**
+ * （`distRead`），不是源页面 —— 源页面里现在只有 `{{SITE_NAV}}`，
+ * 对着它断言等于在问"生成器之外的另一个副本对不对"，而那正是要消灭的东西。
+ */
+await test('★ 发布物的品牌位与标题都不是写死的，来自 {{BRAND}} 与构建期导航', async () => {
   for (const rel of ALL_PAGES) {
-    const html = await read(rel);
-    // 页面上应当**有**占位符：构建期才落成真值，这里写死就等于多了一份来源
-    assert.match(html, /\{\{BRAND\}\}/, `${rel} 没有 {{BRAND}} 占位符`);
+    const src = await read(rel);
+    // 源页面里应当**有**占位符：写死品牌名就等于多了一份来源。
+    assert.match(src, /\{\{BRAND\}\}/, `${rel} 源页面没有 {{BRAND}} 占位符`);
+    assert.match(src, /\{\{SITE_NAV\}\}/, `${rel} 源页面没有 {{SITE_NAV}} 占位符`);
 
-    // 只看**品牌出现的位置** —— `<a class="brand">` 与 <title>。
-    // 为什么不扫全页文本：本站的品牌名是 `trend`，而 "trend" 本身是个正常的英文词
-    // （英文首页的 "Open the trend board" 就是正文），全页扫描会一直误报，
-    // 而误报会训练人忽略门禁。要盯的风险是"有人把品牌名另行写死在页头/标题里"，
-    // 这两个位置正好覆盖它。
-    const spots = [
-      ...html.matchAll(/<a[^>]*class="brand"[^>]*>([\s\S]*?)<\/a>/g),
-      ...html.matchAll(/<title>([\s\S]*?)<\/title>/g),
-    ];
-    assert.ok(spots.length >= 2, `${rel} 没找到页头品牌位与标题`);
-    for (const m of spots) {
-      assert.match(m[1], /\{\{BRAND\}\}/, `${rel} 的品牌位写死了：${m[1].trim().slice(0, 60)}`);
-    }
+    // 发布物里品牌必须已经落成真值。页头品牌位就是品牌名本身。
+    //
+    // <title> 只查"含品牌、且没有残留占位符" —— 品牌在标题里的位置本来
+    // 就因页而异（首页是「Trend · AI 趋势大盘」，面板页是「热门模型 · Trend」），
+    // 规定一个位置等于把排版钉死，而这里要防的是**写死第二份品牌名**。
+    const html = await distRead(rel);
+    const brandSpot = html.match(/<a[^>]*class="brand"[^>]*>([\s\S]*?)<\/a>/)?.[1];
+    assert.equal(brandSpot?.trim(), BRAND, `${rel} 的页头品牌位不对：${String(brandSpot).trim().slice(0, 60)}`);
+
+    const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
+    assert.ok(title, `${rel} 发布物里没有 <title>`);
+    assert.ok(title.includes(BRAND), `${rel} 的标题里没有 ${BRAND}：${title.trim().slice(0, 60)}`);
+    assert.doesNotMatch(title, /\{\{/, `${rel} 的标题里残留占位符：${title.trim().slice(0, 60)}`);
   }
 });
 
@@ -230,9 +236,14 @@ await test('★ <html lang> 与页面语言一致（面板文案按它取字典�
 
 await test('双语互链：每个页面都有指向另一语言的链接', async () => {
   // 首页那一对是目录语义（`en/` 与 `../`）；面板页逐页对应，由上面专门那条盯着。
+  // 链接由构建期生成的页头导航落下，所以看发布物。
   const expect = { 'index.html': 'en/', 'en/index.html': '../' };
   for (const [rel, target] of Object.entries(expect)) {
-    assert.match(await read(rel), new RegExp(`href="${target.replace(/[.]/g, '\\.')}"`), `${rel} 没有指向 ${target}`);
+    assert.match(
+      await distRead(rel),
+      new RegExp(`href="${target.replace(/[.]/g, '\\.')}"`),
+      `${rel} 没有指向 ${target}`
+    );
   }
 });
 
@@ -316,8 +327,8 @@ await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了�
 await test('★ 每个面板页都有指向它自己的英文版 / 中文版', async () => {
   const bad = [];
   for (const id of BOARD_IDS) {
-    if (!(await read(`${id}.html`)).includes(`href="en/${id}.html"`)) bad.push(`${id}.html 没有指向 en/${id}.html`);
-    if (!(await read(`en/${id}.html`)).includes(`href="../${id}.html"`)) bad.push(`en/${id}.html 没有指向 ../${id}.html`);
+    if (!(await distRead(`${id}.html`)).includes(`href="en/${id}.html"`)) bad.push(`${id}.html 没有指向 en/${id}.html`);
+    if (!(await distRead(`en/${id}.html`)).includes(`href="../${id}.html"`)) bad.push(`en/${id}.html 没有指向 ../${id}.html`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
@@ -325,10 +336,41 @@ await test('★ 每个面板页都有指向它自己的英文版 / 中文版', a
 await test('语言切换链接带地球图标，与普通导航项有区分的类名', async () => {
   for (const rel of ALL_PAGES) {
     assert.match(
-      await read(rel),
+      await distRead(rel),
       /<a class="lang"[^>]*>[\s\S]*?data-icon="globe"/,
       `${rel} 的语言切换链接没有 lang 类或地球图标`
     );
+  }
+});
+
+/**
+ * 页头导航是**构建期**从 `BOARD_IDS` 生成的，所以它自己的两条性质要单独盯住：
+ * 每个榜单都要有一个入口（否则那页只能从别处摸到），且语言切换要保持是 `<a>`
+ * —— 它是"另一个地址"，改成按钮就丢掉了可被收藏、可被搜索引擎跟随的语义。
+ */
+await test('★ 页头导航给每个面板都留了入口，且链接与页面文件同名', async () => {
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    const isEn = rel.startsWith('en/');
+    const prefix = isEn ? '../' : '';
+    for (const id of BOARD_IDS) {
+      if (!html.includes(`href="${prefix}${id}.html"`)) bad.push(`${rel} 缺 ${prefix}${id}.html 的入口`);
+    }
+    // 下拉里的入口数应当正好等于面板数，多一个就是有人手写了一条。
+    // 计的是 <li> 项而不是 <a>：当前页那一项带 aria-current，属性不止 href。
+    const menu = html.match(/<ul class="nav-boards-menu">([\s\S]*?)<\/ul>/)?.[1] ?? '';
+    const count = [...menu.matchAll(/<li><a href="[^"]+"[^>]*>/g)].length;
+    if (count !== BOARD_IDS.length) bad.push(`${rel} 下拉里有 ${count} 个入口，应为 ${BOARD_IDS.length}`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 导航里没有残留的占位符，且语言切换仍是链接', async () => {
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    assert.doesNotMatch(html, /\{\{SITE_NAV\}\}/, `${rel} 的导航占位符没被替换`);
+    assert.match(html, /<a class="lang" href="[^"]+"/, `${rel} 的语言切换不是链接`);
   }
 });
 
