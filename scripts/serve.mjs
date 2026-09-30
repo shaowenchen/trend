@@ -7,14 +7,14 @@
  * 这个脚本 `npm start` 一步到位：构建 → 起服务 → 打印各页地址。
  *
  * ## 为什么强调"模仿 GitHub Pages 的目录语义"
- * 静态站的坑几乎都在路径解析上：`/trend.html/` 这种带尾斜杠的地址、
+ * 静态站的坑几乎都在路径解析上：`/eval.html/` 这种带尾斜杠的地址、
  * 目录下的 `index.html` 回落、相对路径相对谁解析 —— 本地用什么服务器预览，
  * 就该和线上**同一个语义**，否则"本地好好的、线上白屏"这类问题查不出来。
  * 所以这里显式实现了两条：
  *   · 目录请求 → 该目录下的 `index.html`
- *   · 找不到 → 404（附一句人话，说明趋势大盘在哪个地址）
+ *   · 找不到 → 404（附一句人话，说明入口页在哪个地址）
  *
- * 刻意**不**做美化 URL（`/trend` → `trend.html`）：GitHub Pages 不做这件事，
+ * 刻意**不**做美化 URL（`/eval` → `eval.html`）：GitHub Pages 不做这件事，
  * 本地做了就会掩盖"链接写错了但本地能用"的问题。
  */
 import http from 'node:http';
@@ -64,7 +64,7 @@ async function main() {
         `<!doctype html><meta charset="utf-8"><title>404</title>` +
           `<body style="font:15px/1.6 system-ui;padding:40px;max-width:40em">` +
           `<h1 style="font-size:20px">404</h1><p>${msg}</p>` +
-          `<p>趋势大盘在 <a href="/trend.html">/trend.html</a>。</p></body>`
+          `<p>首页在 <a href="/index.html">/index.html</a>，各趋势页都从那里进。</p></body>`
       );
     };
     if (!file) return notFound('这个地址越出了站点根目录。');
@@ -87,8 +87,8 @@ async function main() {
 
   server.listen(port, () => {
     console.log(`\n  本地预览已启动 · http://localhost:${port}`);
-    console.log(`  中文入口  /index.html   · 中文大盘 /trend.html`);
-    console.log(`  英文入口  /en/          · 英文大盘 /en/trend.html`);
+    console.log(`  中文入口  /index.html   · 英文入口 /en/`);
+    console.log(`  趋势页    每个面板一页，例如 /trending.html、/eval.html、/en/swebench.html`);
     console.log(`  （产物在 dist/，共 ${files.length} 个文件；改源码后重新跑 npm start）\n`);
   });
 }

@@ -1,4 +1,4 @@
-/* trend 趋势站样式（自 aibox 移植）
+/* trend 趋势站样式
  *
  * 只有一个页面类型（数据面板），所以刻意保持小：主题变量 + 布局 + 面板 + 表格 + 几处特例。
  * 零依赖、无构建步骤 —— 与站点整体取向一致。
@@ -524,12 +524,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .note h2 { margin: 0 0 10px; font-size: 16px; }
 .note p { margin: 8px 0 0; font-size: 14px; }
 
-/* ---------------- 广告与同意横幅：已删除 ----------------
- * 这一版把 AdSense 与统计（GTM/GA4）整套去掉了，所以 `.ad*` 与 `#consent*`
- * 的样式也一并删掉 —— 页面里已经没有任何元素带这些类名。
- * 留一条说明而不是静默删干净，是为了让"样式去哪了"这个问题有答案：
- * 它们不是丢了，是随功能一起移除的（原实现在 aibox 仓库的 site.css 里）。
- */
+/* ---------------- 广告与同意横幅：没有 ---------------- */
 
 /* ==================================================================
  * 全端适配：断点
@@ -551,9 +546,9 @@ tbody tr:last-child td { border-bottom: 0; }
   .site-nav .lang { margin-left: 8px; padding-left: 10px; gap: 4px; }
   th, td { padding: 8px 11px; font-size: 12.5px; }
   .bar { width: 34px; }
-  .hero { padding: 32px 0 26px; }
   .note { padding: 18px 16px; }
   .panel-head, .panel-status { padding-left: 14px; padding-right: 14px; }
+  .board-links .board-actions { padding-left: 14px; padding-right: 14px; }
   .skeleton span { margin-left: 14px; margin-right: 14px; }
 }
 
@@ -641,6 +636,51 @@ tbody tr:last-child td { border-bottom: 0; }
 .btn-ghost .ic svg { width: 16px; height: 16px; display: block; }
 /* 刷新中让图标转起来，给一个"正在做事"的反馈 */
 .btn-ghost:disabled .ic svg { animation: spin .8s linear infinite; }
+
+/* ---------------- 面板页之间的链接（trend.js 插在 #panels 之后）----------------
+ *
+ * 每个面板一页之后，从"正在流行的模型"去"下载最多的模型"如果没有这条路，
+ * 就得先回首页再点一次。浏览器返回键当然能用，但它不是"逛"。
+ *
+ * 刻意**不放进页头导航**：11 个面板名塞进页头会挤成一坨，而且这一条
+ * 页面内的目录/页脚这类导航不该跟"首页 + 语言切换"抢同一排。
+ */
+.board-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+}
+.board-links a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+.board-links a:hover { color: var(--ink); background: var(--bg); }
+/* 当前页：加边框而不只是变色 —— 只靠颜色区分对色觉障碍的访客等于没标 */
+.board-links a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+  border-color: var(--line);
+  background: var(--bg);
+}
+/* 刷新按钮：与面板间链接同处页脚，但它是"动作"不是"链接"，上面一条分隔线分开 */
+.board-links .board-actions {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
 
 /* ---------------- 面板内的切换片（GitHub 时间段 / 加载按钮） ---------------- */
 

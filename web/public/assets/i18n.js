@@ -13,11 +13,10 @@
  * "这两个地址是同一页的两种语言"（避免被判成重复内容）。
  * 参数命名也用 `?lang=en` 这种形式**不做** —— 那会被当成同一个页面的参数版本。
  *
- * ## 与 aibox 版本的差别
- * aibox 有服务端，页面骨架的文案由服务端按 `<!-- i18n:key -->` 占位替换，
- * 所以英文页的源码里只有英文。本站是纯静态（GitHub Pages），没有这一层，
- * 因此英文页的文案**直接写在英文页面文件里**（两种语言的文案仍然各写各的，
- * 不会把两种语言都塞进同一页再靠 CSS 藏）。字典这里只保留**客户端要用的**键。
+ * ## 页面骨架的文案为什么不进字典
+ * 本站没有服务端，页面骨架的文案**直接写在各自的页面文件里**（两种语言的文案
+ * 各写各的，不会把两种语言都塞进同一页再靠 CSS 藏）。字典这里只保留
+ * **客户端要用的**键。
  *
  * ## 约定
  * - 键用点号分层；两种语言的键**必须完全一致**，缺键会在测试里直接报错。
@@ -29,12 +28,10 @@ export const LOCALES = ['zh', 'en'];
 export const DEFAULT_LOCALE = 'zh';
 
 /**
- * ★ 关于 hreflang：aibox 版本这里还导出一个 `HREFLANG`（zh-CN / en），
- * 由服务端在 `<head>` 里插三行 `rel="alternate"`。**本站没有它**，
+ * ★ 关于 hreflang：本站**没有** hreflang（以及 canonical / og:url），
  * 这是有意去掉的，不是漏了：
  *
- *   hreflang（以及 canonical / og:url）里的地址**必须是绝对 URL**，
- *   而绝对地址只能来自"部署在哪里"。aibox 从环境变量 `PUBLIC_BASE_URL` 拿；
+ *   这些标记里的地址**必须是绝对 URL**，而绝对地址只能来自"部署在哪里"。
  *   本站是纯静态、路径全用相对（见 README「为什么全是相对路径」），
  *   没有任何地方知道站点挂在 `https://<用户名>.github.io/<仓库>/`
  *   还是自定义域名的根下 —— 写死一个就等于把站点钉死在一个地址上。
@@ -124,6 +121,9 @@ const zh = {
   'ui.allProviders': '全部服务商',
   'ui.noData': '没有数据',
   'ui.loading': '加载中…',
+  // 单面板页的页脚导航与刷新按钮（由 trend.js 生成，不写进页面骨架）
+  'ui.boardNav': '切换面板',
+  'ui.refresh': '刷新数据',
   'ui.close': '关闭',
   'ui.openSource': '打开原始页面',
   'ui.sortHint': '点击排序',
@@ -179,12 +179,12 @@ const zh = {
   //   web/public/assets/site.test.js 里加了一条"每个被引用的键都存在"的断言，
   //   这类漏配以后会在本地暴露，而不是等到用户看见英文键名。
   'err.init': '面板初始化失败：{msg}',
+  'err.unknownBoard': '本页面指名了一个不存在的面板：{id}（页面上的 data-board 写错了，或面板 id 改过但导航/白名单没跟着改）',
 
   // ── 这一版删掉的键（留着注释是为了让"原文案去哪了"有答案）──
-  // aibox 里还有 site.* / nav.* / hero.title|sub|refresh|enter / home.* /
-  // footer.sources 等键，它们只服务于**服务端渲染的页面骨架**。
-  // 本站的骨架是手写静态文件（没有服务端注入），所以这些键没有调用方，
-  // 按"字典里不留死键"的既有规矩删掉。
+  // 曾有 site.* / nav.* / hero.title|sub|refresh|enter / home.* / footer.sources
+  // 等键，它们只服务于**页面骨架**。本站的骨架是手写静态文件（没有构建期之外的
+  // 注入层），所以这些键没有调用方，按"字典里不留死键"的既有规矩删掉。
 };
 
 const en = {
@@ -263,6 +263,9 @@ const en = {
   'ui.allProviders': 'All providers',
   'ui.noData': 'No data',
   'ui.loading': 'Loading…',
+  // Footer navigation and refresh button on single-board pages (built by trend.js)
+  'ui.boardNav': 'Switch board',
+  'ui.refresh': 'Refresh',
   'ui.close': 'Close',
   'ui.openSource': 'Open original page',
   'ui.sortHint': 'Click to sort',
@@ -311,6 +314,8 @@ const en = {
   'st.ghLimit': '(GitHub anonymous search is limited to 10 req/min — wait a minute or switch network)',
   'st.retry': ', or click the button below to retry',
   'err.init': 'Panel failed to initialise: {msg}',
+  'err.unknownBoard':
+    'This page names a board that does not exist: {id} (the page\'s data-board is misspelled, or a board id changed without updating the navigation and the build whitelist)',
 };
 
 export const DICT = { zh, en };

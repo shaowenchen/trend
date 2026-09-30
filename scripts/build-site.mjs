@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * 构建：把**该发布的文件**从 `web/public/` 复制到 `dist/`，落掉 `{{BRAND}}` 占位符。
+ * 构建：把**该发布的文件**从 `web/public/` 复制到 `dist/`，落掉 `{{…}}` 占位符。
  *
  * ## 为什么这一步存在（GitHub Pages 明明可以直接发仓库目录）
  * 有两个理由，都不是"想加构建步骤"：
  *
- *  1. **占位符必须落成真值。** 品牌名只有一处来源（`src/site/brand.js`），
- *     页面里写 `{{BRAND}}`。aibox 是在**响应时**由服务端替换的；本站没有服务端，
- *     所以替换挪到构建这一步。发布出去的 HTML 里出现 `{{BRAND}}` 就是缺陷
- *     （访客直接看到这串字面量），构建会为此失败。
+ *  1. **占位符必须落成真值。** 品牌名（`src/site/brand.js`）与 GTM 容器 ID
+ *     （`src/site/gtm.js`）各自只有一处来源，页面里写 `{{BRAND}}` / `{{GTM}}`。
+ *     站点是纯静态的，没有"响应时"，所以替换只能发生在构建这一步。
+ *     发布出去的 HTML 里出现 `{{BRAND}}` 就是缺陷（访客直接看到这串字面量），
+ *     构建会为此失败。
  *
  *  2. **发布集合必须是白名单。** `web/public/assets/` 下同时住着运行时脚本与
  *     `*.test.js`。用"排除"式规则（复制一切、排除测试）的话，将来加一个
@@ -35,19 +36,41 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/brand.js';
+import { injectGtm } from '../src/site/gtm.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** 发布集合 —— **白名单**，相对 `web/public/` */
+/**
+ * 发布集合 —— **白名单**，相对 `web/public/`。
+ *
+ * 面板页是"一个面板一页"：每个 `assets/trend.js` 里 `BOARD_IDS` 列出的 id
+ * 对应一个中文页与一个 `en/` 下的英文页。这份清单必须与它**完全对齐** ——
+ * 少登记一页，那一页本地能点、线上 404；多登记一个不存在的 id，构建会因为
+ * 读不到文件而失败（`site.test.js` 另有一条断言比对两者）。
+ */
+const BOARD_PAGES = [
+  'trending',
+  'liked',
+  'downloaded',
+  'eval',
+  'aider',
+  'spaces',
+  'datasets',
+  'papers',
+  'repos',
+  'newmodels',
+  'swebench',
+];
+
 export const SITE_FILES = [
   'index.html',
-  'trend.html',
   'site.css',
   'en/index.html',
-  'en/trend.html',
   'assets/trend.js',
   'assets/ui.js',
   'assets/i18n.js',
+  ...BOARD_PAGES.map((id) => `${id}.html`),
+  ...BOARD_PAGES.map((id) => `en/${id}.html`),
 ];
 
 /* ================================================================== */
@@ -143,6 +166,9 @@ export function assertSafeOutDir(outDir, repoRoot) {
 
 /**
  * 读发布集合 → 落占位符 → 校验 → 写进 outDir。
+ *
+ * 顺序是 brand 再 gtm：两者互不引用，但 GTM 那一步会校验容器 ID 形状，
+ * 放在后面可以让"品牌名漏替换"这类更常见的问题先报出来。
  * @returns {Promise<{outDir:string, files:string[]}>}
  */
 export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), outDir = path.join(ROOT, 'dist'), repoRoot = ROOT } = {}) {
@@ -150,7 +176,7 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
   const files = {};
   for (const rel of SITE_FILES) {
     const buf = await fs.readFile(path.join(srcDir, rel), 'utf8');
-    files[rel] = injectBrand(buf, BRAND);
+    files[rel] = injectGtm(injectBrand(buf, BRAND));
   }
 
   const problems = [];

@@ -4,21 +4,31 @@
 
 **纯静态站，部署在 GitHub Pages**：没有服务端、没有数据库、没有构建依赖。
 榜单数据由访客的浏览器**直接向上游公开接口**请求。
+对外的第三方请求只有一个：Google Tag Manager（统计）。
 
-> 这个仓库是从内部项目 `aibox`（跑在 Vercel 上）移植来的。
-> 移植时做了三处**有意**的差别，详见下面「与 aibox 的差别」——
-> 它们不是实现上的偷懒，而是"没有服务端"这个前提决定的。
+> 有三处设计是被"没有服务端、不写死域名"这个前提决定的：品牌名与 GTM 容器 ID
+> 的占位符**构建期**才落成真值、页面地址带 `.html` 后缀、
+> canonical / hreflang 这类需要绝对地址的标记一律没有。
+> 见下面「纯静态带来的约束」。
 
 ---
 
 ## 页面
 
+**一个面板一页**：每条趋势（榜单）是一个独立地址，首页每张卡片正好对应一个 ——
+不把十一个面板堆在一页里。
+
 | 地址 | 作用 |
 |---|---|
-| `index.html` | 中文入口页 |
-| `trend.html` | **中文趋势大盘** —— 十一个数据面板 |
-| `en/` | 英文入口页 |
-| `en/trend.html` | 英文趋势大盘 |
+| `index.html` | 中文入口页：十一个面板的入口卡片 |
+| `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
+| `eval.html` `aider.html` | 评测与编程能力榜 |
+| `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
+| `newmodels.html` `swebench.html` | 大体积榜（点击后才拉取） |
+| `en/…` | 以上每一个的英文版，文件名相同 |
+
+导航里**只放首页与语言切换**：十一个面板名塞进页头会挤成一坨。面板之间的互相跳转
+放在每页页脚（`trend.js` 生成，当前页用 `aria-current` 标出）。
 
 站点地址取决于仓库名：项目页是 `https://<用户名>.github.io/<仓库>/`，
 若仓库名就是 `<用户名>.github.io`，则挂在域名根下。
@@ -26,37 +36,45 @@
 
 ## 双语
 
-两种语言是**独立 URL**（`en/` 目录），不是一个切换按钮：
-只有独立地址才能让两种语言各自被搜索引擎收录。导航里互相链接，
-`hreflang` 声明两个地址是同一页的两种语言。
+两种语言是**独立 URL**（`en/` 目录，文件名与中文页相同），不是一个切换按钮：
+只有独立地址才能让两种语言各自被搜索引擎收录，两个版本之间在导航里互相链接。
 
 面板文案只有**一处来源**：`web/public/assets/i18n.js`。
-页面骨架里的固定文案（标题、导航、首屏）是手写的两份 —— 中英文各写各的，
+页面骨架里的固定文案（标题、导航）是手写的两份 —— 中英文各写各的，
 **不会**把两种语言都塞进同一页再靠 CSS 藏起来（那样两种语言都会进索引，还被判重复内容）。
+面板标题也是：它由 `trend.js` 从字典里取，渲染成页面的 `<h1>`，
+所以 22 个页面文件里没有第二份面板名。
 
-> 与 aibox 的差别：aibox 有服务端，页面骨架用 `<!-- i18n:key -->` 占位、
-> 响应时服务端替换，所以英文页的源码里只有英文。本站没有服务端，
-> 骨架文案因此直接写在各自的页面文件里 —— 同样保证"英文页源码里只有英文"，
-> 只是少了一层运行时替换。
+> ★ 刻意**没有** `hreflang`（以及 canonical / og:url）：它们的地址必须是绝对 URL，
+> 而本站不写死域名。代价是中英两页之间没有对搜索引擎的互译声明。
+> 详见 `i18n.js` 顶部。
 >
-> `web/public/assets/i18n.test.js` 有一条断言要求两种语言的键完全一致，
-> `site.test.js` 另有一条要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」）。
+> 页面骨架的文案**不进字典**，因为骨架是手写静态文件、没有构建期之外的注入层；
+> 它由三件事保证不出错：`i18n.test.js` 要求两种语言的键完全一致，
+> `site.test.js` 要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」），
+> 以及两条"英文页里不许有中文 / 中文页里不许有整句英文"的断言。
 
 ## 十一个面板
 
-| 面板 | 来源 | 口径 |
-|---|---|---|
-| 正在流行的模型 | HuggingFace Models API | `sort=trendingScore` |
-| 最受喜欢的模型 | 同上 | `sort=likes` |
-| 下载最多的模型 | 同上 | `sort=downloads` |
-| 开源模型评测榜 | HF `open-llm-leaderboard/contents` | 4576 行原始成绩（IFEval / BBH / MATH / GPQA / MMLU-PRO），**本站自己取全量后按平均分排序** |
-| 编程能力榜 | Aider `polyglot_leaderboard.yml` | 同一模型取最高 `pass_rate_2` |
-| 正在流行的 AI 应用 | HuggingFace Spaces API | `sort=trendingScore` |
-| 正在流行的数据集 | HuggingFace Datasets API | `sort=trendingScore` |
-| 每日论文热榜 | HF `daily_papers` | 按点赞数排序 |
-| 高星 AI 开源项目 | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
-| 最新发布的模型 | models.dev | 按 `release_date` 降序；数据 4.8MB 含 8000 个模型，**点击后才加载** |
-| SWE-bench | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**点击后才加载** |
+每个面板都有自己的页面（下表第一列即地址的文件名去掉 `.html`）：
+
+| 面板 | 页面 | 来源 | 口径 |
+|---|---|---|---|
+| 正在流行的模型 | `trending` | HuggingFace Models API | `sort=trendingScore` |
+| 最受喜欢的模型 | `liked` | 同上 | `sort=likes` |
+| 下载最多的模型 | `downloaded` | 同上 | `sort=downloads` |
+| 开源模型评测榜 | `eval` | HF `open-llm-leaderboard/contents` | 4576 行原始成绩（IFEval / BBH / MATH / GPQA / MMLU-PRO），**本站自己取全量后按平均分排序** |
+| 编程能力榜 | `aider` | Aider `polyglot_leaderboard.yml` | 同一模型取最高 `pass_rate_2` |
+| 正在流行的 AI 应用 | `spaces` | HuggingFace Spaces API | `sort=trendingScore` |
+| 正在流行的数据集 | `datasets` | HuggingFace Datasets API | `sort=trendingScore` |
+| 每日论文热榜 | `papers` | HF `daily_papers` | 按点赞数排序 |
+| 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
+| 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB 含 8000 个模型，**点击后才加载** |
+| SWE-bench | `swebench` | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**点击后才加载** |
+
+页面靠 `<div id="panels" data-board="eval">` 指名自己要跑哪一个（`trend.js` 读它）。
+这些 id 同时是**文件名、导航目标、发布白名单里的条目** —— 三处必须一起改，
+`site.test.js` 有断言盯着。没写 `data-board` 的页面会跑全部面板（那是老版大盘页的行为，留作兜底）。
 
 > **没有 Arena 榜**：LMArena 官方榜没有公开 JSON，且响应不带 CORS 头 ——
 > 在"浏览器直连"的前提下做不了（GitHub Pages 更不可能代理）。
@@ -86,6 +104,11 @@
 
 ## 界面
 
+- **一个面板一页**：页面标题就是面板名（由 `trend.js` 渲染成 `<h1>`），
+  没有另写一个 hero 标题 —— 一页一个 h1，且面板名只有字典一处来源。
+- **面板之间的跳转在页脚**：十一个面板名放进页头会挤成一坨，而这一条是"页面内目录"
+  性质的，跟"首页 + 语言切换"不是同一类东西。当前页用 `aria-current` 标出，
+  并且**加边框而不只是变色**（只靠颜色区分对色觉障碍的访客等于没标）。
 - **主题只跟随系统**（CSS 的 `prefers-color-scheme`），页面**没有主题切换按钮**。
   这样无需 JS 参与，浏览器在首次绘制前就定好了配色 —— 不存在"先白后黑"的闪烁。
 - **图标全部是内联 SVG**（不用 emoji）：emoji 的字形由操作系统决定，
@@ -95,18 +118,17 @@
 
 ---
 
-## 与 aibox 的差别（三处，都是"没有服务端"决定的）
+## 纯静态带来的约束（三处）
 
-| 差别 | aibox | 本站 | 为什么 |
-|---|---|---|---|
-| 品牌名占位符 | 服务端**响应时**替换 `{{BRAND}}` | **构建时**替换（`scripts/build-site.mjs`） | 纯静态没有"响应时"；发布物里残留占位符会直接失败 |
-| 页面地址 | `/trend`、`/en/trend`（无扩展名） | `/trend.html`、`/en/trend.html` | Pages 没有 rewrite，无扩展名地址做不到 |
-| 广告与统计 | AdSense + GTM/GA4 + 同意横幅 | **全部去掉** | 需求决定：站点不带第三方请求 |
+| 约束 | 做法 | 为什么 |
+|---|---|---|
+| 占位符只能构建期落值 | 品牌名 `{{BRAND}}` 与 GTM 片段 `{{GTM}}` 由 `scripts/build-site.mjs` 替换 | 没有"响应时"这一层；发布物里残留占位符会直接让构建失败 |
+| 页面地址带 `.html` | `index.html`、`trend.html`、`en/trend.html` | Pages 没有 rewrite，无扩展名的 `/trend` 做不到 |
+| 需要绝对地址的标记一律没有 | 不写 canonical / hreflang / og:url / 站长验证 | 它们的地址只能来自"部署在哪里"，而本站刻意不写死域名（见下） |
 
-另外，`consent.js` 与 `src/site/` 下的注入模块（`ads.js` / `analytics.js` /
-`canonical.js` / `verify.js` / `env-value.js`）**都已删除** —— 它们的存在意义就是
-"按环境变量往页面里注入声明"，而 Pages 上既没有环境变量，也没有要注入的东西。
-`src/site/brand.js` 保留，因为品牌名需要一处唯一来源。
+统计（Google Tag Manager）是**有**的：容器 ID 与部署地址无关，不违反上面任何一条。
+它的 ID 与代码片段同样只有一处来源（`src/site/gtm.js`），构建期落下。
+换来的一点是门禁免费 —— "发布物里不许残留占位符"那条现成的断言自动覆盖它。
 
 ### 为什么全是相对路径
 
@@ -119,11 +141,11 @@
 所以不需要 `BASE_PATH` 这类配置，也就不存在"换个地方就白屏"。
 
 `<base href="./">` 则把这些相对路径**钉在本文件所在目录**上：
-少了它，`/trend.html` 与 `/trend.html/` 这类地址会解析到不同的目录。
+少了它，`/eval.html` 与 `/eval.html/` 这类地址会解析到不同的目录。
 
 `site.test.js` 有一条断言盯着"页面里不许出现 `/` 开头的资源引用"。
 
-### 曾经静默坏掉的一处（移植时修掉的）
+### 曾经静默坏掉的一处（构建门禁就是为此加的）
 
 `trend.js` 引用了 `err.evalFirst`、`err.noBoards`、`st.dated`、`st.ghLimit`、`st.retry`
 五个文案键，而字典里**从来没有这五个键** —— `t()` 在缺键时返回键名本身，
@@ -137,8 +159,8 @@
 
 ## 三条设计取向
 
-1. **页面不做任何数据工作。** 榜单由浏览器直接请求上游。aibox 说的是"服务端不做数据工作"，
-   这里是更强的一版：**根本没有服务端**。代价是能不能取到由上游的 CORS 决定 ——
+1. **页面不做任何数据工作。** 榜单由浏览器直接请求上游 —— **根本没有服务端**
+   （不是"服务端不做"，是没有）。代价是能不能取到由上游的 CORS 决定 ——
    所以每个源都必须实测过（`docs/trend-sources.md`）。
 2. **一个面板坏了不拖垮整页。** 每个面板各自取数、各自渲染、各自报错。
    某个源挂了，只有那一块显示错误。
@@ -170,21 +192,23 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 | `i18n.test.js` | 两种语言的键一致、无空值、英文侧不含中文 |
 | `ui.test.js` | 图标表与 `[data-icon]` 回填 |
 | `trend.test.js` | YAML 子集解析、评测行字段提取、"同模型取最高分"的合并规则 |
-| `site.test.js` | 站点门禁：文案键存在、资源引用可解析、无绝对路径、无占位符残留、语言不串页 |
+| `site.test.js` | 站点门禁：文案键存在、资源引用可解析、无绝对路径、无占位符残留、语言不串页、**首页卡片与面板一一对应**、面板页与发布白名单对齐 |
 
 ## 代码结构
 
 ```
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
-  index.html  trend.html          中文入口 / 大盘
-  en/index.html  en/trend.html    英文入口 / 大盘
+  index.html                      中文入口：十一个面板的入口卡片
+  <board>.html                    ★ 十一个中文面板页（eval.html、repos.html…）
+  en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css
   assets/
-    trend.js                      十一个面板的数据层与渲染（1500 行，主体在这里）
+    trend.js                      面板注册表 + 数据层与渲染（1600 行，主体在这里）
     i18n.js                       双语字典 —— 面板文案的唯一来源
     ui.js                         内联 SVG 图标
     *.test.js                     测试（★ 不发布，构建的白名单挡在外面）
 src/site/brand.js                 品牌名唯一来源 + 占位符替换/校验
+src/site/gtm.js                   GTM 容器 ID 唯一来源 + 两段代码片段
 scripts/build-site.mjs            构建：白名单复制 + 落占位符 + 校验
 scripts/serve.mjs                 本地预览服务器（零依赖）
 scripts/live-check.mjs            上游数据源体检（联网）
@@ -192,6 +216,10 @@ docs/deploy.md                    部署与排错
 docs/trend-sources.md             每个数据源的实测可用性
 .github/workflows/pages.yml       测试 → 构建 → 发布到 Pages
 ```
+
+面板页是"一个面板一页"，所以加一个面板要动四处：`trend.js` 的 `BOARD_IDS`
+与加载器、中英两个页面文件、构建白名单、首页（与页脚导航自动跟上）。
+少任何一处都会在 `npm test` 里暴露，不会静默上线。
 
 ## 部署
 

@@ -8,47 +8,122 @@
 <!--
   English page. Same notes as the Chinese one: hand-written static file served
   straight by GitHub Pages, relative paths only, `<base href="./">` pins them to
-  this directory. The brand is a `{{BRAND}}` placeholder resolved at build time.
+  this directory. There is deliberately no canonical / og:url / site verification
+  here — those need an absolute URL and this site never hard-codes its domain.
+  GTM is different: the container id does not depend on where the site is hosted,
+  so it is here, resolved at build time (see `src/site/gtm.js`).
+  The brand is a `{{BRAND}}` placeholder resolved at build time.
 -->
 <base href="./">
 <link rel="stylesheet" href="../site.css">
+<!-- Google Tag Manager: container id comes from src/site/gtm.js, resolved at build time -->
+{{GTM}}
 </head>
 <body>
+<!-- GTM noscript fallback — this position is the one Google requires -->
+{{GTM_NOSCRIPT}}
 
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html">{{BRAND}}</a>
     <nav class="site-nav">
-      <a href="trend.html">Trend board</a>
+      <a href="index.html">Home</a>
       <a class="lang" href="../" hreflang="zh-CN" lang="zh-CN"><span class="ic" data-icon="globe"><span class="sr-only">Switch language: </span></span>中文</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <!-- Entry cards only — the page's one job is to hand the visitor the board. -->
+  <!-- Entry cards only — the page's one job is to hand the visitor a board.
+       One card per board, and every card points at its own page: `site.test.js`
+       asserts the hrefs are all distinct, because a duplicate means some board
+       lost its only way in. -->
   <section class="entry-grid">
-    <a class="entry" href="trend.html">
+    <a class="entry" href="trending.html">
       <span class="ic" data-icon="trending"></span>
       <span class="entry-body">
-        <span class="entry-title">Trend board</span>
-        <span class="entry-desc">Eleven AI charts: model momentum, community heat, open-model scores, coding ability</span>
+        <span class="entry-title">Trending models</span>
+        <span class="entry-desc">Ranked by HuggingFace trending score</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>
-    <a class="entry" href="trend.html">
+    <a class="entry" href="liked.html">
+      <span class="ic" data-icon="heart"></span>
+      <span class="entry-body">
+        <span class="entry-title">Most-liked models</span>
+        <span class="entry-desc">The models with the most likes</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="downloaded.html">
+      <span class="ic" data-icon="download"></span>
+      <span class="entry-body">
+        <span class="entry-title">Most-downloaded models</span>
+        <span class="entry-desc">The models pulled the most times</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="eval.html">
       <span class="ic" data-icon="trophy"></span>
       <span class="entry-body">
-        <span class="entry-title">Evaluation scores</span>
-        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO</span>
+        <span class="entry-title">Open-model evaluation board</span>
+        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO averaged</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>
-    <a class="entry" href="trend.html">
+    <a class="entry" href="aider.html">
       <span class="ic" data-icon="code"></span>
       <span class="entry-body">
-        <span class="entry-title">Coding ability</span>
-        <span class="entry-desc">Aider Polyglot and SWE-bench: pass rates on real code tasks</span>
+        <span class="entry-title">Coding ability (Aider)</span>
+        <span class="entry-desc">Pass rate on real Aider Polyglot code tasks</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="spaces.html">
+      <span class="ic" data-icon="cube"></span>
+      <span class="entry-body">
+        <span class="entry-title">Trending AI apps</span>
+        <span class="entry-desc">HuggingFace Spaces by trending score</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="datasets.html">
+      <span class="ic" data-icon="layers"></span>
+      <span class="entry-body">
+        <span class="entry-title">Trending datasets</span>
+        <span class="entry-desc">HuggingFace Datasets by trending score</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="papers.html">
+      <span class="ic" data-icon="file"></span>
+      <span class="entry-body">
+        <span class="entry-title">Daily paper leaderboard</span>
+        <span class="entry-desc">Papers ranked by upvotes</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="repos.html">
+      <span class="ic" data-icon="star"></span>
+      <span class="entry-body">
+        <span class="entry-title">Top-starred AI projects</span>
+        <span class="entry-desc">Stars gained this week</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="newmodels.html">
+      <span class="ic" data-icon="box"></span>
+      <span class="entry-body">
+        <span class="entry-title">Latest model releases</span>
+        <span class="entry-desc">models.dev, newest releases first</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="swebench.html">
+      <span class="ic" data-icon="code"></span>
+      <span class="entry-body">
+        <span class="entry-title">SWE-bench (real code fixes)</span>
+        <span class="entry-desc">Five sub-boards you can switch between</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>

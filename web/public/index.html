@@ -7,8 +7,10 @@
 <meta name="description" content="{{BRAND}} 是一个 AI 趋势大盘：把各家平台的模型榜单与开源生态热度收进一个页面。">
 <!--
   这个页面是**手写静态页**，由 GitHub Pages 直接发出，没有任何服务端。
-  因此这里刻意**没有** canonical / og:url / GTM / AdSense / 站长验证这些需要
-  按部署地址生成的标记 —— 它们原本由 aibox 的服务端按环境变量注入（见 docs/deploy.md）。
+
+  页面里刻意**没有** canonical / og:url / 站长验证这类标记：它们的地址必须是
+  **绝对 URL**，而本站不写死域名（路径全用相对，见下）。GTM 与它们不同 ——
+  容器 ID 与部署地址无关，所以它**有**，由构建期落下（见下）。写法见 `src/site/gtm.js`。
 
   路径全部是**相对路径**（`site.css` 而不是 `/site.css`）：站点既可能挂在
   `https://<用户名>.github.io/<仓库>/` 下，也可能挂在自定义域名的根下，
@@ -18,44 +20,116 @@
 -->
 <base href="./">
 <link rel="stylesheet" href="site.css">
+<!-- Google Tag Manager：容器 ID 的唯一来源是 src/site/gtm.js，构建期落成真值。
+     放在 head 靠前的位置（早于页面绘制开始上报），与 Google 的建议一致。 -->
+{{GTM}}
 </head>
 <body>
+<!-- GTM 的 noscript 回退，位置由 Google 规定：紧跟 <body> 开标签 -->
+{{GTM_NOSCRIPT}}
 
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html">{{BRAND}}</a>
     <nav class="site-nav">
-      <a href="trend.html">趋势大盘</a>
       <a class="lang" href="en/" hreflang="en" lang="en"><span class="ic" data-icon="globe"><span class="sr-only">切换语言：</span></span>English</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <!-- 首页不放正文：它的唯一作用是把人送进大盘。
-       卡片本身就是链接（整块可点），文案压到"标题 + 半句说明"。 -->
+  <!-- 首页不放正文：它的唯一作用是把人送进各个面板页。
+       每条趋势各一张卡片，**一张卡对一个页面** —— 卡片本身就是链接（整块可点），
+       文案压到"标题 + 半句说明"。
+       ★ 这 11 张卡与 11 个面板一一对应（href 各不相同），
+         `site.test.js` 有一条断言盯着这件事：重复的 href 意味着有人把几张卡
+         指向了同一页，而那会让一半的面板没有入口。 -->
   <section class="entry-grid">
-    <a class="entry" href="trend.html">
+    <a class="entry" href="trending.html">
       <span class="ic" data-icon="trending"></span>
       <span class="entry-body">
-        <span class="entry-title">趋势大盘</span>
-        <span class="entry-desc">十一个 AI 榜单：模型趋势、社区热度、开源评测、编程能力</span>
+        <span class="entry-title">正在流行的模型</span>
+        <span class="entry-desc">HuggingFace 上按趋势分排序</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>
-    <a class="entry" href="trend.html">
+    <a class="entry" href="liked.html">
+      <span class="ic" data-icon="heart"></span>
+      <span class="entry-body">
+        <span class="entry-title">最受喜欢的模型</span>
+        <span class="entry-desc">累计喜欢数最高的模型</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="downloaded.html">
+      <span class="ic" data-icon="download"></span>
+      <span class="entry-body">
+        <span class="entry-title">下载最多的模型</span>
+        <span class="entry-desc">累计下载量最高的模型</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="eval.html">
       <span class="ic" data-icon="trophy"></span>
       <span class="entry-body">
-        <span class="entry-title">评测成绩</span>
-        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO</span>
+        <span class="entry-title">开源模型评测榜</span>
+        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO 取平均分</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>
-    <a class="entry" href="trend.html">
+    <a class="entry" href="aider.html">
       <span class="ic" data-icon="code"></span>
       <span class="entry-body">
-        <span class="entry-title">编程能力</span>
-        <span class="entry-desc">Aider Polyglot 与 SWE-bench 的真实代码任务通过率</span>
+        <span class="entry-title">编程能力榜</span>
+        <span class="entry-desc">Aider Polyglot 真实代码任务的通过率</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="spaces.html">
+      <span class="ic" data-icon="cube"></span>
+      <span class="entry-body">
+        <span class="entry-title">正在流行的 AI 应用</span>
+        <span class="entry-desc">HuggingFace Spaces 按趋势分排序</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="datasets.html">
+      <span class="ic" data-icon="layers"></span>
+      <span class="entry-body">
+        <span class="entry-title">正在流行的数据集</span>
+        <span class="entry-desc">HuggingFace Datasets 按趋势分排序</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="papers.html">
+      <span class="ic" data-icon="file"></span>
+      <span class="entry-body">
+        <span class="entry-title">每日论文热榜</span>
+        <span class="entry-desc">按点赞数排序</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="repos.html">
+      <span class="ic" data-icon="star"></span>
+      <span class="entry-body">
+        <span class="entry-title">高星 AI 开源项目</span>
+        <span class="entry-desc">本周新增星标</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="newmodels.html">
+      <span class="ic" data-icon="box"></span>
+      <span class="entry-body">
+        <span class="entry-title">最新发布的模型</span>
+        <span class="entry-desc">models.dev 按发布日期降序</span>
+      </span>
+      <span class="entry-go" aria-hidden="true">→</span>
+    </a>
+    <a class="entry" href="swebench.html">
+      <span class="ic" data-icon="code"></span>
+      <span class="entry-body">
+        <span class="entry-title">SWE-bench 真实代码修复</span>
+        <span class="entry-desc">五个子榜可切</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>

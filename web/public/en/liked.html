@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Most-liked models · {{BRAND}}</title>
+<meta name="description" content="Most-liked models: The models with the most likes.">
+<base href="./">
+<link rel="stylesheet" href="../site.css">
+<!-- Google Tag Manager (container id lives in src/site/gtm.js, resolved at build time) -->
+{{GTM}}
+</head>
+<body>
+{{GTM_NOSCRIPT}}
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">{{BRAND}}</a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a class="lang" href="../liked.html" hreflang="zh-CN" lang="zh-CN"><span class="ic" data-icon="globe"><span class="sr-only">Switch language: </span></span>中文</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- One board per page: the one named by data-board.
+       The board title is rendered as this page's h1 by the script, so there is
+       no separate hero heading here — and no second copy of the wording. -->
+  <div id="panels" data-board="liked"></div>
+
+  <section class="note">
+    <p class="muted">Rankings and methodology are the source providers’.</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{{BRAND}} · Sources: HuggingFace · GitHub · models.dev</p>
+  </div>
+</footer>
+
+<script src="../assets/trend.js" type="module"></script>
+<script src="../assets/ui.js" type="module"></script>
+</body>
+</html>

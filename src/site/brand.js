@@ -6,9 +6,8 @@
  * 漏改一处就会让同一个站点出现两个名字。所以页面上出现品牌名的地方
  * 一律引用这里（见 `BRAND_PLACEHOLDER` 的说明）。
  *
- * 与 aibox 版本的差别：那边品牌名由**服务端**在响应前替换（占位符 `{{BRAND}}`），
- * 本站没有服务端 —— 占位符由构建步骤 `scripts/build-site.mjs` 落成真值，
- * 并把产物复制进 `dist/`。所以：
+ * 这是个**纯静态站**（GitHub Pages，没有服务端）：占位符由构建步骤
+ * `scripts/build-site.mjs` 落成真值，并把产物复制进 `dist/`。所以：
  *   · 仓库里的 `web/public/*.html` 可以带占位符；
  *   · **发布出去的 HTML 里绝不能有**（`web/public/assets/site.test.js` 有一道门禁盯着）。
  */

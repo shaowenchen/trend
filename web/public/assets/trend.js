@@ -24,7 +24,7 @@
  * 若上游改用超出该子集的写法，本面板会**明确报错并只影响自己**，不会静默出错值。
  */
 
-import { icon } from './ui.js';
+import { icon, injectIcons } from './ui.js';
 import { t } from './i18n.js';
 
 /**
@@ -150,6 +150,47 @@ async function cachedJson(key, url, { ttl = CACHE_TTL_MS } = {}) {
  */
 const panelsRoot = typeof document === 'undefined' ? null : document.querySelector('#panels');
 
+/**
+ * 全部面板的 id —— **页面地址契约**。
+ *
+ * 每个面板有自己的一页（`trending.html`、`eval.html`…），页面用
+ * `<div id="panels" data-board="trending">` 声明自己要跑哪一个。
+ * 所以这些 id 同时是三样东西：DOM 契约、页面文件名、导航链接的目标。
+ * 改 id = 改地址，必须与 `SITE_FILES` 和导航一起改（`site.test.js` 盯着）。
+ */
+export const BOARD_IDS = [
+  'trending',
+  'liked',
+  'downloaded',
+  'eval',
+  'aider',
+  'spaces',
+  'datasets',
+  'papers',
+  'repos',
+  'newmodels',
+  'swebench',
+];
+
+/**
+ * 本页要跑哪个面板：`data-board` 指名的那一个；**没写就是全部**。
+ *
+ * "没写就跑全部"是可贵的兜底：它是本文件在 Node 测试与旧页面下的行为，
+ * 也让"忘了写 data-board"退化成"跑得慢一点"而不是"空白页"。
+ * 但写了**且名字不认识**就是硬错误 —— 那种情况只会是页面写错或 id 改过，
+ * 静默渲染空白页是本站最不想要的那种失败（见 startAll 里的报错）。
+ */
+const requestedBoard = String(panelsRoot?.dataset?.board || '').trim();
+const wantedIds = requestedBoard ? BOARD_IDS.filter((id) => id === requestedBoard) : BOARD_IDS;
+
+/**
+ * 单面板页：本页只有一个面板，于是这个面板就是页面的主体 ——
+ * 它的标题升级成 `<h1>`（一页一个 h1，且不另写一遍 hero 标题）。
+ * 这样"面板叫什么"仍然只有 `i18n.js` 一处来源，22 个页面文件里一个字都不重复。
+ */
+const SINGLE_BOARD = Boolean(requestedBoard);
+
+
 /** 加载中的骨架：铺几行灰条，让人知道"这里会有内容"以及大致是表格的形状 */
 function skeleton(lines = 5) {
   return `<div class="skeleton" aria-hidden="true">${'<span></span>'.repeat(lines)}</div>`;
@@ -163,9 +204,12 @@ function panel({ id, iconName, title, hint }) {
   const el = document.createElement('section');
   el.className = 'panel';
   el.id = `panel-${id}`;
+  // 整页只有这一个面板时，它的标题就是页面的标题 —— 用 h1 承担
+  // （一页一个 h1；读屏器也能靠它一眼报出"这是什么页"）
+  const heading = SINGLE_BOARD ? 'h1' : 'h2';
   el.innerHTML = `
     <header class="panel-head">
-      <h2><span class="panel-icon">${icon(iconName)}</span>${esc(title)}</h2>
+      <${heading}><span class="panel-icon">${icon(iconName)}</span>${esc(title)}</${heading}>
       ${hint ? `<p class="panel-hint">${esc(hint)}</p>` : ''}
     </header>
     <p class="panel-status loading" aria-live="polite">${L('ui.loading')}</p>
@@ -1447,8 +1491,14 @@ async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
 /* 启动                                                                */
 /* ================================================================== */
 
-const BOARDS = [
-  () =>
+/**
+ * 面板注册表 —— 键就是 `BOARD_IDS` 里的 id，值是一个启动函数。
+ *
+ * 用**映射**而不是数组：面板页靠 id 指名要跑哪一个，数组就只能按下标取，
+ * 而"第 5 个"这种说法一旦有人调整顺序就会静默错位（跑出别的面板，页面不报错）。
+ */
+const BOARD_LOADERS = {
+  trending: () =>
     loadModelBoard({
       id: 'trending',
       iconName: 'trending',
@@ -1457,7 +1507,7 @@ const BOARDS = [
       metric: { label: L('col.trending'), field: 'trendingScore', icon: 'trending' },
       hint: L('p.trending.hint'),
     }),
-  () =>
+  liked: () =>
     loadModelBoard({
       id: 'liked',
       iconName: 'heart',
@@ -1466,7 +1516,7 @@ const BOARDS = [
       metric: { label: L('col.likes'), field: 'likes', icon: 'heart' },
       hint: L('p.liked.hint'),
     }),
-  () =>
+  downloaded: () =>
     loadModelBoard({
       id: 'downloaded',
       iconName: 'download',
@@ -1475,15 +1525,15 @@ const BOARDS = [
       metric: { label: L('col.downloads'), field: 'downloads', icon: 'download' },
       hint: L('p.downloaded.hint'),
     }),
-  () => loadEvalBoard(),
-  () => loadAiderBoard(),
-  () => loadSpaces(),
-  () => loadDatasets(),
-  () => loadPapers(),
-  () => loadRepos('week'),
-  () => loadNewModels(),
-  () => loadSweBench(),
-];
+  eval: () => loadEvalBoard(),
+  aider: () => loadAiderBoard(),
+  spaces: () => loadSpaces(),
+  datasets: () => loadDatasets(),
+  papers: () => loadPapers(),
+  repos: () => loadRepos('week'),
+  newmodels: () => loadNewModels(),
+  swebench: () => loadSweBench(),
+};
 
 /**
  * 清掉本页的缓存并重画全部面板。
@@ -1501,9 +1551,17 @@ function reloadAll() {
 
 /** 逐个启动面板（不 await 彼此）：最慢的源不该挡住最快的源 */
 function startAll() {
-  for (const start of BOARDS) {
+  // 页面指名的 panel 不存在 → 明着报，不要渲染一个空白页。
+  // 走到这里只会是页面写错 id 或 id 改过（`SITE_FILES` / 导航 / data-board 三处要一起改）
+  if (!wantedIds.length) {
+    panelsRoot.innerHTML =
+      `<section class="panel"><p class="panel-status err">` +
+      `${esc(L('err.unknownBoard', { id: requestedBoard }))}</p></section>`;
+    return;
+  }
+  for (const id of wantedIds) {
     Promise.resolve()
-      .then(start)
+      .then(() => BOARD_LOADERS[id]())
       .catch((e) => {
         // 兜底：面板构造本身出错也要看得见，不能静默消失
         const el = document.createElement('section');
@@ -1516,19 +1574,54 @@ function startAll() {
 
 if (panelsRoot) {
   startAll();
+  if (SINGLE_BOARD) buildBoardNav();
+}
 
-  const refreshBtn = document.getElementById('refresh');
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', () => {
-      const hint = document.getElementById('refresh-hint');
-      refreshBtn.disabled = true;
-      if (hint) hint.textContent = L('hero.refreshing');
-      reloadAll();
-      // 评测榜要拉 46 页、约 8 秒，按钮禁用久一点，避免连点
-      setTimeout(() => {
-        refreshBtn.disabled = false;
-        if (hint) hint.textContent = L('hero.refreshed');
-      }, 1200);
-    });
-  }
+/**
+ * 单面板页的页脚：其余面板的链接 + 「刷新数据」按钮。
+ *
+ * 两样都**由脚本生成**而不是写进 22 个页面文件：面板名与"刷新"的文案
+ * 都来自 `i18n.js`（页面骨架的文案不进字典，所以只能由脚本取），
+ * 而且链接的 href 与 `BOARD_IDS` 天然同源 —— 抄进 22 份就迟早抄错。
+ *
+ * 刷新按钮原来长在大盘页的 hero 里，那页被拆掉后它没地方待了。
+ * 放在这里而不是页面骨架里，是因为它依赖本模块的 `reloadAll`。
+ */
+function buildBoardNav() {
+  const current = BOARD_IDS.indexOf(requestedBoard);
+  const links = BOARD_IDS.map((id) => {
+    const label = esc(L(`p.${id}.title`));
+    return id === requestedBoard
+      ? `<a href="${id}.html" aria-current="page">${label}</a>`
+      : `<a href="${id}.html">${label}</a>`;
+  }).join('');
+
+  const nav = document.createElement('nav');
+  nav.className = 'board-links';
+  nav.setAttribute('aria-label', L('ui.boardNav'));
+  nav.innerHTML = `${links}
+    <div class="board-actions">
+      <button class="btn-sm" type="button" id="refresh">
+        <span class="ic" data-icon="refresh"></span>${esc(L('ui.refresh'))}
+      </button>
+      <span class="muted" id="refresh-hint"></span>
+    </div>`;
+  // 插在 #panels 之后（面板还在加载时它就在了 —— 导航不该等数据）
+  panelsRoot.after(nav);
+
+  const refreshBtn = nav.querySelector('#refresh');
+  refreshBtn.addEventListener('click', () => {
+    const hint = nav.querySelector('#refresh-hint');
+    refreshBtn.disabled = true;
+    hint.textContent = L('hero.refreshing');
+    reloadAll();
+    // 评测榜要拉 46 页、约 8 秒，按钮禁用久一点，避免连点
+    setTimeout(() => {
+      refreshBtn.disabled = false;
+      hint.textContent = L('hero.refreshed');
+    }, 1200);
+  });
+
+  // 图标由 ui.js 按 [data-icon] 回填；这一段是后插进来的，这里补一次
+  injectIcons(nav);
 }

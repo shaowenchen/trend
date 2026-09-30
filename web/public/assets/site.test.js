@@ -24,6 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { t, LOCALES } from './i18n.js';
+import { BOARD_IDS } from './trend.js';
 import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';
 import { buildSite, SITE_FILES, findMissingAssets, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
 import { resolveRequest } from '../../../scripts/serve.mjs';
@@ -31,8 +32,17 @@ import { resolveRequest } from '../../../scripts/serve.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const PUBLIC = path.join(ROOT, 'web', 'public');
 
-/** 发布集合里的 HTML 页面（中文两个 + 英文两个） */
-const PAGES = { zh: ['index.html', 'trend.html'], en: ['en/index.html', 'en/trend.html'] };
+/**
+ * 页面清单 —— 从 `BOARD_IDS`（trend.js 里的面板注册表）**推导**，不手写。
+ *
+ * 手写清单的失效方式是静默的：新加一个面板页、登记进 `SITE_FILES` 却漏在这里，
+ * 下面所有"逐页扫描"的断言就都跳过了它 —— 那一页可以带着绝对路径、串着语言
+ * 上线，而门禁一路绿灯。从注册表推导则不会漂移。
+ */
+const PAGES = {
+  zh: ['index.html', ...BOARD_IDS.map((id) => `${id}.html`)],
+  en: ['en/index.html', ...BOARD_IDS.map((id) => `en/${id}.html`)],
+};
 const ALL_PAGES = [...PAGES.zh, ...PAGES.en];
 /**
  * 要扫文案键的脚本 —— **从发布集合推导**，不是手写清单。
@@ -219,7 +229,8 @@ await test('★ <html lang> 与页面语言一致（面板文案按它取字典�
 });
 
 await test('双语互链：每个页面都有指向另一语言的链接', async () => {
-  const expect = { 'index.html': 'en/', 'trend.html': 'en/trend.html', 'en/index.html': '../', 'en/trend.html': '../trend.html' };
+  // 首页那一对是目录语义（`en/` 与 `../`）；面板页逐页对应，由上面专门那条盯着。
+  const expect = { 'index.html': 'en/', 'en/index.html': '../' };
   for (const [rel, target] of Object.entries(expect)) {
     assert.match(await read(rel), new RegExp(`href="${target.replace(/[.]/g, '\\.')}"`), `${rel} 没有指向 ${target}`);
   }
@@ -240,6 +251,73 @@ await test('★ 首页每张入口卡片都是 <a>（整块可点、键盘一次
       if (!tag.startsWith('<a')) bad.push(`${rel}: 入口卡片不是链接 —— ${tag}`);
       else if (!/\bhref="[^"]+"/.test(tag)) bad.push(`${rel}: 入口卡片没有 href —— ${tag}`);
     }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 首页卡片与面板**一一对应**：每张卡指向自己那一页，不重复、不遗漏', async () => {
+  // 这条盯的需求是"不要多个卡片对应一个趋势页面"。
+  // 重复的 href 意味着有面板**没有入口** —— 页面上看不出来（卡片数量没变、
+  // 名字也都在），只有点进去才发现两张卡到了同一个地方。
+  const bad = [];
+  for (const rel of [PAGES.zh[0], PAGES.en[0]]) {
+    const html = await read(rel);
+    const hrefs = [...html.matchAll(/<a class="entry"[^>]*href="([^"]+)"/g)].map((m) => m[1]);
+    const wanted = BOARD_IDS.map((id) => `${id}.html`);
+    const dup = hrefs.filter((h, i) => hrefs.indexOf(h) !== i);
+    if (dup.length) bad.push(`${rel}: 有卡片指向同一页 —— ${[...new Set(dup)].join(' ')}`);
+    const missing = wanted.filter((h) => !hrefs.includes(h));
+    if (missing.length) bad.push(`${rel}: 这些面板没有入口卡片 —— ${missing.join(' ')}`);
+    const extra = hrefs.filter((h) => !wanted.includes(h));
+    if (extra.length) bad.push(`${rel}: 有卡片指向了非面板页 —— ${extra.join(' ')}`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 每个面板页都指名了自己那一个面板，且名字是真的', async () => {
+  // data-board 写错时页面**不报错**，只是渲染出空白（或别的面板）。
+  // 这里同时核对"写的是合法 id"与"页面文件名与 id 一致"，
+  // 后者是地址契约：trending.html 必须跑 trending 面板。
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    for (const rel of [`${id}.html`, `en/${id}.html`]) {
+      const html = await read(rel);
+      const m = html.match(/<div id="panels" data-board="([^"]+)"><\/div>/);
+      if (!m) bad.push(`${rel}: 没有 <div id="panels" data-board="…"></div>`);
+      else if (m[1] !== id) bad.push(`${rel}: data-board="${m[1]}" 与文件名不符`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 每个面板 id 都有名字（页脚导航是动态拼键 `p.<id>.title`，正则扫不到）', () => {
+  // 上面那条"被引用的键都存在"靠正则抓 `L('字面量')`，而页脚导航拼的是
+  // `L(`p.${id}.title`)` —— 模板字符串躲过扫描。于是新加一个面板 id 却忘了
+  // 加 `p.<id>.title` 时，那一页的标题与导航会上线成键名本身（`p.foo.title`）。
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    for (const locale of LOCALES) {
+      const key = `p.${id}.title`;
+      if (t(locale, key) === key) bad.push(`${locale} 缺 ${key}`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了线上 404，多了构建失败）', () => {
+  const expected = [
+    ...BOARD_IDS.map((id) => `${id}.html`),
+    ...BOARD_IDS.map((id) => `en/${id}.html`),
+  ];
+  const actual = SITE_FILES.filter((f) => f.endsWith('.html') && f !== 'index.html' && f !== 'en/index.html');
+  assert.deepEqual(actual.sort(), expected.sort());
+});
+
+await test('★ 每个面板页都有指向它自己的英文版 / 中文版', async () => {
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    if (!(await read(`${id}.html`)).includes(`href="en/${id}.html"`)) bad.push(`${id}.html 没有指向 en/${id}.html`);
+    if (!(await read(`en/${id}.html`)).includes(`href="../${id}.html"`)) bad.push(`en/${id}.html 没有指向 ../${id}.html`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
@@ -271,10 +349,10 @@ await test('★ 预览服务器挡住路径穿越，且目录请求回落到 ind
   const dist = path.resolve('/srv/dist');
   assert.equal(resolveRequest(dist, '/../../etc/passwd'), null);
   assert.equal(resolveRequest(dist, '/en/'), path.join(dist, 'en', 'index.html'));
-  assert.equal(resolveRequest(dist, '/trend.html?x=1'), path.join(dist, 'trend.html'));
-  // 不做美化 URL：GitHub Pages 不会把 /trend 映射到 trend.html，
+  assert.equal(resolveRequest(dist, '/eval.html?x=1'), path.join(dist, 'eval.html'));
+  // 不做美化 URL：GitHub Pages 不会把 /eval 映射到 eval.html，
   // 本地也不该映射 —— 否则链接写错了本地还看得见，线上却是 404
-  assert.equal(resolveRequest(dist, '/trend'), path.join(dist, 'trend'));
+  assert.equal(resolveRequest(dist, '/eval'), path.join(dist, 'eval'));
 });
 
 await fs.rm(tmp, { recursive: true, force: true });
