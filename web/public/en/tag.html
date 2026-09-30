@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Browse by tag · {{BRAND}}</title>
+<meta name="description" content="Every Trend board grouped by tag; pick one to narrow it down.">
+<!--
+  English page. Same notes as the Chinese one: hand-written static file served
+  straight by GitHub Pages, relative paths only, `<base href="./">` pins them to
+  this directory. There is deliberately no canonical / og:url / site verification
+  here — those need an absolute URL and this site never hard-codes its domain.
+  GTM is different: the container id does not depend on where the site is hosted,
+  so it is here, resolved at build time (see `src/site/gtm.js`).
+  The brand is a `{{BRAND}}` placeholder resolved at build time.
+-->
+<base href="./">
+<link rel="stylesheet" href="../site.css">
+<!-- Google Tag Manager: container id comes from src/site/gtm.js, resolved at build time -->
+{{GTM}}
+</head>
+<body>
+<!-- GTM noscript fallback — this position is the one Google requires -->
+{{GTM_NOSCRIPT}}
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    {{SITE_NAV}}
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="tag-page">
+    {{TAG_PAGE}}
+  </article>
+</main>
+<script src="../assets/ui.js" type="module"></script>
+</body>
+</html>

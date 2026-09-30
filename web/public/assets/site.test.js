@@ -24,8 +24,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { t, LOCALES } from './i18n.js';
-import { BOARD_IDS } from './trend.js';
-import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';import { buildSite, SITE_FILES, findMissingAssets, findMissingImports, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
+import { BOARD_IDS, BOARD_TAGS } from './trend.js';
+import { ALL_TAGS, boardsWithTag } from './boards.js';
+import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';
+import { buildSite, SITE_FILES, findMissingAssets, findMissingImports, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
 import { resolveRequest } from '../../../scripts/serve.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -39,8 +41,8 @@ const PUBLIC = path.join(ROOT, 'web', 'public');
  * 上线，而门禁一路绿灯。从注册表推导则不会漂移。
  */
 const PAGES = {
-  zh: ['index.html', ...BOARD_IDS.map((id) => `${id}.html`)],
-  en: ['en/index.html', ...BOARD_IDS.map((id) => `en/${id}.html`)],
+  zh: ['index.html', ...BOARD_IDS.map((id) => `${id}.html`), 'tags.html', 'tag.html'],
+  en: ['en/index.html', ...BOARD_IDS.map((id) => `en/${id}.html`), 'en/tags.html', 'en/tag.html'],
 };
 const ALL_PAGES = [...PAGES.zh, ...PAGES.en];
 /**
@@ -352,8 +354,84 @@ await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了�
     ...BOARD_IDS.map((id) => `${id}.html`),
     ...BOARD_IDS.map((id) => `en/${id}.html`),
   ];
-  const actual = SITE_FILES.filter((f) => f.endsWith('.html') && f !== 'index.html' && f !== 'en/index.html');
+  // 榜单页 = 发布集合里除入口页与**两个标签页**之外的全部 HTML
+  // （`tags.html` 列标签、`tag.html` 按标签筛，中英各一份，共四个）
+  const notBoards = new Set(['index.html', 'en/index.html', 'tags.html', 'tag.html', 'en/tags.html', 'en/tag.html']);
+  const actual = SITE_FILES.filter((f) => f.endsWith('.html') && !notBoards.has(f));
   assert.deepEqual(actual.sort(), expected.sort());
+});
+
+/* ---------------- 标签 ---------------- */
+
+await test('★ 每个面板 id 都有至少一个标签（少了它的卡片就孤立无援）', () => {
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    const tags = BOARD_TAGS[id];
+    if (!Array.isArray(tags) || !tags.length) bad.push(`${id} 没有标签`);
+    else if (tags.some((x) => !String(x).trim())) bad.push(`${id} 有空标签`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 每个出现过的标签都能筛出至少一个面板（不然 tags 页会有一个空链接）', () => {
+  const bad = [];
+  for (const tag of ALL_TAGS) {
+    const ids = boardsWithTag(tag);
+    if (!ids.length) bad.push(`标签 ${tag} 筛不出任何面板`);
+    // 反过来说：标签下的每个 id 都得是**真的**面板 id，否则 tag 页会渲染一个 404 链接
+    if (ids.some((id) => !BOARD_IDS.includes(id))) bad.push(`标签 ${tag} 指向了不存在的面板`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ tags 页列出全部标签，且每个链接都带 ?t=<标签>', async () => {
+  const bad = [];
+  for (const rel of ['tags.html', 'en/tags.html']) {
+    const html = await distRead(rel);
+    for (const tag of ALL_TAGS) {
+      if (!html.includes(`tag.html?t=${encodeURIComponent(tag)}`)) bad.push(`${rel} 缺标签 ${tag} 的链接`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ tag 页把全部面板都渲染进分组里（卡片链接必须指向真实存在的榜单页）', async () => {
+  const bad = [];
+  for (const rel of ['tag.html', 'en/tag.html']) {
+    const html = await distRead(rel);
+    for (const id of BOARD_IDS) {
+      // 每一个面板至少出现在一个标签组里 —— 否则按标签逛会漏掉它
+      if (!new RegExp(`<a class="entry" href="(?:\\.\\./|en/)?${id}\\.html"`).test(html)) {
+        bad.push(`${rel} 没有任何标签组包含 ${id}`);
+      }
+    }
+    // 分组本身要在（脚本靠它收窄；没有分组就等于这页永远是全部）
+    if (!/data-tag="/.test(html)) bad.push(`${rel} 没有标签分组`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ tag 页的分组默认**不隐藏**（没有 JS 时应当看到全部，而不是空白）', async () => {
+  for (const rel of ['tag.html', 'en/tag.html']) {
+    const html = await distRead(rel);
+    for (const m of html.matchAll(/<section class="tag-group"[^>]*>/g)) {
+      assert.ok(!/\bhidden\b/.test(m[0]), `${rel} 的分组带了 hidden —— 禁用 JS 时会是一片空白`);
+    }
+  }
+});
+
+await test('★ 榜单页的页脚标出了本页标签（可点进标签页）', async () => {
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    for (const rel of [`${id}.html`, `en/${id}.html`]) {
+      const src = await read(rel);
+      // 标签由 trend.js 运行期渲染，所以源页里看不到 —— 这里查的是
+      // "这个面板在 boards.js 里有标签"，以及脚本确实被引到了
+      if (!BOARD_TAGS[id]?.length) bad.push(`${id} 没有标签`);
+      if (!/assets\/trend\.js/.test(src)) bad.push(`${rel} 没有引入 trend.js（标签渲染不出来）`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
 await test('★ 每个面板页都有指向它自己的英文版 / 中文版', async () => {
@@ -383,7 +461,7 @@ await test('语言切换链接带地球图标，与普通导航项有区分的�
  * 页头不许再长出别的链接 —— 榜单入口在首页的卡片里，页头多一条就是同一个目录
  * 出现两次，而且按 id 硬推链接的写法（下拉菜单）已经没有调用方了。
  */
-await test('★ 页头导航只有「首页」与语言切换两项，且首页指向本语言的首页', async () => {
+await test('★ 页头导航只有「首页」「标签」与语言切换三项，且首页指向本语言的首页', async () => {
   const bad = [];
   for (const rel of ALL_PAGES) {
     const html = await distRead(rel);
@@ -393,7 +471,7 @@ await test('★ 页头导航只有「首页」与语言切换两项，且首页�
     if (!header) { bad.push(`${rel}: 没找到页头`); continue; }
 
     const hrefs = [...header.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
-    if (hrefs.length !== 2) bad.push(`${rel}: 页头有 ${hrefs.length} 个链接，应为 2（首页 + 语言切换）`);
+    if (hrefs.length !== 3) bad.push(`${rel}: 页头有 ${hrefs.length} 个链接，应为 3（首页 + 标签 + 语言切换）`);
 
     // 首页链接指向本语言的首页，不是对方语言的（那是语言切换的活）
     const isEn = rel.startsWith('en/');
@@ -402,13 +480,36 @@ await test('★ 页头导航只有「首页」与语言切换两项，且首页�
     if (home !== want) bad.push(`${rel}: 首页链接是 ${home}，应为 ${want}`);
 
     // 首页页面上，首页链接要带 aria-current（读屏器靠它播报"当前页"）；
-    // 榜单页上不该带 —— 那是别的页面。
+    // 榜单页与标签页上不该带 —— 那是别的页面。
     const isHome = rel === 'index.html' || rel === 'en/index.html';
     const current = /<a class="nav-home"[^>]*aria-current="page"/.test(header);
-    if (isHome !== current) bad.push(`${rel}: aria-current ${current ? '多了' : '少了'}`);
+    if (isHome !== current) bad.push(`${rel}: 首页的 aria-current ${current ? '多了' : '少了'}`);
 
-    // 下拉菜单是上一版的东西，必须彻底消失（有 .nav-boards 就说明模板还留着）
+    // 「标签」项永远指向 tags 页（本语言的那一份），并且只有 tags 页自己带 aria-current
+    const tagsHref = header.match(/<a class="nav-tags" href="([^"]+)"/)?.[1];
+    const wantTags = isEn ? '../tags.html' : 'tags.html';
+    if (tagsHref !== wantTags) bad.push(`${rel}: 标签链接是 ${tagsHref}，应为 ${wantTags}`);
+    const tagsCurrent = /<a class="nav-tags"[^>]*aria-current="page"/.test(header);
+    const isTags = rel === 'tags.html' || rel === 'en/tags.html';
+    if (isTags !== tagsCurrent) bad.push(`${rel}: 标签项的 aria-current ${tagsCurrent ? '多了' : '少了'}`);
+
+    // 下拉菜单是更早一版的东西，必须彻底消失（有 .nav-boards 就说明模板还留着）
     if (/nav-boards/.test(html)) bad.push(`${rel}: 还有榜单下拉的痕迹`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 卡片里的标签不能是链接（HTML 不允许 <a> 套 <a>）', async () => {
+  // 这条盯的是一次真实的手误：给首页卡片的标签加了跳转链接，于是卡片 `<a>` 里
+  // 套了 `<a>`。浏览器解析时会把外层卡片**提前闭合** —— 整片入口栅格散架、
+  // 卡片高度塌掉，而 `npm test` 当时全绿（没有任何断言看标签是怎么渲染的）。
+  // 判据：`.entry` 卡片内部不许出现标签页的链接。
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    for (const m of html.matchAll(/<a class="entry"[^>]*>([\s\S]*?)<\/a>/g)) {
+      if (/href="[^"]*tag\.html/.test(m[1])) bad.push(`${rel}: 卡片内部出现了标签链接`);
+    }
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });

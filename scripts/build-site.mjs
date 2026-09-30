@@ -40,20 +40,25 @@ import { fileURLToPath } from 'node:url';
 
 import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/brand.js';
 import { injectGtm } from '../src/site/gtm.js';
-// 面板 id 的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的文件，
-// 所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
-import { BOARD_IDS } from '../web/public/assets/boards.js';
-import { injectNav, NAV_PLACEHOLDER } from '../src/site/nav.js';
+// 面板 id 与标签的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的
+// 文件，所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
+import { BOARD_IDS, ALL_TAGS, boardsWithTag } from '../web/public/assets/boards.js';
+import { injectNav, injectTagsPage, injectTagPage } from '../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
  * 发布集合 —— **白名单**，相对 `web/public/`。
  *
- * 面板页是"一个面板一页"：每个 `assets/boards.js` 里 `BOARD_IDS` 列出的 id
- * 对应一个中文页与一个 `en/` 下的英文页。这份清单必须与它**完全对齐** ——
- * 少登记一页，那一页本地能点、线上 404；多登记一个不存在的 id，构建会因为
- * 读不到文件而失败（`site.test.js` 另有一条断言比对两者）。
+ * 三类页面：
+ *   · 入口页（中英各一）；
+ *   · 榜单页（`BOARD_IDS` 每个 id 一中一英）；
+ *   · 标签页（`tags.html` 列出全部标签；`tag.html` 按 `?t=` 筛出含该标签的榜单）。
+ *     后两个的标签是**运行期**从地址读的，所以构建时只落一次文案。
+ *
+ * 这份清单必须与 `BOARD_IDS` **完全对齐** —— 少登记一页，那一页本地能点、
+ * 线上 404；多登记一个不存在的 id，构建会因为读不到文件而失败
+ * （`site.test.js` 另有一条断言比对两者）。
  */
 const BOARD_PAGES = BOARD_IDS;
 
@@ -61,8 +66,13 @@ export const SITE_FILES = [
   'index.html',
   'site.css',
   'en/index.html',
+  'tags.html',
+  'tag.html',
+  'en/tags.html',
+  'en/tag.html',
   'assets/trend.js',
   'assets/boards.js',
+  'assets/tags.js',
   'assets/ui.js',
   'assets/i18n.js',
   ...BOARD_PAGES.map((id) => `${id}.html`),
@@ -219,9 +229,23 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
     // 所以还要知道本页是哪个榜单（首页为 null）。见 `src/site/nav.js`。
     const isEn = rel === 'en/index.html' || rel.startsWith('en/');
     const id = path.basename(rel, '.html');
-    const boardId = id === 'index' ? null : id;
-    const nav = injectNav(buf, isEn ? 'en' : 'zh', isEn ? '../' : '', boardId);
-    files[rel] = injectGtm(injectBrand(nav, BRAND));
+    // `tags.html` / `tag.html` 是页面种类，不是榜单 —— 导航要按它们自己的规则落
+    // （Tags 项带 aria-current；两者共用同一份 tag 列表文案）
+    const isTagsPage = id === 'tags';
+    const isTagPage = id === 'tag';
+    const boardId = id === 'index' || isTagsPage || isTagPage ? null : id;
+    let out = injectNav(
+      buf,
+      isEn ? 'en' : 'zh',
+      isEn ? '../' : '',
+      isTagPage ? 'tag' : boardId,
+      { tags: isTagsPage }
+    );
+    // 两个标签页的正文由构建期生成（标签清单只有 `boards.js` 一处来源）
+    if (isTagsPage || isTagPage) {
+      out = (isTagsPage ? injectTagsPage : injectTagPage)(out, isEn ? 'en' : 'zh', isEn ? '../' : '');
+    }
+    files[rel] = injectGtm(injectBrand(out, BRAND));
   }
 
   const problems = [];

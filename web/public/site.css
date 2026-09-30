@@ -158,11 +158,11 @@ a { color: var(--accent); }
 }
 
 /* ── 页头导航 ──────────────────────────────────────────────
- * 由构建期生成（`src/site/nav.js` + `{{SITE_NAV}}`），不是手写在 24 个页面里。
+ * 由构建期生成（`src/site/nav.js` + `{{SITE_NAV}}`），不是手写在每个页面里。
  *
- * 只有两样：左边「首页」，右边切换语言 —— 十一个榜单不进页头，它们在首页的
- * 入口卡片里各有一张卡（见 `.entry-grid`）。页头的两个元素直接是
- * `header-inner` 的子元素，靠它的 `space-between` 各就各位。
+ * 三样：左边「首页」+「标签」，右边切换语言 —— 十二个榜单不进页头，它们在
+ * 首页的入口卡片里各有一张卡（见 `.entry-grid`）；「标签」是一条按来源/分类逛的
+ * 入口，不是榜单清单。页头的两个子元素靠 `header-inner` 的 `space-between` 各就各位。
  *
  * 两块链接的高度统一用 `--nav-h`：高度不一致是"这一排没对齐"最常见的原因，
  * 而定成一个变量之后，改一处就全跟着走。
@@ -229,6 +229,9 @@ a { color: var(--accent); }
 }
 .site-nav .lang .ic { display: inline-flex; color: currentColor; }
 .site-nav .lang .ic svg { width: 15px; height: 15px; display: block; }
+/* 「标签」那一项也带图标（与语言切换同一个视觉语言），尺寸同样收一档 */
+.site-nav .nav-tags .ic { display: inline-flex; color: currentColor; }
+.site-nav .nav-tags .ic svg { width: 15px; height: 15px; display: block; }
 
 /* 图标按钮（主题切换 / 刷新）：★ 触控目标不小于 44×44，手机上好点 */
 .icon-btn {
@@ -256,18 +259,9 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
    （品牌在页头，面板间的跳转由 trend.js 生成的 .board-links 承担）。
    留一段空规则会让人以为还有个页脚要维护，所以整块去掉。 */
 
-/* ---------------- 首屏 ----------------
- * 这一段现在只服务**大盘页**的紧凑首屏（`hero-compact`）：
- * 首页改成了纯卡片（见下面的 .entry-grid），大标题 + 大按钮的样式没有调用方了。
- */
-.hero-compact { text-align: left; padding: 34px 0 26px; }
-.hero-compact h1 {
-  margin: 0 0 12px;
-  font-size: clamp(22px, 4.5vw, 27px); /* 窄屏自动收小，不用写断点 */
-  line-height: 1.25;
-  letter-spacing: -.6px;
-}
-.hero-compact p { margin: 0; max-width: 620px; color: var(--muted); }
+/* 首屏（`hero-compact`）的样式已随大盘页一起删掉：拆成"一个面板一页"之后，
+   页面标题由 trend.js 渲染成面板头里的 <h1>，没有任何页面再用那些类名。
+   留一段死规则会让人以为还有调用方。 */
 
 /* ---------------- 入口卡片（首页）----------------
  *
@@ -318,6 +312,11 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .entry .entry-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .entry .entry-title { font-weight: 600; font-size: 15px; }
 .entry .entry-desc { color: var(--muted); font-size: 13px; line-height: 1.45; }
+/* 卡片上的标签（来源 + 分类）。
+   ★ 这里是**静态**标签片（`.tag`），不是链接：卡片本身就是 `<a>`，而 HTML 不允许
+   嵌套 `<a>` —— 浏览器解析时会把外层卡片提前闭合，整片栅格会散架。要按标签逛，
+   走页头的 Tags 入口，或榜单页页脚那条（`.board-links` 里的标签，那里是链接）。 */
+.entry-tags { display: flex; flex-wrap: wrap; gap: 5px; align-self: center; }
 /* 末尾的箭头往右推，暗示"点了会去哪" */
 .entry .entry-go {
   margin-left: auto;
@@ -583,15 +582,9 @@ tbody tr:last-child td { border-bottom: 0; }
   th, td { position: static !important; }
 }
 
-/* ---------------- 首屏动作区（刷新按钮） ---------------- */
-
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px !important;
-}
+/* ---------------- 动作按钮（`.btn-sm` / `.btn-ghost`） ----------------
+ * 刷新按钮现在住在榜单页页脚（trend.js 生成），不再是"首屏动作区"，
+   所以 `.hero-actions` 那个包裹层也没有调用方了。 */
 
 .btn-ghost {
   display: inline-flex;
@@ -683,6 +676,83 @@ tbody tr:last-child td { border-bottom: 0; }
   margin-top: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
+}
+
+/* 面板头里的标签：与说明同一行区域，但单独一行更清楚 */
+.panel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0 0; }
+/* 标签片（可点，进 tag.html?t=…）。页面上出现三种大小：面板头 / 页脚 / 标签页，
+   共用这一个类名，靠上下文调尺寸。 */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  text-decoration: none;
+  transition: color .15s ease, border-color .15s ease;
+}
+.tag-chip:hover { color: var(--ink); border-color: var(--accent); }
+
+/* 页脚：面板之间的跳转之后，再来一行"本页标签" */
+.board-tags {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+}
+
+/* ---------------- 标签页（tags.html / tag.html）----------------
+ *
+ * 标签是"来源 + 分类"，用来在榜单之间按主题走。两个页面共用这一组样式，
+ * 卡片用首页那套 `.entry`（同一个东西就该长同一个样子）。
+ */
+.tag-page { padding-top: 30px; }
+.tag-page > h1 { margin: 0 0 10px; font-size: clamp(20px, 4vw, 25px); letter-spacing: -.5px; }
+.tag-page > p { margin: 0 0 20px; max-width: 620px; }
+
+/* 标签片：一行铺开、可换行。每片是 <a>（另一个地址，可收藏可被跟随） */
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 26px;
+}
+.tag-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  min-height: 36px; /* 触控目标不要比手指小 */
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.tag-link:hover { border-color: var(--accent); background: var(--bg); }
+/* 当前标签：加边框 + 变色，不只靠颜色（见页头导航同样的处理） */
+.tag-link[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); }
+.tag-link .tag { border: 0; padding: 0; background: transparent; }
+.tag-link .muted { font-size: 12.5px; }
+
+/* 按标签分组的段落（tag.html；JS 会把非当前组收掉） */
+.tag-group { margin: 0 0 30px; }
+.tag-group[hidden] { display: none; }
+.tag-group-head {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: none;
 }
 
 /* ---------------- 面板内的切换片（GitHub 时间段 / 加载按钮） ---------------- */

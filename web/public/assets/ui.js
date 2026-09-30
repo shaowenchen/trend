@@ -24,6 +24,11 @@
  * 每个图标都是 `{ label, path }`：label 用于无障碍文本（读屏器念得出名字）。
  */
 export const ICONS = {
+  // 标签（页头的 Tags 入口、卡片上的来源/分类标记）
+  tag: {
+    label: '标签',
+    path: '<path d="M3 12V5a2 2 0 012-2h7l8 8-9 9-8-8z"/><circle cx="8" cy="8" r="1.4"/>',
+  },
   // 趋势上行（正在流行）
   trending: {
     label: '趋势上行',

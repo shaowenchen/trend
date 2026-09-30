@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>标签 · {{BRAND}}</title>
+<meta name="description" content="按数据来源与榜单类别浏览 Trend 的全部榜单。">
+<!--
+  这个页面是**手写静态页**，由 GitHub Pages 直接发出，没有任何服务端。
+
+  页面里刻意**没有** canonical / og:url / 站长验证这类标记：它们的地址必须是
+  **绝对 URL**，而本站不写死域名（路径全用相对，见下）。GTM 与它们不同 ——
+  容器 ID 与部署地址无关，所以它**有**，由构建期落下（见下）。写法见 `src/site/gtm.js`。
+
+  路径全部是**相对路径**（`site.css` 而不是 `/site.css`）：站点既可能挂在
+  `https://<用户名>.github.io/<仓库>/` 下，也可能挂在自定义域名的根下，
+  相对路径两种都能用，不需要任何 BASE_PATH 配置，也就不存在"换个域名整站白屏"。
+  下面这行 base 标签把这些相对路径钉在**本文件所在目录**上，与访问地址怎么写无关
+  （少了它，`/trend.html` 与 `/trend.html/` 这类地址会解析到不同的目录）。
+-->
+<base href="./">
+<link rel="stylesheet" href="site.css">
+<!-- Google Tag Manager：容器 ID 的唯一来源是 src/site/gtm.js，构建期落成真值。
+     放在 head 靠前的位置（早于页面绘制开始上报），与 Google 的建议一致。 -->
+{{GTM}}
+</head>
+<body>
+<!-- GTM 的 noscript 回退，位置由 Google 规定：紧跟 <body> 开标签 -->
+{{GTM_NOSCRIPT}}
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    {{SITE_NAV}}
+  </div>
+</header>
+
+<main class="wrap">
+  <article class="tag-page">
+    {{TAGS_PAGE}}
+  </article>
+</main>
+<script src="assets/ui.js" type="module"></script>
+</body>
+</html>

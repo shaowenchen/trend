@@ -133,6 +133,7 @@ const zh = {
   'ui.loading': '加载中…',
   // 单面板页的页脚导航与刷新按钮（由 trend.js 生成，不写进页面骨架）
   'ui.boardNav': '切换面板',
+  'ui.boardTags': '本页标签：',
   'ui.refresh': '刷新数据',
   'ui.close': '关闭',
   'ui.openSource': '打开原始页面',
@@ -287,6 +288,7 @@ const en = {
   'ui.loading': 'Loading…',
   // Footer navigation and refresh button on single-board pages (built by trend.js)
   'ui.boardNav': 'Switch board',
+  'ui.boardTags': 'Tags on this board:',
   'ui.refresh': 'Refresh',
   'ui.close': 'Close',
   'ui.openSource': 'Open original page',
@@ -361,4 +363,33 @@ export function t(locale, key, vars = {}) {
 /** 某个语言下的全部键（测试用来对齐两种语言） */
 export function keysOf(locale) {
   return Object.keys(DICT[locale] || {});
+}
+
+/**
+ * 一组标签的 HTML —— 首页卡片与榜单页共用，所以放在这里而不是各写一遍。
+ *
+ * 标签文字**不走字典**（见 `boards.js` 的说明：它们是专有名词与英文分类词，
+ * 中英共用一份）；只有链接的目标前缀随语言变（中文页 `tag.html`、
+ * 英文页 `../tag.html`），所以 `prefix` 由调用方按页面层级传。
+ *
+ * 为什么是链接而不是死文字：标签页的存在意义就是"点进去按类看"。
+ * 少了这层链接，标签就只是装饰。
+ */
+export function tagChips(tags, prefix = '') {
+  return (tags || [])
+    .map(
+      (tag) =>
+        `<a class="tag-chip" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">${escTag(tag)}</a>`
+    )
+    .join('');
+}
+
+/** 标签文本的转义（与 `trend.js` 的 `esc` 同样规则，独立一份免得循环依赖） */
+function escTag(s) {
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
