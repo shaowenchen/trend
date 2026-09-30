@@ -312,11 +312,6 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .entry .entry-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .entry .entry-title { font-weight: 600; font-size: 15px; }
 .entry .entry-desc { color: var(--muted); font-size: 13px; line-height: 1.45; }
-/* 卡片上的标签（来源 + 分类）。
-   ★ 这里是**静态**标签片（`.tag`），不是链接：卡片本身就是 `<a>`，而 HTML 不允许
-   嵌套 `<a>` —— 浏览器解析时会把外层卡片提前闭合，整片栅格会散架。要按标签逛，
-   走页头的 Tags 入口，或榜单页页脚那条（`.board-links` 里的标签，那里是链接）。 */
-.entry-tags { display: flex; flex-wrap: wrap; gap: 5px; align-self: center; }
 /* 末尾的箭头往右推，暗示"点了会去哪" */
 .entry .entry-go {
   margin-left: auto;
@@ -697,6 +692,15 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .tag-chip:hover { color: var(--ink); border-color: var(--accent); }
 
+/* 面板头 / 页脚里的标签比标签页的小一档：那里是**附注**，36px 的高度会把
+   面板头撑得比标题还重。仍然保留 ≥24px 的可点尺寸（触控下限）。 */
+.panel-tags .tag-chip,
+.board-tags .tag-chip {
+  min-height: 26px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+
 /* 页脚：面板之间的跳转之后，再来一行"本页标签" */
 .board-tags {
   flex: 1 0 100%;
@@ -712,48 +716,135 @@ tbody tr:last-child td { border-bottom: 0; }
 
 /* ---------------- 标签页（tags.html / tag.html）----------------
  *
- * 标签是"来源 + 分类"，用来在榜单之间按主题走。两个页面共用这一组样式，
- * 卡片用首页那套 `.entry`（同一个东西就该长同一个样子）。
+ * 两个页面共用这一组样式。设计上跟站内其余卡片走同一套语言（surface 底、
+ * 同样的圆角与阴影、hover 抬起），所以它看起来是站点的第 N 个页面，
+ * 而不是另一个站点。
+ *
+ * 三种元素：
+ *   · `.tag-cards` / `.tag-card` —— tags 页的标签卡（名字 + 数量 + 包含哪些榜）
+ *   · `.tag-grid` / `.tag-chip`  —— tag 页顶部的标签选择条（带数量角标）
+ *   · `.tag-group`               —— tag 页的分组段落（JS 按 ?t= 收窄）
  */
 .tag-page { padding-top: 30px; }
-.tag-page > h1 { margin: 0 0 10px; font-size: clamp(20px, 4vw, 25px); letter-spacing: -.5px; }
-.tag-page > p { margin: 0 0 20px; max-width: 620px; }
+.tag-page > h1 { margin: 0 0 22px; font-size: clamp(20px, 4vw, 25px); letter-spacing: -.5px; }
+/* tag 页的返回链接与大标题之间留一口气 */
+.tag-page > p:first-child { margin: 0 0 18px; }
 
-/* 标签片：一行铺开、可换行。每片是 <a>（另一个地址，可收藏可被跟随） */
+/* ── tags 页：标签卡 ──────────────────────────────────────
+ * 一张卡回答三个问题：叫什么、多少个榜、都是哪些榜。
+ * 前两个在上排（名字 + 数量），第三个在下排（名字连着列）。
+ */
+.tag-section { margin: 0 0 30px; }
+.tag-section-head {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tag-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: 12px;
+}
+.tag-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.tag-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .08);
+}
+.tag-card:active { transform: translateY(0); }
+.tag-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tag-card-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+/* 数量做成一个胶囊：它是这张卡上最需要被一眼看到的数字 */
+.tag-card-count {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 包含哪些榜：一行放不下就截断（读者点进去能看到全部） */
+.tag-card-boards {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ── tag 页：顶部标签选择条 ─────────────────────────────── */
 .tag-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 26px;
 }
-.tag-link {
+.tag-chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 12px;
+  padding: 6px 12px;
   min-height: 36px; /* 触控目标不要比手指小 */
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
+  color: var(--muted);
+  font-size: 13.5px;
   text-decoration: none;
-  transition: border-color .15s ease, background-color .15s ease;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
 }
-.tag-link:hover { border-color: var(--accent); background: var(--bg); }
-/* 当前标签：加边框 + 变色，不只靠颜色（见页头导航同样的处理） */
-.tag-link[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); }
-.tag-link .tag { border: 0; padding: 0; background: transparent; }
-.tag-link .muted { font-size: 12.5px; }
+.tag-chip:hover { border-color: var(--accent); color: var(--ink); background: var(--bg); }
+/* 当前标签：加边框 + 变色，不只靠颜色（与页头导航同样的处理） */
+.tag-chip[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+/* 数量角标：每个标签几个榜 */
+.tag-chip-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.tag-chip[aria-current='page'] .tag-chip-n { background: var(--surface); color: var(--accent); }
+/* 角标自带内边距，把外层的右内边距收回去 —— 榜单页页脚的标签没有角标，
+   所以不能把"更窄的右侧"写死在外层（`：has` 不支持时只是略宽，无碍）。 */
+.tag-chip:has(.tag-chip-n) { padding-right: 7px; }
 
-/* 按标签分组的段落（tag.html；JS 会把非当前组收掉） */
+/* ── tag 页：分组段落（JS 会把非当前组收掉）───────────────── */
 .tag-group { margin: 0 0 30px; }
 .tag-group[hidden] { display: none; }
 .tag-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
   margin: 0 0 12px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--muted);
-  text-transform: none;
 }
+.tag-group-count { font-size: 12.5px; font-weight: 500; color: var(--muted); }
 
 /* ---------------- 面板内的切换片（GitHub 时间段 / 加载按钮） ---------------- */
 

@@ -80,6 +80,35 @@ export const BOARD_TAGS = {
  */
 export const ALL_TAGS = [...new Set(Object.values(BOARD_TAGS).flat())];
 
+/**
+ * 每个标签属于哪一类 —— 决定 `tags.html` 怎么分组（来源一组、类别一组）。
+ *
+ * 为什么值得单独一份：不分组的话 tags 页就是一坨平铺的标签片，
+ * 读者看不出"HuggingFace 是来源、Models 是类别"这两件事不是一回事 ——
+ * 而这正是标签存在的理由。分组让"按来源逛"与"按主题逛"变成两条看得见的路。
+ *
+ * 与 `BOARD_TAGS` 一样，**两语言共用**（见那里的说明）。
+ * 未知标签默认归到 `topic`，所以新增标签时忘了登记也只是分组不够准，不会丢。
+ */
+export const TAG_KINDS = {
+  HuggingFace: 'source',
+  Aider: 'source',
+  GitHub: 'source',
+  'models.dev': 'source',
+  OpenRouter: 'source',
+  'SWE-bench': 'source',
+  Models: 'topic',
+  Evaluation: 'topic',
+  Coding: 'topic',
+  Community: 'topic',
+  Papers: 'topic',
+};
+
+/** 某一类下的标签，顺序沿用 `ALL_TAGS`（保证页面上的排列稳定） */
+export function tagsOfKind(kind) {
+  return ALL_TAGS.filter((tag) => (TAG_KINDS[tag] || 'topic') === kind);
+}
+
 /** 某个标签下的榜单 id（按 `BOARD_IDS` 的顺序，保证页面上的排列稳定） */
 export function boardsWithTag(tag) {
   return BOARD_IDS.filter((id) => (BOARD_TAGS[id] || []).includes(tag));

@@ -122,7 +122,7 @@ export function injectNav(html, lang, prefix, boardId, opts) {
  * 不再 `export` 转出去：那会让这个构建期模块多一层对外表面，而调用方
  * （构建脚本、测试）都能直接引 `boards.js`。
  */
-import { ALL_TAGS, boardsWithTag, BOARD_TAGS } from '../../web/public/assets/boards.js';
+import { ALL_TAGS, boardsWithTag, BOARD_TAGS, tagsOfKind } from '../../web/public/assets/boards.js';
 
 /* ================================================================== */
 /* 标签页                                                              */
@@ -201,27 +201,29 @@ const BOARD_ICONS = {
 const TAG_TEXT = {
   zh: {
     tagsTitle: '标签',
-    tagsIntro: '按数据来源或榜单类别浏览。点任意标签，看它下面有哪些榜。',
-    // tag.html 的标题/说明分前后缀，脚本只往中间插标签值
+    // ★ 这一页**没有**说明句：标签卡自带数量与"包含哪些榜"的预览，
+    //   "按来源或类别浏览"这种事由分组标题直接说明，再补一句就是废话。
+    // tag.html 的标题分前后缀，脚本只往中间插标签值
     tagPrefix: '标签：',
-    tagIntroPrefix: '下面这些榜都带 ',
-    tagIntroSuffix: ' 标签。',
     allTitle: '按标签浏览',
-    allIntro: '全部榜单，按标签分组。点上面的标签看某一类。',
+    // 分组标题（两类标签）
+    sourceKind: '数据来源',
+    topicKind: '榜单类别',
+    // 卡片里的两行小字
+    boardCount: '{n} 个榜单',
+    noBoard: '暂无',
     allTags: '全部标签',
-    counts: '{n} 个',
     back: '← 全部标签',
   },
   en: {
     tagsTitle: 'Tags',
-    tagsIntro: 'Browse by data source or by what the board measures. Pick a tag to see the boards under it.',
     tagPrefix: 'Tag: ',
-    tagIntroPrefix: 'These boards all carry the ',
-    tagIntroSuffix: ' tag.',
     allTitle: 'Browse by tag',
-    allIntro: 'Every board, grouped by tag. Pick a tag above to narrow it down.',
+    sourceKind: 'Data sources',
+    topicKind: 'Board topics',
+    boardCount: '{n} boards',
+    noBoard: 'none yet',
     allTags: 'All tags',
-    counts: '{n}',
     back: '← All tags',
   },
 };
@@ -243,22 +245,47 @@ function boardCard(lang, prefix, id) {
 }
 
 /**
- * `tags.html` 的正文：每个标签一个链接 + 条数。
- * 用 `<a>` 而不是按钮 —— 这些是**另一个地址**（可收藏、可被搜索引擎跟随）。
+ * `tags.html` 的正文：标签**卡片**，分两类摆。
+ *
+ * 每张卡给出三样读者要判断的东西：标签名、**多少个榜单**、以及**具体是哪些**
+ * （名字连着列出来）。少了后两样，读者只能挨个点进去才知道是不是自己要找的 ——
+ * 而"有多少、都是什么"正是这一页要回答的。
+ *
+ * 分组（数据来源 / 榜单类别）让人一眼看出"HuggingFace 是来源、Models 是类别"
+ * 是两件不同的事，而不是一坨平铺的标签片。这一页**不写导语**：
+ * 分组标题与卡片本身就把话说完了。
  */
+function tagCard(lang, prefix, tag) {
+  const text = TAG_TEXT[lang];
+  const ids = boardsWithTag(tag);
+  const names = ids.map((id) => BOARD_TITLES[lang][id] || id);
+  return `<a class="tag-card" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">
+      <span class="tag-card-top">
+        <span class="tag-card-name">${escHtml(tag)}</span>
+        <span class="tag-card-count">${escHtml(fill(text.boardCount, { n: ids.length }))}</span>
+      </span>
+      <span class="tag-card-boards">${escHtml(names.join(' · '))}</span>
+    </a>`;
+}
+
+/** 一类标签的一段（带小标题）。顺序固定：来源在前、类别在后 */
+function tagKindSection(lang, prefix, kind) {
+  const text = TAG_TEXT[lang];
+  const tags = tagsOfKind(kind);
+  if (!tags.length) return '';
+  return `<section class="tag-section">
+      <h2 class="tag-section-head">${escHtml(kind === 'source' ? text.sourceKind : text.topicKind)}</h2>
+      <div class="tag-cards">
+    ${tags.map((tag) => tagCard(lang, prefix, tag)).join('\n    ')}
+      </div>
+    </section>`;
+}
+
 export function renderTagsPage(lang, prefix) {
   const text = TAG_TEXT[lang];
-  const items = ALL_TAGS.map(
-    (tag) =>
-      `<a class="tag-link" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">` +
-      `<span class="tag">${escHtml(tag)}</span>` +
-      `<span class="muted">${fill(text.counts, { n: boardsWithTag(tag).length })}</span></a>`
-  ).join('\n      ');
   return `<h1>${escHtml(text.tagsTitle)}</h1>
-  <p class="muted">${escHtml(text.tagsIntro)}</p>
-  <nav class="tag-grid">
-      ${items}
-  </nav>`;
+    ${tagKindSection(lang, prefix, 'source')}
+    ${tagKindSection(lang, prefix, 'topic')}`;
 }
 
 /**
@@ -266,8 +293,8 @@ export function renderTagsPage(lang, prefix) {
  * 再由 `assets/tags.js`（一小段脚本）按地址里的 `?t=` 收窄成一组。
  *
  * ★ 两个刻意的选择，都是为了**没有 JS 时页面仍然可用**：
- *   1. 分组**不带 `hidden`** —— 禁用 JS 时 `:target` 那套也失效，所以默认
- *      "全部显示"，那正是"没指定标签"该有的样子。脚本跑起来才把其余的收掉。
+ *   1. 分组**不带 `hidden`** —— 禁用 JS 时脚本不会跑，默认"全部显示"，
+ *      那正是"没指定标签"该有的样子。
  *   2. 全部标签都渲染出来，而不是只渲染当前标签那一组 —— 静态托管没有
  *      rewrite，做不到"一个标签一个文件"，所以只能一个页面装下全部。
  */
@@ -276,24 +303,27 @@ export function renderTagPage(lang, prefix) {
   const groups = ALL_TAGS.map((tag) => {
     const ids = boardsWithTag(tag);
     return `<section class="tag-group" data-tag="${escHtml(tag)}">
-      <h2 class="tag-group-head">${escHtml(tag)}</h2>
+      <h2 class="tag-group-head">${escHtml(tag)}<span class="tag-group-count">${escHtml(fill(text.boardCount, { n: ids.length }))}</span></h2>
       <div class="entry-grid">
     ${ids.map((id) => boardCard(lang, prefix, id)).join('\n    ')}
       </div>
     </section>`;
   }).join('\n    ');
 
-  const chips = ALL_TAGS.map(
+  // 顶部的标签选择条：每个标签带条数，点它把页面收窄到那一组。
+  // 顺序**按类**（来源在前、类别在后）而不是 ALL_TAGS 的"首次出现"顺序 ——
+  // 后者会把 Aider 夹在 Models 与 Coding 之间，读起来像随手排的。
+  const ordered = [...tagsOfKind('source'), ...tagsOfKind('topic')];
+  const chips = ordered.map(
     (tag) =>
-      `<a class="tag-link" data-tag-link="${escHtml(tag)}" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">` +
-      `<span class="tag">${escHtml(tag)}</span></a>`
+      `<a class="tag-chip" data-tag-link="${escHtml(tag)}" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">` +
+      `${escHtml(tag)}<span class="tag-chip-n">${boardsWithTag(tag).length}</span></a>`
   ).join('\n      ');
 
   return `<p><a class="muted" href="${prefix}tags.html">${escHtml(text.back)}</a></p>
   <!-- 没有 ?t= 时显示"按标签浏览"（下面默认全部展开）；脚本选中某个标签后
        会把它换成"标签：<那个标签>"。data-prefix 就是给脚本用的前缀，见 assets/tags.js。 -->
   <h1 id="tag-title" data-prefix="${escHtml(text.tagPrefix)}">${escHtml(text.allTitle)}</h1>
-  <p class="muted" id="tag-intro" data-prefix="${escHtml(text.tagIntroPrefix)}" data-suffix="${escHtml(text.tagIntroSuffix)}">${escHtml(text.allIntro)}</p>
   <nav class="tag-grid" aria-label="${escHtml(text.allTags)}">
       ${chips}
   </nav>
