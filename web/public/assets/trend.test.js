@@ -10,6 +10,7 @@
  * 用真实的 polyglot_leaderboard.yml 片段：前 3 个元素（含缩进与类型混合）。
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   parseFlatYamlList, bestAiderRows, normalizeEval, compact, num, table, esc, rankBadge, bar,
   normalizePaper, rankPapers, rankRepos, flattenModelsDev, fmtCost,
@@ -822,6 +823,33 @@ t('attachPanel：替换时**保持原来的位置**（否则面板会被挪到�
   attachPanel(root, root.newPanel('b'), 'b');
   attachPanel(root, root.newPanel('a'), 'a'); // 重挂 a
   assert.deepEqual(root.children.map((c) => c.datasetBoard), ['a', 'b'], 'a 不该被挪到 b 后面');
+});
+
+/* ---------------- 源码级门禁：面板挂载的唯一入口 ---------------- */
+
+/*
+ * `panel()` 曾经无条件 `panelsRoot.appendChild(el)`，而**切换子榜**的路径是
+ * "重新调用 loader"（chip 点击 → loadOrApps('week')），于是每次切换都往
+ * `#panels` 里**再塞一个同 id 的面板**：旧的仍在 DOM 里显示老数据，
+ * 新的排在下面。页面上不报错、也不抛异常，读者只觉得"点了没反应"。
+ *
+ * 上面三条 attachPanel 测试盯的是那个函数本身；这一条盯的是**唯一的调用方**——
+ * 只要有人把 `panel()` 改回 `appendChild`，整条修复就失效，而函数测试照样全绿。
+ * 所以这里直接读源码，钉住"panel() 必须经由 attachPanel 挂载"。
+ */
+t('★ panel() 只能经由 attachPanel 挂载（改回 appendChild 会让切子榜重新变成追加）', () => {
+  const src = readFileSync(new URL('./trend.js', import.meta.url), 'utf8');
+  const body = src.slice(src.indexOf('function panel({'));
+  const end = body.indexOf('\n}\n', body.indexOf('attachPanel(panelsRoot'));
+  assert.ok(end > 0, '没找到 panel() 的函数体 —— 上面的切片定位已失效，请同步本条');
+  const fn = body.slice(0, end);
+  assert.match(fn, /attachPanel\(panelsRoot, el, id\)/, 'panel() 不再调用 attachPanel');
+  // 反证：函数体里不该再出现直接往 panelsRoot 里塞元素/HTML 的写法
+  assert.doesNotMatch(
+    fn,
+    /panelsRoot\.(appendChild|insertAdjacent|innerHTML)/,
+    'panel() 里出现了绕过 attachPanel 的直接挂载'
+  );
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);
