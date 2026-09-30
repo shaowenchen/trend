@@ -23,6 +23,7 @@ import {
   normalizeEval, parseFlatYamlList, bestAiderRows,
   rankPapers, rankRepos, flattenModelsDev, rankSweBench, sweBoardNames,
   openrouterBoard, openrouterNames,
+  rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
 } from '../web/public/assets/trend.js';
 
 /**
@@ -82,7 +83,8 @@ const EXTRA = [
 const MODELS_DEV_URL = 'https://models.dev/api.json';
 
 /** 面板 12：OpenRouter（用量榜 + 模型清单，见下面的体检段） */
-const OPENROUTER_RANKINGS_URL = 'https://openrouter.ai/api/frontend/v1/rankings/models';
+const OR_API = 'https://openrouter.ai/api/frontend/v1';
+const OPENROUTER_RANKINGS_URL = `${OR_API}/rankings/models`;
 const OPENROUTER_MODELS_URL = 'https://openrouter.ai/api/v1/models';
 
 /** 面板 11：SWE-bench（4MB）。★ 重点验证 resolved 的量纲没被上游改口径。 */
@@ -185,6 +187,44 @@ for (const src of EXTRA) {
     } catch (e) {
       bad += 1;
       console.log(`     └ ❌ 解析失败（上游格式可能已变）：${e.message}`);
+    }
+  }
+}
+
+/* ---------------- 面板 12-16：OpenRouter 的四张榜 ----------------
+ * 都是 api/frontend 那一路，且**形状互不相同**（见 docs/trend-sources.md §4）。
+ * 这里逐条打印"能解析出几行、榜首是谁"，因为这几张榜最容易出的错是
+ * "形状变了但解析器还在按老形状取值" —— 页面上只表现为行数变少，不报错。
+ */
+{
+  const eps = [
+    ['上升榜 climbing', 'discovery', (d) => rankClimbing(d.data.climbing, 'climbing'), (r) => `${r.slug} +${r.growth.toFixed(1)}%`],
+    ['突破榜 breakouts', 'discovery', (d) => rankClimbing(d.data.breakouts, 'breakouts'), (r) => `${r.slug} +${r.growth.toFixed(1)}%`],
+    ['厂商份额', 'discovery', (d) => rankAuthors(d.data.authors), (r) => `${r.author} ${r.share.toFixed(1)}%`],
+    ['性能（延迟）', 'performance', (d) => rankPerformance(d.data, 'latency'), (r) => `${r.name} ${r.latency}ms`],
+    ['性能（吞吐）', 'performance', (d) => rankPerformance(d.data, 'throughput'), (r) => `${r.name} ${r.throughput}tok/s`],
+    ['AA 综合智能', 'benchmarks', (d) => rankAa(d.data.aaData.intelligence), (r) => `${r.name.slice(0, 30)} ${r.score}`],
+    ['AA 编程', 'benchmarks', (d) => rankAa(d.data.aaData.coding), (r) => `${r.name.slice(0, 30)} ${r.score}`],
+    ['AA 智能体', 'benchmarks', (d) => rankAa(d.data.aaData.agentic), (r) => `${r.name.slice(0, 30)} ${r.score}`],
+    ['应用（本日）', 'apps', (d) => rankApps(d.data.day), (r) => `${r.title} ${(r.tokens / 1e9).toFixed(0)}B`],
+    ['图像模型', 'image-output', (d) => flattenMedia(d), (r) => r.slug],
+    ['视频模型', 'video-output-hours', (d) => flattenMedia(d), (r) => r.slug],
+    ['语音模型', 'stt-transcript-characters', (d) => flattenMedia(d), (r) => r.slug],
+  ];
+  // discovery / performance / benchmarks / apps 各取一次，避免重复请求
+  const cache = new Map();
+  for (const [name, ep, pick, fmt] of eps) {
+    if (!cache.has(ep)) cache.set(ep, await probe(`OR ${name}`, `${OR_API}/rankings/${ep}`));
+    const r = cache.get(ep);
+    if (!r?.res.ok) continue;
+    try {
+      const rows = pick(JSON.parse(r.buf.toString('utf8')));
+      const flag = rows.length ? '✅' : '❌';
+      if (!rows.length) bad += 1;
+      console.log(`     ${flag} ${name.padEnd(16)} ${rows.length} 行；榜首 ${rows[0] ? fmt(rows[0]) : '—'}`);
+    } catch (e) {
+      bad += 1;
+      console.log(`     ❌ ${name} 解析失败（上游形状可能已变）：${e.message}`);
     }
   }
 }

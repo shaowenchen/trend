@@ -163,6 +163,11 @@ const BOARD_TITLES = {
     repos: '高星 AI 开源项目',
     newmodels: '最新发布的模型',
     openrouter: 'OpenRouter 模型用量榜',
+    orTrends: 'OpenRouter 上升榜',
+    orAuthors: 'OpenRouter 厂商份额',
+    orPerf: 'OpenRouter 性能榜',
+    aaBench: 'Artificial Analysis 评测榜',
+    orApps: 'OpenRouter 应用榜',
     swebench: 'SWE-bench（真实代码修复）',
   },
   en: {
@@ -177,6 +182,11 @@ const BOARD_TITLES = {
     repos: 'Top-starred AI projects',
     newmodels: 'Latest model releases',
     openrouter: 'OpenRouter model usage',
+    orTrends: 'OpenRouter fastest climbers',
+    orAuthors: 'OpenRouter vendor share',
+    orPerf: 'OpenRouter performance',
+    aaBench: 'Artificial Analysis benchmarks',
+    orApps: 'OpenRouter app usage',
     swebench: 'SWE-bench (real code fixes)',
   },
 };
@@ -194,6 +204,11 @@ const BOARD_ICONS = {
   repos: 'star',
   newmodels: 'box',
   openrouter: 'bolt',
+  orTrends: 'trending',
+  orAuthors: 'database',
+  orPerf: 'bolt',
+  aaBench: 'trophy',
+  orApps: 'cube',
   swebench: 'code',
 };
 

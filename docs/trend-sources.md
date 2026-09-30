@@ -147,9 +147,44 @@ https://openrouter.ai/api/v1/models                       ← 模型清单（只
 `?order=top-weekly` 之类的排序参数确实被忽略（上一版测的没错），
 但那是 `api/v1` 的老结论，与用量榜无关。
 
+### `rankings/` 下还有 15 个端点（2026-09-30 实测，全部 CORS `*`）
+
+把它们全挖出来之后，OpenRouter 能做的**不止一张榜**。同一个 `/rankings` 页面背后：
+
+| 端点 | 内容 | 做成哪张榜 |
+|---|---|---|
+| `discovery` | `climbing`(8) / `breakouts`(8) / `authors`(8) / `modelOfWeek` / `totals`(548) / `routerTokens` / `videoRequests` | 上升榜、厂商份额 |
+| `performance` | 190 个模型的 p50 延迟 / 吞吐 / 请求量 / 最快 provider | 性能榜 |
+| `benchmarks` | Artificial Analysis 的 intelligence(103) / coding(148) / agentic(103) + `percentilesBySlug` | AA 评测榜 |
+| `apps` | 按 **agent 应用**归因的用量，`day` / `week` 两窗口 | 应用榜 |
+| `image-output` / `video-output-hours` / `stt-transcript-characters` | 图像 / 视频 / 语音模型的用量序列 | 多模态用量 |
+| `models` | 按天的模型用量（7 天） | 模型用量榜（本站已有的那张） |
+| `programming-language` / `natural-language` | 按编程语言 / 自然语言的 token 序列 | 未做（与模型榜重叠） |
+| `session-cost` / `task-spend` | 按 harness / 任务类别的花费 | 未做（偏费用，与榜的取向不同） |
+| `context-length` / `model-rankings-chart` / `modality-chart` / `modality-models` / `rerank-documents` | 曲线与分布数据 | 未做（前两个要参数） |
+
+★ **`changePercent` 在同一接口里有两套单位**（这是本轮最容易踩的坑）：
+`climbing` 给的是**百分数**（359.85 = +359.85%），`breakouts` 给的是**比率**
+（3.57 = +357%），`authors` 的也是比率（0.0289 = +2.9%）。
+数值看着差不多，乘 100 之后差两个数量级 —— 混排会让突破榜整条沉到上升榜末尾，
+而页面上**不会报错**。所以换算集中在 `growthPct(v, kind)` 一处做，
+`trend.test.js` 有一条断言把它钉住。
+
+★ **两个多模态端点多套一层**：`image-output` 是 `{data:[{x,ys}]}`，而
+`video-output-hours` / `stt-transcript-characters` 是 `{data:{data:[{x,ys}]}}`。
+按同一种形状解析的话，后两个只会得到一行（把 `data` 当模型映射，取到 `cachedAt`
+这种键），页面上表现为"只有一个模型的榜"。另外 `Others` 是上游的**合计桶**，
+不是模型，要排除。
+
 ---
 
 ## 5. 实测耗时（2026-09-23，`npm run test:live` 原始输出）
+
+```bash
+npm run test:live
+```
+
+下面是当时的一次原始输出（含耗时）：
 
 ```
 ✅ HF 趋势模型     200 · 27KB · 698ms · CORS: https://<站点域名>

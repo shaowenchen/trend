@@ -16,6 +16,7 @@ import {
   rankSweBench, sweBoardNames, applyBoardState, groupOptions, controlsHtml,
   cardGrid, detailFromCols, detailRow,
   openrouterBoard, openrouterNames, openrouterLabel,
+  growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
 } from './trend.js';
 
 let pass = 0;
@@ -604,6 +605,121 @@ t('★ openrouterLabel：有名字用名字，没名字回落成去日期去厂�
   assert.equal(openrouterLabel('openai/gpt-5-20260901', nameOf), 'OpenAI: GPT-5');
   // 取不到名字时，至少不要把 `vendor/` 前缀和日期一起甩给读者
   assert.equal(openrouterLabel('typesafe/jev-1.13-20260917', nameOf), 'jev-1.13');
+});
+
+
+/* ---------------- OpenRouter 的四张榜 ---------------- */
+
+t('★ growthPct：climbing 是百分数、breakouts 是比率（同一接口里两种单位）', () => {
+  // 实测：climbing 给 359.85（= +359.85%），breakouts 给 3.57（= +357%）。
+  // 不区分就会把突破榜整条压到上升榜末尾，而页面上不会报错。
+  assert.equal(growthPct(359.85, 'climbing'), 359.85);
+  assert.equal(growthPct(3.57, 'breakouts'), 357);
+  assert.ok(Math.abs(growthPct(0.65, 'breakouts') - 65) < 1e-9);
+  assert.equal(growthPct(null, 'climbing'), null);
+  assert.equal(growthPct('abc', 'breakouts'), null);
+});
+
+t('★ rankClimbing：按增幅降序（上游给的数组不是排好的）', () => {
+  const rows = rankClimbing(
+    [
+      { variantPermaslug: 'a/x', weeklyTokens: 100, prevWeeklyTokens: 10, changePercent: 10 },
+      { variantPermaslug: 'b/y', weeklyTokens: 200, prevWeeklyTokens: 1, changePercent: 50 },
+    ],
+    'climbing'
+  );
+  assert.deepEqual(rows.map((r) => r.slug), ['b/y', 'a/x']);
+  assert.equal(rows[0].growth, 50);
+});
+
+t('rankClimbing：空 slug / 无用量 / 无增幅的行被丢掉', () => {
+  const rows = rankClimbing(
+    [
+      { variantPermaslug: '', weeklyTokens: 100, changePercent: 9 },
+      { variantPermaslug: 'a/x', weeklyTokens: 0, changePercent: 9 },
+      { variantPermaslug: 'b/y', weeklyTokens: 5, changePercent: null },
+      { variantPermaslug: 'c/z', weeklyTokens: 5, changePercent: 1 },
+    ],
+    'climbing'
+  );
+  assert.deepEqual(rows.map((r) => r.slug), ['c/z']);
+  assert.deepEqual(rankClimbing(null, 'climbing'), []);
+});
+
+t('★ rankAuthors：share 是比例、changePercent 是比率（与 climbing 又不同）', () => {
+  const rows = rankAuthors([
+    { author: 'deepseek', weeklyTokens: 100, share: 0.2272, changePercent: 0.0289 },
+    { author: 'openai', weeklyTokens: 50, share: 0.1, changePercent: -0.5 },
+  ]);
+  assert.equal(rows[0].author, 'deepseek', '按用量降序');
+  assert.ok(Math.abs(rows[0].share - 22.72) < 1e-9, 'share 要转成百分数');
+  assert.ok(Math.abs(rows[0].growth - 2.89) < 1e-9, 'changePercent 是比率 → 2.89%');
+  assert.ok(rows[1].growth < 0);
+});
+
+t('★ rankPerformance：延迟越小越前、吞吐越大越前（两个视角方向相反）', () => {
+  const data = [
+    { slug: 'a', name: 'A', request_count: 10, p50_latency: 900, p50_throughput: 20 },
+    { slug: 'b', name: 'B', request_count: 20, p50_latency: 200, p50_throughput: 80 },
+  ];
+  assert.deepEqual(rankPerformance(data, 'latency').map((r) => r.slug), ['b', 'a']);
+  assert.deepEqual(rankPerformance(data, 'throughput').map((r) => r.slug), ['b', 'a']);
+  // 反过来构造：延迟高但吞吐也高，两个视角就应当给出不同顺序
+  const data2 = [
+    { slug: 'fast', p50_latency: 100, p50_throughput: 10 },
+    { slug: 'big', p50_latency: 5000, p50_throughput: 900 },
+  ];
+  assert.equal(rankPerformance(data2, 'latency')[0].slug, 'fast');
+  assert.equal(rankPerformance(data2, 'throughput')[0].slug, 'big');
+});
+
+t('rankPerformance：缺失的延迟/吞吐是 null，不是 0（否则会排到榜首）', () => {
+  const rows = rankPerformance([{ slug: 'a', p50_latency: null, p50_throughput: undefined }], 'latency');
+  assert.equal(rows[0].latency, null);
+  assert.equal(rows[0].throughput, null);
+});
+
+t('★ rankAa：用 score 排，不用 percentilesBySlug', () => {
+  const rows = rankAa([
+    { permaslug: 'a', aa_name: 'A', score: 10 },
+    { permaslug: 'b', aa_name: 'B', score: 50 },
+    { permaslug: 'c', aa_name: 'C' }, // 无分 → 丢
+  ]);
+  assert.deepEqual(rows.map((r) => r.slug), ['b', 'a']);
+});
+
+t('rankApps：按 token 降序，取 app.title 与链接', () => {
+  const rows = rankApps([
+    { app: { title: 'X', slug: 'x', origin_url: 'https://x' }, total_tokens: '100', total_requests: 5 },
+    { app: { title: 'Y', slug: 'y' }, total_tokens: '900', total_requests: 1 },
+  ]);
+  assert.deepEqual(rows.map((r) => r.title), ['Y', 'X']);
+  assert.equal(rows[1].url, 'https://x');
+});
+
+t('★ flattenMedia：video/stt 多套一层 data.data（按同一种形状解析只会出一行）', () => {
+  const inner = { data: [{ x: '2026-09-28', ys: { 'a/one': 5, 'b/two': 9, Others: 100 } }] };
+  // 图像是 {data:[…]}，视频/语音是 {data:{data:[…]}}
+  assert.deepEqual(flattenMedia({ data: inner.data }).map((r) => r.slug), ['b/two', 'a/one']);
+  assert.deepEqual(flattenMedia(inner).map((r) => r.slug), ['b/two', 'a/one']);
+});
+
+t('flattenMedia：Others 是合计桶、不是模型，且取最后一个时间点', () => {
+  const rows = flattenMedia({
+    data: [
+      { x: 'd1', ys: { 'a/one': 1 } },
+      { x: 'd2', ys: { 'a/one': 7, Others: 99 } },
+    ],
+  });
+  assert.deepEqual(rows.map((r) => r.slug), ['a/one']);
+  assert.equal(rows[0].value, 7, '应当取最后一个点');
+  assert.equal(rows[0].at, 'd2');
+});
+
+t('flattenMedia：空输入不炸', () => {
+  assert.deepEqual(flattenMedia(null), []);
+  assert.deepEqual(flattenMedia({}), []);
+  assert.deepEqual(flattenMedia({ data: [] }), []);
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

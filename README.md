@@ -16,11 +16,11 @@
 ## 页面
 
 **一个面板一页**：每条趋势（榜单）是一个独立地址，首页每张卡片正好对应一个 ——
-不把十二个面板堆在一页里。
+不把十七个面板堆在一页里。
 
 | 地址 | 作用 |
 |---|---|
-| `index.html` | 中文入口页：十二个面板的入口卡片 |
+| `index.html` | 中文入口页：十七个面板的入口卡片 |
 | `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
 | `eval.html` `aider.html` | 评测与编程能力榜 |
 | `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
@@ -30,7 +30,7 @@
 | `tag.html?t=<标签>` | 含该标签的榜单，卡片式 |
 | `en/…` | 以上每一个的英文版（含标签页），文件名相同 |
 
-页头**三样**：左上角「首页」与「标签」，右上角切换语言。十二个榜单不进页头 ——
+页头**三样**：左上角「首页」与「标签」，右上角切换语言。十七个榜单不进页头 ——
 它们就是首页的入口卡片（下面一格一张卡），页头再列一遍等于同一份目录出现两次。
 页面**下方**另有一条由 `trend.js` 生成的 `.board-links`，列出全部面板并带
 「刷新数据」按钮 —— 那是"看完了换下一个"的那条路。
@@ -48,7 +48,7 @@
 页面骨架里的固定文案（标题、导航）是手写的两份 —— 中英文各写各的，
 **不会**把两种语言都塞进同一页再靠 CSS 藏起来（那样两种语言都会进索引，还被判重复内容）。
 面板标题也是：它由 `trend.js` 从字典里取，渲染成页面的 `<h1>`，
-所以 30 个页面文件里没有第二份面板名。
+所以 40 个页面文件里没有第二份面板名。
 
 > ★ 刻意**没有** `hreflang`（以及 canonical / og:url）：它们的地址必须是绝对 URL，
 > 而本站不写死域名。代价是中英两页之间没有对搜索引擎的互译声明。
@@ -59,7 +59,7 @@
 > `site.test.js` 要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」），
 > 以及两条"英文页里不许有中文 / 中文页里不许有整句英文"的断言。
 
-## 十二个面板
+## 十七个面板
 
 每个面板都有自己的页面（下表第一列即地址的文件名去掉 `.html`）：
 
@@ -76,6 +76,11 @@
 | 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
 | 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB 含 8000 个模型，**点击后才加载** |
 | OpenRouter 模型用量榜 | `openrouter` | `openrouter.ai/api/frontend/v1/rankings/models` + `/api/v1/models`（只为名字） | 按**当天 token 用量**排序，日更 7 天窗口；standard/batch/free **已合并**（见 `docs/trend-sources.md` §4） |
+| OpenRouter 上升榜 | `orTrends` | 同上 `…/rankings/discovery` | **周环比增幅**（本周 vs 上周）；子榜：上升 / 突破 |
+| OpenRouter 厂商份额 | `orAuthors` | 同上 `…/discovery` 的 `authors` | 各机构 token 份额与周环比变化 |
+| OpenRouter 性能榜 | `orPerf` | 同上 `…/rankings/performance` | 实测 p50 延迟 / 吞吐（190 个模型，取最快的 provider）；子榜：延迟 / 吞吐 |
+| Artificial Analysis 评测榜 | `aaBench` | 同上 `…/rankings/benchmarks` | 与 HF 评测榜**不同来源**，可并列对照；子榜：综合智能 / 编程 / 智能体 |
+| OpenRouter 应用榜 | `orApps` | 同上 `…/rankings/apps` + 三个多模态端点 | 哪些 agent 应用在烧 token（日/周），以及图像/视频/语音模型用量 |
 | SWE-bench | `swebench` | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**点击后才加载** |
 
 页面靠 `<div id="panels" data-board="eval">` 指名自己要跑哪一个（`trend.js` 读它）。
@@ -141,7 +146,7 @@ Papers）。真值只有一处：`web/public/assets/boards.js` 的 `BOARD_TAGS`�
 - **一个面板一页**：页面标题就是面板名（由 `trend.js` 渲染成 `<h1>`），
   没有另写一个 hero 标题 —— 一页一个 h1，且面板名只有字典一处来源。
 - **页头三样**：左边「首页」+「标签」，右边切换语言（构建期生成，
-  `src/site/nav.js` + `{{SITE_NAV}}`，不是抄 26 份）。十二个榜单**不进页头** ——
+  `src/site/nav.js` + `{{SITE_NAV}}`，不是抄 40 份）。十七个榜单**不进页头** ——
   它们已经在首页的入口卡片里各占一张卡，页头再列一遍就是同一份目录的第二次出现；
   「标签」是一条**入口**（按来源/分类逛），不是榜单清单。
   语言切换**指向对应的那一页**（`repos.html` ↔ `en/repos.html`），
@@ -240,8 +245,8 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 
 ```
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
-  index.html                      中文入口：十二个面板的入口卡片
-  <board>.html                    ★ 十二个中文面板页（eval.html、repos.html…）
+  index.html                      中文入口：十七个面板的入口卡片
+  <board>.html                    ★ 十七个中文面板页（eval.html、repos.html…）
   tags.html  tag.html             标签总览 / 按标签筛选
   en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css

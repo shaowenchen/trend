@@ -1685,6 +1685,426 @@ async function loadOpenRouter() {
 }
 
 /* ================================================================== */
+/* 面板：OpenRouter 的四张榜（上升 / 机构 / 性能 / 应用）              */
+/* ================================================================== */
+
+const OR_API = 'https://openrouter.ai/api/frontend/v1';
+
+/**
+ * `climbing` / `breakouts` 的 `changePercent` **单位不一样**（实测，必须分开处理）
+ *
+ * 同一个响应里：`climbing` 给的是**百分数**（359.85 = +359.85%），
+ * `breakouts` 给的是**比率**（3.57 = +357%）。看着数值差不多，乘 100 之后就差
+ * 两个数量级 —— 混在一起排，突破榜会整条被排到上升榜末尾，而页面上不会报错，
+ * 只会看起来"突破榜怎么都这么小"。
+ *
+ * 所以每个子榜自带单位标记：`kind` 只有 `climbing` 是百分数，其余按比率算。
+ * 需要证据时看两榜的分布：climbing 几十~几百、breakouts 0.0x~3.5，量级分得很开。
+ */
+export function growthPct(v, kind) {
+  // ★ 先挡空值再 Number()：`Number(null)` 与 `Number('')` 都是 **0**（有限数），
+  // 直接转会把"上游没给增幅"变成"增幅 0%"，于是这种行会混进榜里假装有数据。
+  // 合法结果是 0（真的没涨），但那是**上游给了 0**，不是"没给"。
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  return kind === 'climbing' ? n : n * 100;
+}
+
+/** 上升榜的行：climbing / breakouts 共用，唯一的差别就是 changePercent 的单位 */
+export function rankClimbing(list, kind) {
+  const rows = (Array.isArray(list) ? list : [])
+    .map((r) => ({
+      slug: String(r.variantPermaslug || ''),
+      tokens: Number(r.weeklyTokens) || 0,
+      prev: Number(r.prevWeeklyTokens) || 0,
+      // 单位换算在这里一次性做掉，下游只管 %（见 growthPct 的说明）
+      growth: growthPct(r.changePercent, kind),
+    }))
+    .filter((r) => r.slug && r.growth !== null && r.tokens > 0);
+  // 按增幅降序 —— 上游给的这个数组**不是**按增幅排的（实测 breakouts 是乱的）
+  rows.sort((a, b) => b.growth - a.growth || b.tokens - a.tokens);
+  return rows;
+}
+
+/**
+ * 厂商（机构）份额。
+ * `share` 上游给的是 0~1 的比例（0.2272 = 22.7%），`changePercent` 是**比率**
+ * （0.0289 = +2.9%，注意不是 289%）—— 与 climbing 的单位又不同，实测确认。
+ */
+export function rankAuthors(list) {
+  return (Array.isArray(list) ? list : [])
+    .map((a) => ({
+      author: String(a.author || ''),
+      tokens: Number(a.weeklyTokens) || 0,
+      share: Number(a.share) * 100,
+      growth: Number(a.changePercent) * 100,
+    }))
+    .filter((a) => a.author)
+    .sort((a, b) => b.tokens - a.tokens);
+}
+
+/** 性能榜：延迟与吞吐两个视角，各自按"越小/越大越好"降序 */
+export function rankPerformance(list, view) {
+  const rows = (Array.isArray(list) ? list : [])
+    .map((r) => ({
+      slug: String(r.slug || r.id || ''),
+      name: String(r.name || ''),
+      author: String(r.author || ''),
+      requests: Number(r.request_count) || 0,
+      latency: Number.isFinite(r.p50_latency) ? Number(r.p50_latency) : null,
+      throughput: Number.isFinite(r.p50_throughput) ? Number(r.p50_throughput) : null,
+      provider: view === 'throughput' ? r.best_throughput_provider : r.best_latency_provider,
+      price: view === 'throughput' ? r.best_throughput_price : r.best_latency_price,
+      providers: Number(r.provider_count) || 0,
+    }))
+    .filter((r) => r.slug);
+  // 延迟：快在前（升序）；吞吐：快在前（降序）。缺值的行丢给调用方按"空值最后"处理
+  if (view === 'throughput') rows.sort((a, b) => (b.throughput ?? -1) - (a.throughput ?? -1));
+  else rows.sort((a, b) => (a.latency ?? Infinity) - (b.latency ?? Infinity));
+  return rows;
+}
+
+/**
+ * Artificial Analysis 的评测分（三张子榜：intelligence / coding / agentic）。
+ *
+ * ★ 用 `score` 排，**不用** `percentilesBySlug` —— 后者是"百分位"，看着像分
+ * 但语义完全不同（同一个模型在两处的数不一样），混用会得到一个说不清是什么的榜。
+ */
+export function rankAa(list) {
+  return (Array.isArray(list) ? list : [])
+    .map((r) => ({
+      slug: String(r.permaslug || r.uid || ''),
+      // aa_name 是 Artificial Analysis 那边的完整名（带括号后缀），太啰嗦；
+      // heuristic_openrouter_slug 是它猜的 OpenRouter 标识，优先用它做显示名
+      name: String(r.aa_name || r.heuristic_openrouter_slug || r.permaslug || ''),
+      score: Number(r.score),
+    }))
+    .filter((r) => r.slug && Number.isFinite(r.score))
+    .sort((a, b) => b.score - a.score);
+}
+
+/** 应用榜：day / week 两个窗口，按 token 用量排序 */
+export function rankApps(list) {
+  return (Array.isArray(list) ? list : [])
+    .map((r) => ({
+      title: String(r.app?.title || ''),
+      slug: String(r.app?.slug || ''),
+      url: r.app?.origin_url || r.app?.main_url || '',
+      source: r.app?.source_code_url || '',
+      categories: Array.isArray(r.app?.categories) ? r.app.categories.join(' · ') : '',
+      tokens: Number(r.total_tokens) || 0,
+      requests: Number(r.total_requests) || 0,
+    }))
+    .filter((r) => r.title)
+    .sort((a, b) => b.tokens - a.tokens);
+}
+
+/**
+ * 多模态用量榜：图像 / 视频 / 语音三个端点。
+ *
+ * ★ 形状**不完全一样**（实测确认）：三个都是 `{x, ys}` 的时间序列，
+ * 但 `video-output-hours` 与 `stt-transcript-characters` **多套一层** ——
+ * 是 `{data:{data:[…]}}` 而不是 `{data:[…]}`。按同一种形状解析的话，
+ * 后两个只会得到一行（把 `data` 当成模型映射，取到 `cachedAt` 这种键），
+ * 页面上表现为"只有一个模型的榜"，不报错。
+ *
+ * 取**最后一个点**作为当前值；`Others` 是上游的合计桶（不是模型），排除。
+ */
+export function flattenMedia(json, { exclude = ['Others'] } = {}) {
+  const series = Array.isArray(json?.data) ? json.data : json?.data?.data;
+  const last = Array.isArray(series) && series.length ? series[series.length - 1] : null;
+  const rows = [];
+  for (const [slug, v] of Object.entries(last?.ys || {})) {
+    if (!slug || exclude.includes(slug)) continue;
+    const value = Number(v) || 0;
+    if (value > 0) rows.push({ slug, value, at: String(last.x || '') });
+  }
+  return rows.sort((a, b) => b.value - a.value);
+}
+
+/** 取名字的小工具：OpenRouter 的四张榜都要显示名，走同一个连接 */
+function orNameOf(models) {
+  return openrouterNames(models?.data);
+}
+
+/** 子榜切换片（与 GitHub 时间段的写法一致：按钮 + 事件委托） */
+function subBoardChips(views, current, attr) {
+  return (
+    `<div class="chips" data-chips>` +
+    Object.entries(views)
+      .map(
+        ([k, v]) =>
+          `<button class="chip${k === current ? ' on' : ''}" data-${attr}="${k}" type="button">${esc(L(v))}</button>`
+      )
+      .join('') +
+    '</div>'
+  );
+}
+
+/** 面板：OpenRouter 上升榜（climbing / breakouts 两个子榜） */
+async function loadOrTrends(view = 'climbing') {
+  const p = panel({ id: 'orTrends', iconName: 'trending', title: L('p.orTrends.title'), hint: L('p.orTrends.hint') });
+  try {
+    const [disc, models] = await Promise.all([
+      cachedJson('or-discovery', `${OR_API}/rankings/discovery`),
+      cachedJson('openrouter-models', OPENROUTER_MODELS_URL),
+    ]);
+    const nameOf = orNameOf(models);
+    const rows = rankClimbing(disc?.data?.[view], view).map((r) => ({
+      ...r,
+      label: openrouterLabel(r.slug, nameOf),
+      named: Boolean(nameOf(r.slug)),
+    }));
+    if (!rows.length) throw new Error(L('err.noBoard'));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.model'),
+          field: 'label',
+          cell: (r) => `<a href="https://openrouter.ai/${encodeURI(r.slug)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a>`,
+        },
+        {
+          label: L('col.orGrowth'),
+          num: true,
+          field: 'growth',
+          cell: (r) => `<span class="v-num">+${num(r.growth, r.growth >= 10 ? 0 : 1)}%</span>`,
+        },
+        { label: L('col.orWeekTokens'), num: true, cls: 'col-2', field: 'tokens', cell: (r) => compact(r.tokens) ?? '—' },
+        { label: L('col.orPrevWeek'), num: true, cls: 'col-2', field: 'prev', cell: (r) => compact(r.prev) ?? '—' },
+      ],
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: ['label', 'slug'],
+      placeholder: L('ui.searchModels'),
+      transform: withRank,
+      beforeControls: () => subBoardChips({ climbing: 'p.orTrends.climbing', breakouts: 'p.orTrends.breakouts' }, view, 'trend'),
+      card: {
+        title: (r) => esc(r.label),
+        value: (r) => `<span class="v-num">+${num(r.growth, r.growth >= 10 ? 0 : 1)}%</span> <span class="v-unit">${L('col.orGrowth')}</span>`,
+        meta: (r) => `<span class="tag">${compact(r.tokens) ?? '—'} ${L('col.orWeekTokens')}</span>`,
+        link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
+      },
+    });
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-trend]');
+      if (b) loadOrTrends(b.getAttribute('data-trend'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/** 面板：OpenRouter 机构份额 */
+async function loadOrAuthors() {
+  const p = panel({ id: 'orAuthors', iconName: 'database', title: L('p.orAuthors.title'), hint: L('p.orAuthors.hint') });
+  try {
+    const disc = await cachedJson('or-discovery', `${OR_API}/rankings/discovery`);
+    const rows = rankAuthors(disc?.data?.authors);
+    if (!rows.length) throw new Error(L('err.noBoard'));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        { label: L('col.org'), field: 'author', cell: (r) => esc(r.author) },
+        { label: L('col.orShare'), num: true, field: 'share', cell: (r) => `${num(r.share, 1)}%` },
+        { label: L('col.orWeekTokens'), num: true, field: 'tokens', cell: (r) => compact(r.tokens) ?? '—' },
+        {
+          label: L('col.orGrowth'),
+          num: true,
+          cls: 'col-2',
+          field: 'growth',
+          cell: (r) => (r.growth === null ? '—' : `${r.growth > 0 ? '+' : ''}${num(r.growth, 1)}%`),
+        },
+      ],
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: ['author'],
+      placeholder: L('ui.search'),
+      transform: withRank,
+      card: {
+        title: (r) => esc(r.author),
+        value: (r) => `<span class="v-num">${num(r.share, 1)}%</span> <span class="v-unit">${L('col.orShare')}</span>`,
+        meta: (r) =>
+          `<span class="tag">${compact(r.tokens) ?? '—'} ${L('col.orWeekTokens')}</span>` +
+          `<span class="tag">${r.growth > 0 ? '+' : ''}${num(r.growth, 1)}%</span>`,
+      },
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/** 面板：OpenRouter 性能榜（延迟 / 吞吐两个子榜） */
+async function loadOrPerformance(view = 'latency') {
+  const p = panel({ id: 'orPerf', iconName: 'bolt', title: L('p.orPerf.title'), hint: L('p.orPerf.hint') });
+  try {
+    const data = await cachedJson('or-performance', `${OR_API}/rankings/performance`);
+    const rows = rankPerformance(data?.data, view);
+    if (!rows.length) throw new Error(L('err.noBoard'));
+    p.status('', 'ok');
+    const field = view === 'throughput' ? 'throughput' : 'latency';
+    const unit = view === 'throughput' ? 'tok/s' : 'ms';
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        { label: L('col.model'), field: 'name', cell: (r) => esc(r.name || r.slug) },
+        { label: L('col.org'), cls: 'col-2', field: 'author', cell: (r) => (r.author ? `<span class="tag">${esc(r.author)}</span>` : '') },
+        {
+          label: view === 'throughput' ? L('col.orThroughput') : L('col.orLatency'),
+          num: true,
+          field,
+          cell: (r) => (r[field] === null ? '—' : `${num(r[field], 0)} ${unit}`),
+        },
+        { label: L('col.orReqCount'), num: true, cls: 'col-2', field: 'requests', cell: (r) => compact(r.requests) ?? '—' },
+        { label: L('col.orProvider'), cls: 'col-2', field: 'provider', cell: (r) => (r.provider ? `<span class="tag">${esc(r.provider)}</span>` : '') },
+      ],
+      defaultSort: { index: 3, dir: view === 'throughput' ? 'desc' : 'asc' },
+      searchFields: ['name', 'slug', 'author'],
+      placeholder: L('ui.searchModels'),
+      transform: withRank,
+      beforeControls: () => subBoardChips({ latency: 'p.orPerf.latency', throughput: 'p.orPerf.throughput' }, view, 'perf'),
+      card: {
+        title: (r) => esc(r.name || r.slug),
+        value: (r) =>
+          r[field] === null
+            ? '—'
+            : `<span class="v-num">${num(r[field], 0)}</span> <span class="v-unit">${unit}</span>`,
+        meta: (r) =>
+          (r.provider ? `<span class="tag">${esc(r.provider)}</span>` : '') +
+          `<span class="tag">${compact(r.requests) ?? '—'} ${L('col.orReqCount')}</span>`,
+      },
+    });
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-perf]');
+      if (b) loadOrPerformance(b.getAttribute('data-perf'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/** 面板：Artificial Analysis 三张评测榜（与 HF 评测榜不同来源，可并列看） */
+async function loadOrBenchmarks(view = 'intelligence') {
+  const p = panel({ id: 'aaBench', iconName: 'trophy', title: L('p.aaBench.title'), hint: L('p.aaBench.hint') });
+  try {
+    const data = await cachedJson('or-benchmarks', `${OR_API}/rankings/benchmarks`);
+    const rows = rankAa(data?.data?.aaData?.[view]);
+    if (!rows.length) throw new Error(L('err.noBoard'));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        { label: L('col.model'), field: 'name', cell: (r) => esc(r.name) },
+        { label: L('col.score'), num: true, field: 'score', cell: (r) => num(r.score, 1) },
+      ],
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: ['name', 'slug'],
+      placeholder: L('ui.searchModels'),
+      transform: withRank,
+      beforeControls: () =>
+        subBoardChips(
+          { intelligence: 'p.aaBench.intelligence', coding: 'p.aaBench.coding', agentic: 'p.aaBench.agentic' },
+          view,
+          'aa'
+        ),
+      card: {
+        title: (r) => esc(r.name),
+        value: (r) => `<span class="v-num">${num(r.score, 1)}</span> <span class="v-unit">${L('col.score')}</span>`,
+        link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
+      },
+    });
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-aa]');
+      if (b) loadOrBenchmarks(b.getAttribute('data-aa'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/** 面板：OpenRouter 应用榜 + 多模态用量（三个子榜） */
+async function loadOrApps(view = 'day') {
+  const p = panel({ id: 'orApps', iconName: 'cube', title: L('p.orApps.title'), hint: L('p.orApps.hint') });
+  const views = { day: 'p.orApps.day', week: 'p.orApps.week', image: 'p.orApps.image', video: 'p.orApps.video', audio: 'p.orApps.audio' };
+  try {
+    const isMedia = view === 'image' || view === 'video' || view === 'audio';
+    const url = isMedia
+      ? `${OR_API}/rankings/${view === 'image' ? 'image-output' : view === 'video' ? 'video-output-hours' : 'stt-transcript-characters'}`
+      : `${OR_API}/rankings/apps`;
+    const [raw, models] = await Promise.all([cachedJson(`or-${view}`, url), cachedJson('openrouter-models', OPENROUTER_MODELS_URL)]);
+    const nameOf = orNameOf(models);
+    // 单位三者不同：图像按张、视频按**小时**（上游给的就是小时）、语音按字符
+    const mediaUnit = view === 'image' ? L('ui.orImages') : view === 'video' ? L('ui.orHours') : L('ui.orChars');
+
+    let rows;
+    let cols;
+    let card;
+    if (isMedia) {
+      rows = flattenMedia(raw).map((r) => ({
+        ...r,
+        label: openrouterLabel(r.slug, nameOf),
+      }));
+      cols = [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        { label: L('col.model'), field: 'label', cell: (r) => esc(r.label) },
+        { label: mediaUnit, num: true, field: 'value', cell: (r) => num(r.value, 0) },
+      ];
+      card = {
+        title: (r) => esc(r.label),
+        value: (r) => `<span class="v-num">${num(r.value, 0)}</span> <span class="v-unit">${mediaUnit}</span>`,
+      };
+    } else {
+      rows = rankApps(raw?.data?.[view]);
+      cols = [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.app'),
+          field: 'title',
+          cell: (r) => (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>` : esc(r.title)),
+        },
+        { label: L('col.orTokens'), num: true, field: 'tokens', cell: (r) => compact(r.tokens) ?? '—' },
+        { label: L('col.orRequests'), num: true, cls: 'col-2', field: 'requests', cell: (r) => compact(r.requests) ?? '—' },
+        { label: L('col.task'), cls: 'col-2', field: 'categories', cell: (r) => (r.categories ? `<span class="tag">${esc(r.categories)}</span>` : '') },
+      ];
+      card = {
+        title: (r) => esc(r.title),
+        value: (r) => `<span class="v-num">${compact(r.tokens) ?? '—'}</span> <span class="v-unit">${L('col.orTokens')}</span>`,
+        meta: (r) => `<span class="tag">${compact(r.requests) ?? '—'} ${L('col.orRequests')}</span>`,
+        link: (r) => r.url,
+      };
+    }
+    if (!rows.length) throw new Error(L('err.noBoard'));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols,
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: isMedia ? ['label', 'slug'] : ['title', 'categories'],
+      placeholder: isMedia ? L('ui.searchModels') : L('ui.searchApps'),
+      transform: withRank,
+      beforeControls: () => subBoardChips(views, view, 'app'),
+      card,
+    });
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-app]');
+      if (b) loadOrApps(b.getAttribute('data-app'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/* ================================================================== */
 /* 启动                                                                */
 /* ================================================================== */
 
@@ -1730,6 +2150,11 @@ const BOARD_LOADERS = {
   repos: () => loadRepos('week'),
   newmodels: () => loadNewModels(),
   openrouter: () => loadOpenRouter(),
+  orTrends: () => loadOrTrends(),
+  orAuthors: () => loadOrAuthors(),
+  orPerf: () => loadOrPerformance(),
+  aaBench: () => loadOrBenchmarks(),
+  orApps: () => loadOrApps(),
   swebench: () => loadSweBench(),
 };
 

@@ -33,6 +33,11 @@ export const BOARD_IDS = [
   'repos',
   'newmodels',
   'openrouter',
+  'orTrends',
+  'orAuthors',
+  'orPerf',
+  'aaBench',
+  'orApps',
   'swebench',
 ];
 
@@ -70,6 +75,11 @@ export const BOARD_TAGS = {
   repos: ['GitHub', 'Community'],
   newmodels: ['models.dev', 'Models'],
   openrouter: ['OpenRouter', 'Models'],
+  orTrends: ['OpenRouter', 'Trends', 'Models'],
+  orAuthors: ['OpenRouter', 'Trends', 'Community'],
+  orPerf: ['OpenRouter', 'Performance', 'Models'],
+  aaBench: ['Artificial Analysis', 'Evaluation', 'Models'],
+  orApps: ['OpenRouter', 'Community', 'Apps'],
   swebench: ['SWE-bench', 'Coding', 'Evaluation'],
 };
 
@@ -97,7 +107,11 @@ export const TAG_KINDS = {
   'models.dev': 'source',
   OpenRouter: 'source',
   'SWE-bench': 'source',
+  'Artificial Analysis': 'source',
   Models: 'topic',
+  Trends: 'topic',
+  Performance: 'topic',
+  Apps: 'topic',
   Evaluation: 'topic',
   Coding: 'topic',
   Community: 'topic',
