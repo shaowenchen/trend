@@ -176,22 +176,21 @@ await test('每个页面都用 <base href="./"> 把相对路径钉在自己的�
  * （`distRead`），不是源页面 —— 源页面里现在只有 `{{SITE_NAV}}`，
  * 对着它断言等于在问"生成器之外的另一个副本对不对"，而那正是要消灭的东西。
  */
-await test('★ 发布物的品牌位与标题都不是写死的，来自 {{BRAND}} 与构建期导航', async () => {
+await test('★ 发布物的标题不是写死的，来自 {{BRAND}} 与构建期导航', async () => {
   for (const rel of ALL_PAGES) {
     const src = await read(rel);
     // 源页面里应当**有**占位符：写死品牌名就等于多了一份来源。
     assert.match(src, /\{\{BRAND\}\}/, `${rel} 源页面没有 {{BRAND}} 占位符`);
     assert.match(src, /\{\{SITE_NAV\}\}/, `${rel} 源页面没有 {{SITE_NAV}} 占位符`);
 
-    // 发布物里品牌必须已经落成真值。页头品牌位就是品牌名本身。
+    // 发布物里品牌必须已经落成真值。
     //
-    // <title> 只查"含品牌、且没有残留占位符" —— 品牌在标题里的位置本来
-    // 就因页而异（首页是「Trend · AI 趋势大盘」，面板页是「热门模型 · Trend」），
-    // 规定一个位置等于把排版钉死，而这里要防的是**写死第二份品牌名**。
+    // ★ 页头**没有**品牌位了：那里只剩「首页」与语言切换（榜单在首页的入口卡片里，
+    //   见 `src/site/nav.js`）。品牌因此只出现在 <title> 里，下面这条就是它唯一
+    //   的门禁 —— 盯的两件事：含品牌、且没有残留占位符。
+    //   <title> 里品牌的位置因页而异（首页是「Trend · AI 趋势大盘」，面板页是
+    //   「热门模型 · Trend」），规定位置等于把排版钉死；这里要防的是**写死第二份品牌名**。
     const html = await distRead(rel);
-    const brandSpot = html.match(/<a[^>]*class="brand"[^>]*>([\s\S]*?)<\/a>/)?.[1];
-    assert.equal(brandSpot?.trim(), BRAND, `${rel} 的页头品牌位不对：${String(brandSpot).trim().slice(0, 60)}`);
-
     const title = html.match(/<title>([\s\S]*?)<\/title>/)?.[1];
     assert.ok(title, `${rel} 发布物里没有 <title>`);
     assert.ok(title.includes(BRAND), `${rel} 的标题里没有 ${BRAND}：${title.trim().slice(0, 60)}`);
@@ -344,24 +343,39 @@ await test('语言切换链接带地球图标，与普通导航项有区分的�
 });
 
 /**
- * 页头导航是**构建期**从 `BOARD_IDS` 生成的，所以它自己的两条性质要单独盯住：
- * 每个榜单都要有一个入口（否则那页只能从别处摸到），且语言切换要保持是 `<a>`
- * —— 它是"另一个地址"，改成按钮就丢掉了可被收藏、可被搜索引擎跟随的语义。
+ * 页头导航是**构建期**生成的，所以它自己的性质要单独盯住。
+ *
+ * 它只有两样：左边「首页」（指向本语言的首页），右边语言切换。
+ * 上面那条"语言切换指向对应榜单页"already 盯着切换的目标，这里盯它的**组成**：
+ * 页头不许再长出别的链接 —— 榜单入口在首页的卡片里，页头多一条就是同一个目录
+ * 出现两次，而且按 id 硬推链接的写法（下拉菜单）已经没有调用方了。
  */
-await test('★ 页头导航给每个面板都留了入口，且链接与页面文件同名', async () => {
+await test('★ 页头导航只有「首页」与语言切换两项，且首页指向本语言的首页', async () => {
   const bad = [];
   for (const rel of ALL_PAGES) {
     const html = await distRead(rel);
+    // 取**整条页头**（header-inner）而不是 `<nav class="site-nav">`：
+    // 「首页」是页头左侧的元素、`<nav>` 的兄弟，只看 nav 会把它整个漏掉。
+    const header = html.match(/<div class="wrap header-inner">([\s\S]*?)<\/div>/)?.[1] ?? '';
+    if (!header) { bad.push(`${rel}: 没找到页头`); continue; }
+
+    const hrefs = [...header.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+    if (hrefs.length !== 2) bad.push(`${rel}: 页头有 ${hrefs.length} 个链接，应为 2（首页 + 语言切换）`);
+
+    // 首页链接指向本语言的首页，不是对方语言的（那是语言切换的活）
     const isEn = rel.startsWith('en/');
-    const prefix = isEn ? '../' : '';
-    for (const id of BOARD_IDS) {
-      if (!html.includes(`href="${prefix}${id}.html"`)) bad.push(`${rel} 缺 ${prefix}${id}.html 的入口`);
-    }
-    // 下拉里的入口数应当正好等于面板数，多一个就是有人手写了一条。
-    // 计的是 <li> 项而不是 <a>：当前页那一项带 aria-current，属性不止 href。
-    const menu = html.match(/<ul class="nav-boards-menu">([\s\S]*?)<\/ul>/)?.[1] ?? '';
-    const count = [...menu.matchAll(/<li><a href="[^"]+"[^>]*>/g)].length;
-    if (count !== BOARD_IDS.length) bad.push(`${rel} 下拉里有 ${count} 个入口，应为 ${BOARD_IDS.length}`);
+    const home = header.match(/<a class="nav-home" href="([^"]+)"/)?.[1];
+    const want = isEn ? '../index.html' : 'index.html';
+    if (home !== want) bad.push(`${rel}: 首页链接是 ${home}，应为 ${want}`);
+
+    // 首页页面上，首页链接要带 aria-current（读屏器靠它播报"当前页"）；
+    // 榜单页上不该带 —— 那是别的页面。
+    const isHome = rel === 'index.html' || rel === 'en/index.html';
+    const current = /<a class="nav-home"[^>]*aria-current="page"/.test(header);
+    if (isHome !== current) bad.push(`${rel}: aria-current ${current ? '多了' : '少了'}`);
+
+    // 下拉菜单是上一版的东西，必须彻底消失（有 .nav-boards 就说明模板还留着）
+    if (/nav-boards/.test(html)) bad.push(`${rel}: 还有榜单下拉的痕迹`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });

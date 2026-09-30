@@ -149,25 +149,22 @@ a { color: var(--accent); }
 .header-inner {
   display: flex;
   align-items: center;
+  /* 页头的两个元素各就各位：左边 nav-home、右边 .site-nav。
+     它们都是 header-inner 的直接子元素，所以"左一个右一个"由这一行负责，
+     不需要在 CSS 里给语言切换写 `margin-left: auto` 这类补丁。 */
   justify-content: space-between;
   gap: 12px;
   height: 58px;
 }
 
-.brand {
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -.2px;
-  color: var(--ink);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 /* ── 页头导航 ──────────────────────────────────────────────
  * 由构建期生成（`src/site/nav.js` + `{{SITE_NAV}}`），不是手写在 24 个页面里。
- * 三段：品牌 / 首页 + 榜单下拉 / 语言切换。
  *
- * 三个控件的高度统一用 `--nav-h`：高度不一致是"这一排没对齐"最常见的原因，
+ * 只有两样：左边「首页」，右边切换语言 —— 十一个榜单不进页头，它们在首页的
+ * 入口卡片里各有一张卡（见 `.entry-grid`）。页头的两个元素直接是
+ * `header-inner` 的子元素，靠它的 `space-between` 各就各位。
+ *
+ * 两块链接的高度统一用 `--nav-h`：高度不一致是"这一排没对齐"最常见的原因，
  * 而定成一个变量之后，改一处就全跟着走。
  */
 .site-nav {
@@ -177,8 +174,7 @@ a { color: var(--accent); }
   font-size: 14px;
   --nav-h: 36px;
 }
-.site-nav a,
-.site-nav summary {
+.site-nav a {
   display: inline-flex;
   align-items: center;
   height: var(--nav-h);
@@ -189,85 +185,23 @@ a { color: var(--accent); }
   white-space: nowrap;
   transition: color .15s ease, background-color .15s ease, border-color .15s ease;
 }
-.site-nav a:hover,
-.site-nav summary:hover { color: var(--ink); background: var(--bg); }
+.site-nav a:hover { color: var(--ink); background: var(--bg); }
 
-/* 当前页：加边框而不只是变色 —— 只靠颜色区分对色觉障碍的访客等于没标。
-   `.nav-home` 只在首页带上 aria-current，所以这条同时管着首页与下拉里的当前项。 */
-.site-nav a[aria-current='page'] {
-  color: var(--ink);
-  font-weight: 600;
-  border: 1px solid var(--line);
-  background: var(--bg);
-}
+/* 首页：页头左侧那一项，和语言切换是同一级别，所以共用上面的尺寸。
+   ★ 刻意**不**给 `[aria-current]` 加边框：它就在页头左侧、是那里唯一的东西，
+   加框只会让它看起来像一颗按钮；而"我在首页"这件事由页面内容本身说明
+   （一整屏入口卡片）。用 aria-current 是为了读屏器，不是为了画出来。
+   （榜单页的下拉菜单里曾经需要边框来标出当前项，那个下拉已经没有调用方了。） */
+.nav-home { font-weight: 600; }
 
-/* ── 榜单下拉 ──────────────────────────────────────────────
- * 用 <details>/<summary> 而不是自绘菜单：原生就提供"点击展开、点外部收起、
- * 键盘可达"，不需要一行 JS，也就不存在"脚本没跑起来菜单就点不动"。
- *
- * summary 上的 marker 要去掉（Safari 是 ::-webkit-details-marker，
- * 其余浏览器是 list-style），否则会和自绘的 caret 一起出现两个箭头。
- */
-.nav-boards { position: relative; }
-.nav-boards > summary {
-  cursor: pointer;
-  list-style: none;
-  gap: 5px;
-}
-.nav-boards > summary::-webkit-details-marker { display: none; }
-.nav-boards > summary::marker { content: ''; }
-.nav-boards[open] > summary { color: var(--ink); background: var(--bg); }
-
-/* caret 用边框画，跟 currentColor 走，两种主题都不用另配颜色 */
-.nav-boards .caret {
-  width: 5px;
-  height: 5px;
-  margin-top: -3px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg);
-  transition: transform .15s ease;
-}
-.nav-boards[open] .caret { transform: rotate(-135deg); margin-top: 2px; }
-
-/* 菜单绝对定位，不占布局高度 —— 否则展开会把整页内容顶下去 */
-.nav-boards-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 20;
-  min-width: 190px;
-  margin: 0;
-  padding: 6px;
-  list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-}
-.nav-boards-menu a {
-  display: flex;
-  height: auto;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 13.5px;
-}
-/* 下拉里的当前项：比导航项再多一档背景，否则展开菜单里它和 hover 态分不清 */
-.nav-boards-menu a[aria-current='page'] {
-  color: var(--ink);
-  font-weight: 600;
-  border-color: var(--line);
-  background: var(--bg);
-}
-
-/* ── 语言切换：与导航分家 ──────────────────────────────────
- * 它和"首页 / 榜单"是同一排、但**不是同一类控件**：另外两个在本站内跳转，
+/* ── 语言切换 ──────────────────────────────────────────────
+ * 它和「首页」是同一排、但**不是同一类控件**：首页在本站内跳转，
  * 这一个会换语言、跳到另一个地址。样式上让它自己说话：
  *
- *   · 前面一条竖分隔线，视觉上断开"导航"与"切换"；
+ *   · 前面一条竖分隔线，视觉上断开"首页"与"切换"；
  *   · 地球图标 —— 站点本来就有内联 SVG（ui.js），同一个视觉语言，
  *     比写一个 "EN" 缩写更省空间，也不用为两种语言各想一个缩写；
- *   · 收敛成"安静"的样子：不占满高度、hover 才抬起，不与导航项争夺注意力。
+ *   · 收敛成"安静"的样子：不占满高度、hover 才抬起，不与首页争夺注意力。
  *
  * 分隔线用 ::before 画，而不是在 HTML 里写一个空 <span>：它纯粹是装饰，
  * 不该出现在无障碍树里（读屏器念"竖线"没有意义）。
@@ -622,14 +556,10 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (max-width: 560px) {
   .wrap { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
   .header-inner { height: 54px; gap: 8px; }
-  .brand { font-size: 16px; }
   .site-nav { gap: 0; font-size: 13.5px; --nav-h: 34px; }
-  .site-nav a, .site-nav summary { padding: 0 8px; }
-  /* 窄屏上分隔线的留白换成实在的空间：14px 的边距把导航挤得很紧 */
+  .site-nav a { padding: 0 8px; }
+  /* 窄屏上分隔线的留白换成实在的空间 */
   .site-nav .lang { margin-left: 6px; padding: 0 4px 0 9px; gap: 4px; }
-  /* 手机上下拉菜单贴着屏幕右边，宽度改由内容决定但不超过视口 ——
-     固定 min-width 在窄屏上会横着溢出，把整页撑出横向滚动条。 */
-  .nav-boards-menu { min-width: 0; max-width: calc(100vw - 28px); }
   th, td { padding: 8px 11px; font-size: 12.5px; }
   .bar { width: 34px; }
   .note { padding: 18px 16px; }
@@ -643,7 +573,7 @@ tbody tr:last-child td { border-bottom: 0; }
   tbody tr:hover td { background: transparent; }
   tbody tr:hover td:first-child { background: var(--surface); }
   .icon-btn:hover { color: var(--muted); border-color: var(--line); background: transparent; }
-  .site-nav a:hover, .site-nav summary:hover { color: var(--muted); background: transparent; }
+  .site-nav a:hover { color: var(--muted); background: transparent; }
 }
 
 /* ★ 尊重系统的"减弱动态效果"设置。

@@ -172,7 +172,7 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
     const isEn = rel === 'en/index.html' || rel.startsWith('en/');
     const id = path.basename(rel, '.html');
     const boardId = id === 'index' ? null : id;
-    const nav = injectNav(buf, isEn ? 'en' : 'zh', isEn ? '../' : '', BRAND, boardId);
+    const nav = injectNav(buf, isEn ? 'en' : 'zh', isEn ? '../' : '', boardId);
     files[rel] = injectGtm(injectBrand(nav, BRAND));
   }
 
