@@ -15,7 +15,7 @@ import {
   normalizePaper, rankPapers, rankRepos, flattenModelsDev, fmtCost,
   rankSweBench, sweBoardNames, applyBoardState, groupOptions, controlsHtml,
   cardGrid, detailFromCols, detailRow,
-  openrouterBoard, openrouterNames, openrouterLabel,
+  openrouterBoard, openrouterNames, openrouterLabel, attachPanel,
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
 } from './trend.js';
 
@@ -756,6 +756,72 @@ t('cardGrid：title 是必需的（缺了就该炸，而不是渲染一张空卡
 t('cardGrid：meta 返回空串时不产出那块 DOM（空标签会占位但没内容）', () => {
   const html = cardGrid([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name), meta: () => '' });
   assert.ok(!html.includes('card-meta'));
+});
+
+/* ---------------- 面板挂载：同 id 必须原地替换 ---------------- */
+
+/**
+ * 一个够真的假容器 —— 只实现 attachPanel 用到的那几个方法。
+ *
+ * 为什么值得写这十几行：那个 bug（切子榜变成"追加"）**只有真的走一遍 DOM 行为
+ * 才会暴露**，而本站的测试不跑浏览器。这个假容器把 `querySelector` /
+ * `appendChild` / `replaceWith` / `children` 按真实语义实现，于是
+ * "点击后容器里应当只有 1 个面板"这件事可以被断言。
+ */
+function fakeRoot() {
+  // 只实现 attachPanel 用到的那几个方法，语义与真 DOM 一致：
+  // `replaceWith` = **新元素占据旧元素的位置**（旧元素被移出）。
+  const root = {
+    _children: [],
+    get children() { return this._children; },
+    querySelector(sel) {
+      const m = /^#(.+)$/.exec(sel);
+      return m ? this._children.find((c) => c.id === m[1]) || null : null;
+    },
+    appendChild(el) { this._children.push(el); return el; },
+  };
+  // ★ 元素的 id 必须是 `panel-<id>`（与 panel() 里 `el.id = \`panel-${id}\`` 一致），
+  // 否则 attachPanel 的 `#panel-<id>` 查不到，测试会"永远走追加分支"而假装通过。
+  root.newPanel = (id, content = `panel:${id}`) => ({
+    id: `panel-${id}`,
+    className: 'panel',
+    datasetBoard: id,
+    innerHTML: content,
+    replaceWith(next) {
+      const i = root._children.indexOf(this);
+      if (i >= 0) root._children[i] = next; // 新元素留在旧元素的位置上
+    },
+  });
+  return root;
+}
+
+t('★ attachPanel：同 id 再挂一次是**替换**，不是追加（切子榜曾因此看起来没反应）', () => {
+  const root = fakeRoot();
+  attachPanel(root, root.newPanel('orApps'), 'orApps');
+  assert.equal(root.children.length, 1, '第一次挂载后面板数应为 1');
+
+  // 模拟"点击子榜 chip"：loader 被重新调用，又挂一个同 id 的面板
+  const next = root.newPanel('orApps');
+  next.innerHTML = 'panel:orApps:week';
+  attachPanel(root, next, 'orApps');
+
+  assert.equal(root.children.length, 1, '不该出现两个同 id 的面板（旧的那个会留在页面上）');
+  assert.equal(root.children[0].innerHTML, 'panel:orApps:week', '应当是新的那份内容');
+});
+
+t('★ attachPanel：不同 id 是**追加**（一个页面上可以并排多个面板）', () => {
+  const root = fakeRoot();
+  attachPanel(root, root.newPanel('a'), 'a');
+  attachPanel(root, root.newPanel('b'), 'b');
+  assert.equal(root.children.length, 2);
+});
+
+t('attachPanel：替换时**保持原来的位置**（否则面板会被挪到列表末尾）', () => {
+  const root = fakeRoot();
+  attachPanel(root, root.newPanel('a'), 'a');
+  attachPanel(root, root.newPanel('b'), 'b');
+  attachPanel(root, root.newPanel('a'), 'a'); // 重挂 a
+  assert.deepEqual(root.children.map((c) => c.datasetBoard), ['a', 'b'], 'a 不该被挪到 b 后面');
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

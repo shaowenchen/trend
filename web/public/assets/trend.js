@@ -201,6 +201,26 @@ function skeleton(lines = 5) {
  * 建一个面板并返回它的操作柄。
  * 面板先以"加载中"出现，填好后替换 —— 避免整页空白等最慢的那个源。
  */
+/**
+ * 把一个新建的面板挂进容器 —— **同 id 已存在就原地替换**。
+ *
+ * ★ 这里曾是一个真实故障：`panel()` 无条件 `appendChild`，于是"切换子榜"
+ * （点击 chip 会重新调用 loader）不是切换，而是**又追加一个同 id 的面板**，
+ * 旧的那个还在 DOM 里 —— 读者看到的仍是原来的数据，像是"点了没反应"。
+ * 页面上不报错，同一页出现两个同 id 元素也不会被浏览器指出。
+ *
+ * 抽成独立函数是为了能测：它只依赖一个"像 parent 的东西"（`querySelector`
+ * / `appendChild` / `replaceWith`），不必造一整个假 DOM。
+ */
+export function attachPanel(root, el, id) {
+  const existing = root.querySelector(`#panel-${id}`);
+  // 原地替换而不是"删了再追加"：后者会把面板挪到列表末尾，
+  // 多面板页面上会看到顺序莫名其妙地变。
+  if (existing) existing.replaceWith(el);
+  else root.appendChild(el);
+  return el;
+}
+
 function panel({ id, iconName, title, hint }) {
   const el = document.createElement('section');
   el.className = 'panel';
@@ -218,7 +238,7 @@ function panel({ id, iconName, title, hint }) {
     </header>
     <p class="panel-status loading" aria-live="polite">${L('ui.loading')}</p>
     <div class="panel-body">${skeleton()}</div>`;
-  panelsRoot.appendChild(el);
+  attachPanel(panelsRoot, el, id);
   return {
     el,
     status: (text, kind = '') => {
