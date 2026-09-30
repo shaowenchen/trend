@@ -385,6 +385,9 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   gap: 8px;
 }
 .panel-status[hidden] { display: none; }
+/* 状态行里的 `\n` 要真的换行（见 err.unknownBoard：那条消息有两段，
+   第二段是给读者的"怎么办"）。不写 `white-space` 的话它们会挤成一行。 */
+.panel-status { white-space: pre-line; }
 .panel-status.ok { color: var(--ok); }
 .panel-status.warn { color: var(--warn); }
 .panel-status.err { color: var(--err); }

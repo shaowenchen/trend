@@ -226,7 +226,11 @@ const zh = {
   //   web/public/assets/site.test.js 里加了一条"每个被引用的键都存在"的断言，
   //   这类漏配以后会在本地暴露，而不是等到用户看见英文键名。
   'err.init': '面板初始化失败：{msg}',
-  'err.unknownBoard': '本页面指名了一个不存在的面板：{id}（页面上的 data-board 写错了，或面板 id 改过但导航/白名单没跟着改）',
+  // ★ 这一条几乎总是**旧缓存**：页面按新代码发出去、脚本还是上一次构建的那份时，
+  //   就会出现"页面指名了一个老脚本不认识的 panel"。所以先把这条最可能的原因写在前面，
+  //   并给出**读者能自己做**的动作 —— 原来的措辞只对开发者有意义。
+  'err.unknownBoard':
+    '本页面指名了一个不存在的面板：{id}。\n（最可能是页面脚本是旧缓存 —— 刷新一下本页（Cmd/Ctrl+Shift+R）多半就好；若仍然如此，则是页面上的 data-board 写错、或面板 id 改过而白名单/导航没跟着改）',
 
   // ── 这一版删掉的键（留着注释是为了让"原文案去哪了"有答案）──
   // 曾有 site.* / nav.* / hero.title|sub|refresh|enter / home.* / footer.sources
@@ -408,7 +412,7 @@ const en = {
   'st.retryRefresh': ', or retry with the Refresh button at the bottom of the page',
   'err.init': 'Panel failed to initialise: {msg}',
   'err.unknownBoard':
-    'This page names a board that does not exist: {id} (the page\'s data-board is misspelled, or a board id changed without updating the navigation and the build whitelist)',
+    'This page names a board that does not exist: {id}.\n(Most likely the page script is a stale cache — a hard refresh (Cmd/Ctrl+Shift+R) usually fixes it. If not, the page\'s data-board is misspelled, or a board id changed without updating the whitelist and navigation.)',
 };
 
 export const DICT = { zh, en };

@@ -349,6 +349,21 @@ await test('★ 每个面板 id 都有名字（页脚导航是动态拼键 `p.<i
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
+await test('★ 每个页面指名的 panel 都在 BOARD_IDS 里（否则线上报\"不存在的面板\"）', async () => {
+  // 这条盯的是一次真实故障：页面按新代码发出去了，而**脚本是上一版**（缓存/半发布），
+  // 于是新页面指名的 panel 在旧脚本的 BOARD_IDS 里找不到，页面上只剩一句错误。
+  // 断言本身管不到缓存，但能管住另一半：**同一份仓库里**页面与注册表必须自洽 ——
+  // 加面板时只改页面不改 BOARD_IDS，就会在这里暴露。
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await read(rel);
+    const m = html.match(/<div id="panels" data-board="([^"]+)"><\/div>/);
+    if (!m) continue; // 首页与标签页没有面板容器
+    if (!BOARD_IDS.includes(m[1])) bad.push(`${rel}: data-board="${m[1]}" 不在 BOARD_IDS 里`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
 await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了线上 404，多了构建失败）', () => {
   const expected = [
     ...BOARD_IDS.map((id) => `${id}.html`),
