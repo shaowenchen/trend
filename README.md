@@ -201,7 +201,7 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 | `i18n.test.js` | 两种语言的键一致、无空值、英文侧不含中文 |
 | `ui.test.js` | 图标表与 `[data-icon]` 回填 |
 | `trend.test.js` | YAML 子集解析、评测行字段提取、"同模型取最高分"的合并规则 |
-| `site.test.js` | 站点门禁：文案键存在、资源引用可解析、无绝对路径、无占位符残留、语言不串页、**首页卡片与面板一一对应**、面板页与发布白名单对齐 |
+| `site.test.js` | 站点门禁：文案键存在、HTML 引用与**脚本 import** 都能解析到发布集合、无绝对路径、无占位符残留、语言不串页、**首页卡片与面板一一对应**、面板页与发布白名单对齐 |
 
 ## 代码结构
 
@@ -213,12 +213,12 @@ web/public/                       手写静态页（页面 + 样式 + 客户端�
   site.css
   assets/
     trend.js                      面板注册表 + 数据层与渲染（1600 行，主体在这里）
+    boards.js                     面板 id 唯一来源（★ 必须在 assets/ 下，见下）
     i18n.js                       双语字典 —— 面板文案的唯一来源
     ui.js                         内联 SVG 图标
     *.test.js                     测试（★ 不发布，构建的白名单挡在外面）
 src/site/brand.js                 品牌名唯一来源 + 占位符替换/校验
 src/site/gtm.js                   GTM 容器 ID 唯一来源 + 两段代码片段
-src/site/boards.js                面板 id 唯一来源（构建白名单、测试都从它推导）
 src/site/nav.js                   页头导航的构建期生成器（{{SITE_NAV}}：首页 + 语言切换）
 scripts/build-site.mjs            构建：白名单复制 + 落占位符 + 校验
 scripts/serve.mjs                 本地预览服务器（零依赖）
@@ -228,10 +228,18 @@ docs/trend-sources.md             每个数据源的实测可用性
 .github/workflows/pages.yml       测试 → 构建 → 发布到 Pages
 ```
 
-面板页是"一个面板一页"，所以加一个面板要动四处：`src/site/boards.js` 的
+面板页是"一个面板一页"，所以加一个面板要动四处：`assets/boards.js` 的
 `BOARD_IDS`、`trend.js` 的加载器、中英两个页面文件、首页的入口卡。
 少任何一处都会在 `npm test` 里暴露，不会静默上线 —— 构建白名单从 `BOARD_IDS`
 推导，页脚的面板跳转由 `trend.js` 从同一份清单生成，都不用手改。
+
+> ★ `boards.js` 放在 `assets/` 下是**必须的**，不是随手：浏览器只能拿到发布集合里的
+> 文件，而 `trend.js` 要在浏览器里 `import` 它。它曾经住在 `src/site/` 下，
+> `trend.js` 那句 `../../../src/site/boards.js` 在线上解析成
+> `https://<域名>/src/site/boards.js` → 404 → **整个模块不执行，所有榜单页空白**，
+> 而本地构建与测试按文件系统路径 import，怎么跑都成功。现在构建期有一条
+> 「发布出去的脚本没有 import 发布集合之外的文件」（`findMissingImports`）盯着，
+> 见 `docs/deploy.md` 排错表。
 
 ## 部署
 

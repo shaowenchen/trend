@@ -158,13 +158,14 @@ const panelsRoot = typeof document === 'undefined' ? null : document.querySelect
  * 所以这些 id 同时是三样东西：DOM 契约、页面文件名、导航链接的目标。
  * 改 id = 改地址，必须与发布集合和页头导航一起改（`site.test.js` 盯着）。
  *
- * 真值住在 `src/site/boards.js`：那三个消费者里有两个（构建脚本与站点测试）
- * 在 Node 下运行，而本文件顶层会发请求，构建期 import 它并不合适。
- * 这里再导出一次，是为了让运行时与测试继续从同一个地方取（也免得
- * `./trend.js` 的既有引用者改 import）。
+ * 真值住在 `./boards.js`（同级文件）：浏览器只能拿到发布集合里的文件，
+ * 所以它必须在 `assets/` 下，`trend.js` 才 import 得到。那三个在 Node 下跑的
+ * 消费者（构建脚本、站点测试、页头生成器）隔着目录引它没问题，反过来则不然。
+ * 这里再导出一次，是为了让测试继续从同一个地方取（也免得 `./trend.js` 的
+ * 既有引用者改 import）。
  */
-export { BOARD_IDS } from '../../../src/site/boards.js';
-import { BOARD_IDS } from '../../../src/site/boards.js';
+export { BOARD_IDS } from './boards.js';
+import { BOARD_IDS } from './boards.js';
 
 /**
  * 本页要跑哪个面板：`data-board` 指名的那一个；**没写就是全部**。

@@ -29,6 +29,9 @@
  *   · 页面里引用的相对资源（css / js）不在发布集合里 → 失败
  *     （这是静态站最典型的"白屏"成因：路径写错、文件没复制进去，本地看还好，
  *      线上 404，而页面上什么都不会说）；
+ *   · 发布出去的脚本里 `import` 了不在发布集合里的文件 → 失败
+ *     （同上，只是另一个解析链：HTML 的 `href`/`src` 之外，ES module 还会
+ *      顺着 import 继续取文件。这条曾漏过一次，见 `findMissingImports`）；
  *   · 发布集合里出现 `*.test.js` → 失败。
  */
 import fs from 'node:fs/promises';
@@ -37,7 +40,9 @@ import { fileURLToPath } from 'node:url';
 
 import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/brand.js';
 import { injectGtm } from '../src/site/gtm.js';
-import { BOARD_IDS } from '../src/site/boards.js';
+// 面板 id 的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的文件，
+// 所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
+import { BOARD_IDS } from '../web/public/assets/boards.js';
 import { injectNav, NAV_PLACEHOLDER } from '../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,7 +50,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /**
  * 发布集合 —— **白名单**，相对 `web/public/`。
  *
- * 面板页是"一个面板一页"：每个 `src/site/boards.js` 里 `BOARD_IDS` 列出的 id
+ * 面板页是"一个面板一页"：每个 `assets/boards.js` 里 `BOARD_IDS` 列出的 id
  * 对应一个中文页与一个 `en/` 下的英文页。这份清单必须与它**完全对齐** ——
  * 少登记一页，那一页本地能点、线上 404；多登记一个不存在的 id，构建会因为
  * 读不到文件而失败（`site.test.js` 另有一条断言比对两者）。
@@ -57,6 +62,7 @@ export const SITE_FILES = [
   'site.css',
   'en/index.html',
   'assets/trend.js',
+  'assets/boards.js',
   'assets/ui.js',
   'assets/i18n.js',
   ...BOARD_PAGES.map((id) => `${id}.html`),
@@ -129,6 +135,48 @@ export function findForbidden(files) {
   return Object.keys(files).filter((f) => f.endsWith('.test.js') || path.basename(f).startsWith('.'));
 }
 
+/**
+ * 找出发布出去的**客户端脚本**里，import/export 指向了非发布文件的那些。
+ *
+ * ## 为什么这条必须单独有（它漏过一次，整站白屏）
+ * 上面 `findMissingAssets` 只看 HTML 的 `href` / `src`。而 ES module 的
+ * `import` 是**另一个**解析链：浏览器拿到一个 `assets/*.js`，会按里面的
+ * 说明符继续去取它依赖的文件 —— 那个文件不在发布集合里，就 404。
+ *
+ * 现实里踩到的样子：`assets/trend.js` 曾经写着
+ * `import { BOARD_IDS } from '../../../src/site/boards.js'`。
+ * `src/site/` 从来不在发布集合里，于是浏览器请求
+ * `https://<域名>/src/site/boards.js` → 404 → **整个模块不执行**，
+ * 所有榜单页都是一片空白。而本地怎么跑都成功：构建、测试、CI 全都按
+ * **文件系统路径** import 那个文件，它就在那儿。
+ *
+ * 所以这里按**发布物**的视角重算一遍：说明符必须相对本文件解析、且落在
+ * 发布集合内。越出站点根（`../../..`）一律算错 —— 那是本地能解析、
+ * 线上必然 404 的写法。
+ *
+ * 只认行首的 import/export 语句（本项目的 import 都是单行，写在行首）。
+ * 注释里出现的示例不会被误判：JSDoc 的行首是 `*`。
+ */
+export function findMissingImports(files) {
+  const have = new Set(Object.keys(files));
+  const missing = [];
+  for (const [rel, text] of Object.entries(files)) {
+    if (!rel.endsWith('.js')) continue;
+    const dir = path.posix.dirname(rel);
+    for (const m of String(text).matchAll(/^[ \t]*(?:import|export)\s[^\n]*?['"]([^'"]+)['"]/gm)) {
+      const raw = m[1];
+      if (!raw.startsWith('.')) continue; // 裸标识符：无依赖站里不该出现，但也不归这条管
+      const target = path.posix.normalize(path.posix.join(dir === '.' ? '' : dir, raw));
+      if (target.startsWith('..')) {
+        missing.push(`${rel} → ${raw}（越出站点根，浏览器取不到）`);
+      } else if (!have.has(target)) {
+        missing.push(`${rel} → ${raw}`);
+      }
+    }
+  }
+  return missing;
+}
+
 /* ================================================================== */
 /* 构建                                                                */
 /* ================================================================== */
@@ -182,6 +230,7 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
   }
   for (const f of findForbidden(files)) problems.push(`${f} 不该被发布（测试文件 / 隐藏文件）`);
   for (const m of findMissingAssets(files)) problems.push(`引用的资源不在发布集合里：${m}`);
+  for (const m of findMissingImports(files)) problems.push(`脚本 import 的文件不在发布集合里：${m}`);
   if (problems.length) {
     throw new Error(`构建校验未通过：\n  · ${problems.join('\n  · ')}`);
   }

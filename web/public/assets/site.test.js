@@ -25,8 +25,7 @@ import { fileURLToPath } from 'node:url';
 
 import { t, LOCALES } from './i18n.js';
 import { BOARD_IDS } from './trend.js';
-import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';
-import { buildSite, SITE_FILES, findMissingAssets, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
+import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';import { buildSite, SITE_FILES, findMissingAssets, findMissingImports, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
 import { resolveRequest } from '../../../scripts/serve.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -135,6 +134,40 @@ await test('★ 构建产出的每个文件都没有残留占位符', async () =
 await test('★ 页面引用的相对资源都在发布集合里（否则线上 404、页面白屏）', async () => {
   const files = Object.fromEntries(await Promise.all(SITE_FILES.map(async (f) => [f, await read(f)])));
   assert.deepEqual(findMissingAssets(files), []);
+});
+
+await test('★ 发布出去的脚本没有 import 发布集合之外的文件（否则模块加载失败、整页空白）', async () => {
+  const files = Object.fromEntries(await Promise.all(SITE_FILES.map(async (f) => [f, await read(f)])));
+  assert.deepEqual(findMissingImports(files), []);
+});
+
+await test('★ 上面那条确实能抓到"import 越出站点根"（它漏过一次，真出过线上故障）', () => {
+  // 复现当时那一版：`assets/trend.js` 里 import 了 `../../../src/site/boards.js`。
+  // src/site/ 从来不在发布集合里，浏览器会请求 /src/site/boards.js → 404 →
+  // 整个 trend.js 不执行，所有榜单页空白；而构建/测试按文件系统路径 import，
+  // 本地怎么跑都成功 —— 这就是需要这个函数盯着的原因。
+  const broken = {
+    'assets/trend.js': `import { x } from '../../../src/site/boards.js';\nexport { x } from '../../../src/site/boards.js';\n`,
+    'assets/ui.js': `import { y } from './nope.js';\n`,
+    'assets/i18n.js': `import { z } from './boards.js';\n`,
+    'assets/boards.js': 'export const BOARD_IDS = [];\n',
+  };
+  const found = findMissingImports(broken);
+  // trend.js 里有**两行**指向那个不存在的文件（`import` 与 `export … from`
+  // 各算一处 —— 两处都得改，所以不去重），加 ui.js 一行，共三处。
+  assert.equal(found.length, 3, `应当报三处，实得：${JSON.stringify(found)}`);
+  assert.equal(found.filter((f) => f.includes('越出站点根')).length, 2, '越出站点根的两行没都报出来');
+  assert.ok(found.some((f) => /nope\.js/.test(f)), '没报出 assets/ui.js 里那个不存在的同级文件');
+});
+
+await test('★ 注释里的路径示例不会被误判成 import（否则门禁天天误报，人就不看了）', () => {
+  // 本站的注释里满是 `src/site/boards.js` 这种示例路径。它们行首是 `*`，
+  // 不该被当成 import 语句 —— 误报会训练人忽略门禁。
+  const files = {
+    'assets/trend.js': `/**\n * 见 src/site/boards.js 与 ../../../src/site/gtm.js\n */\nimport { a } from './ui.js';\n`,
+    'assets/ui.js': 'export function icon() {}\n',
+  };
+  assert.deepEqual(findMissingImports(files), []);
 });
 
 await test('发布集合里没有测试文件、也没有隐藏文件', async () => {
