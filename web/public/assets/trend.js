@@ -1293,18 +1293,11 @@ async function loadNewModels() {
     title: L('p.newmodels.title'),
     hint: L('p.newmodels.hint'),
   });
-  p.status(L('st.bigDataHint'), '');
-  p.body(
-    `<div class="chips"><button class="btn-ghost" type="button" data-load-models>` +
-      `${icon('download')}${L('st.loadModels')}</button></div>`
-  );
-
-  const btn = p.el.querySelector('[data-load-models]');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    p.status(L('st.loadingBig', { size: '4.8MB' }), 'loading');
-    p.body(skeleton(6));
+  // ★ 进页面就拉（4.8MB）—— 与 SWE-bench 同理：这一页只有这一张榜，
+  // 多一次点击只是多一步。
+  p.status(L('st.loadingBig', { size: '4.8MB' }), 'loading');
+  p.body(skeleton(6));
+  {
     try {
       const json = await cachedJson('models-dev', MODELS_DEV_URL);
       const rows = flattenModelsDev(json);
@@ -1342,10 +1335,10 @@ async function loadNewModels() {
         },
       });
     } catch (e) {
-      p.status(L('st.failed', { msg: e.message }), 'err');
+      p.status(L('st.failed', { msg: e.message }) + L('st.retryRefresh'), 'err');
       p.body('');
     }
-  });
+  }
 }
 
 /* ================================================================== */
@@ -1418,15 +1411,9 @@ async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
     hint: L('p.swebench.hint'),
   });
 
-  // 未加载：给一个按钮（4MB 不进首屏）
-  const showLoadButton = (note) => {
-    p.status(note || L('st.bigDataHint'));
-    p.body(
-      `<div class="chips"><button class="btn-ghost" type="button" data-load-swe>` +
-        `${icon('download')}${L('st.loadSwe')}</button></div>`
-    );
-    p.el.querySelector('[data-load-swe]')?.addEventListener('click', () => run(boardName));
-  };
+  // ★ 进页面就拉（4MB）。曾经是"点击才加载"，但那个按钮是**多余的仪式** ——
+  // 这一页只有这一张榜，读者既然点进来了就是要看它，多一次点击只是多一步。
+  // 代价是首屏要等 4MB（约 1–2 秒），所以状态行明说在拉什么、多大。
 
   // 已加载：给子榜切换（5 个子榜）并渲染
   const render = (boards, current) => {
@@ -1482,13 +1469,13 @@ async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
       if (!rankSweBench(boards, which).length) throw new Error(L('err.noBoardRows', { name: which }));
       render(boards, which);
     } catch (e) {
-      p.status(L('st.failed', { msg: e.message }), 'err');
+      // 没有"重试按钮"了：重试的路是页面底部的「刷新数据」（它清缓存后重画）
+      p.status(L('st.failed', { msg: e.message }) + L('st.retryRefresh'), 'err');
       p.body('');
-      showLoadButton(L('st.failed', { msg: e.message }) + L('st.retry'));
     }
   };
 
-  showLoadButton();
+  run(boardName);
 }
 
 /* ================================================================== */

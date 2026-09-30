@@ -24,7 +24,7 @@
 | `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
 | `eval.html` `aider.html` | 评测与编程能力榜 |
 | `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
-| `newmodels.html` `swebench.html` | 大体积榜（点击后才拉取） |
+| `newmodels.html` `swebench.html` | 大体积榜（4MB / 4.8MB，进页面即加载） |
 | `openrouter.html` | OpenRouter 模型用量榜（约 1.1MB，进页面就拉） |
 | `tags.html` | 全部标签（来源 + 分类），每个标签带条数 |
 | `tag.html?t=<标签>` | 含该标签的榜单，卡片式 |
@@ -74,14 +74,14 @@
 | 正在流行的数据集 | `datasets` | HuggingFace Datasets API | `sort=trendingScore` |
 | 每日论文热榜 | `papers` | HF `daily_papers` | 按点赞数排序 |
 | 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
-| 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB 含 8000 个模型，**点击后才加载** |
+| 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB，**进页面即加载**（约 0.5s） |
 | OpenRouter 模型用量榜 | `openrouter` | `openrouter.ai/api/frontend/v1/rankings/models` + `/api/v1/models`（只为名字） | 按**当天 token 用量**排序，日更 7 天窗口；standard/batch/free **已合并**（见 `docs/trend-sources.md` §4） |
 | OpenRouter 上升榜 | `orTrends` | 同上 `…/rankings/discovery` | **周环比增幅**（本周 vs 上周）；子榜：上升 / 突破 |
 | OpenRouter 厂商份额 | `orAuthors` | 同上 `…/discovery` 的 `authors` | 各机构 token 份额与周环比变化 |
 | OpenRouter 性能榜 | `orPerf` | 同上 `…/rankings/performance` | 实测 p50 延迟 / 吞吐（190 个模型，取最快的 provider）；子榜：延迟 / 吞吐 |
 | Artificial Analysis 评测榜 | `aaBench` | 同上 `…/rankings/benchmarks` | 与 HF 评测榜**不同来源**，可并列对照；子榜：综合智能 / 编程 / 智能体 |
 | OpenRouter 应用榜 | `orApps` | 同上 `…/rankings/apps` + 三个多模态端点 | 哪些 agent 应用在烧 token（日/周），以及图像/视频/语音模型用量 |
-| SWE-bench | `swebench` | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**点击后才加载** |
+| SWE-bench | `swebench` | `swe-bench.github.io` 官方榜 | 真实代码修复能力，5 个子榜**可切**；数据 4MB，**进页面即加载**（约 1s） |
 
 页面靠 `<div id="panels" data-board="eval">` 指名自己要跑哪一个（`trend.js` 读它）。
 这些 id 同时是**文件名、导航目标、发布白名单里的条目** —— 三处必须一起改，

@@ -67,7 +67,7 @@ const zh = {
   'p.repos.title': '高星 AI 开源项目',
   'p.repos.hint': '按本期新增星标排序',
   'p.newmodels.title': '最新发布的模型',
-  'p.newmodels.hint': '数据较大（约 4.8MB），点击后才拉取',
+  'p.newmodels.hint': '数据较大（约 4.8MB），进页面即加载',
   'p.openrouter.title': 'OpenRouter 模型用量榜',
   'p.openrouter.hint': '按 token 用量排序，日更；standard / batch / free 三种变体已合并',
   'p.orTrends.title': 'OpenRouter 上升榜',
@@ -93,7 +93,7 @@ const zh = {
   'p.orApps.video': '视频模型',
   'p.orApps.audio': '语音模型',
   'p.swebench.title': 'SWE-bench（真实代码修复）',
-  'p.swebench.hint': '数据较大（约 4MB），点击后才拉取',
+  'p.swebench.hint': '数据较大（约 4MB），进页面即加载',
 
   // ── 列名 / 字段名 ──
   'col.rank': '#',
@@ -219,6 +219,7 @@ const zh = {
   'st.dated': '共 {total} 条，其中 {dated} 条有发布日期',
   'st.ghLimit': '（GitHub 匿名搜索限流 10 次/分钟，等一分钟或换个网络再试）',
   'st.retry': '，可点下方按钮重试',
+  'st.retryRefresh': '，可用页面底部的「刷新数据」重试',
   // ★ 上面这五个键原本**只被 trend.js 引用、字典里没有**：取到的是键名本身，
   //   也就是说线上错误提示曾经直接显示 "err.evalFirst" 这种字符串。
   //   翻译自检（两种语言键一致）抓不到它 —— 它俩"一致地都缺"。
@@ -257,7 +258,7 @@ const en = {
   'p.repos.title': 'Top-starred AI projects',
   'p.repos.hint': 'sorted by stars gained in the period',
   'p.newmodels.title': 'Latest model releases',
-  'p.newmodels.hint': 'large payload (~4.8MB), loaded on click',
+  'p.newmodels.hint': 'large payload (~4.8MB), loads on page open',
   'p.openrouter.title': 'OpenRouter model usage',
   'p.openrouter.hint': 'ranked by token usage, updated daily; standard / batch / free variants merged',
   'p.orTrends.title': 'OpenRouter fastest climbers',
@@ -283,7 +284,7 @@ const en = {
   'p.orApps.video': 'Video models',
   'p.orApps.audio': 'Speech models',
   'p.swebench.title': 'SWE-bench (real code fixes)',
-  'p.swebench.hint': 'large payload (~4MB), loaded on click',
+  'p.swebench.hint': 'large payload (~4MB), loads on page open',
 
   'col.rank': '#',
   'col.model': 'Model',
@@ -404,6 +405,7 @@ const en = {
   'st.dated': '{dated} of {total} rows carry a release date',
   'st.ghLimit': '(GitHub anonymous search is limited to 10 req/min — wait a minute or switch network)',
   'st.retry': ', or click the button below to retry',
+  'st.retryRefresh': ', or retry with the Refresh button at the bottom of the page',
   'err.init': 'Panel failed to initialise: {msg}',
   'err.unknownBoard':
     'This page names a board that does not exist: {id} (the page\'s data-board is misspelled, or a board id changed without updating the navigation and the build whitelist)',

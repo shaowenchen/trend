@@ -232,6 +232,7 @@ for (const src of EXTRA) {
 /* ---------------- 面板 10：models.dev（体量大，单独量一次） ---------------- */
 
 {
+  // ★ 这两条现在都是**首屏**成本（进页面即加载），所以耗时值得盯着
   const r = await probe('models.dev 模型库', MODELS_DEV_URL);
   if (r && r.res.ok) {
     try {

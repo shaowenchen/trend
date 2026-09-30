@@ -25,8 +25,8 @@
 | 正在流行的数据集 | `huggingface.co/api/datasets?sort=trendingScore` | 200 JSON | 回显 Origin | ✅ 可直连 |
 | 每日论文热榜 | `huggingface.co/api/daily_papers?limit=50` | 200 JSON | 回显 Origin | ✅ 可直连 |
 | 高星 AI 开源项目 | `api.github.com/search/repositories?q=topic:llm…` | 200 JSON | `*` | ✅ 可直连，**但匿名限流 10 次/分钟** |
-| 最新发布的模型 | `models.dev/api.json` | 200 JSON | `*` | ✅ 可直连，**4.8MB / 8080 个模型 → 点击才加载** |
-| SWE-bench | `raw.githubusercontent.com/swe-bench/swe-bench.github.io/master/data/leaderboards.json` | 200 JSON | `*` | ✅ 可直连，**4MB → 点击才加载** |
+| 最新发布的模型 | `models.dev/api.json` | 200 JSON | `*` | ✅ 可直连，**4.8MB / 8000+ 个模型 → 进页面即加载** |
+| SWE-bench | `raw.githubusercontent.com/swe-bench/swe-bench.github.io/master/data/leaderboards.json` | 200 JSON | `*` | ✅ 可直连，**4MB → 进页面即加载** |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
@@ -75,7 +75,10 @@ npm run test:live
 GitHub 仓库里，而 `raw.githubusercontent.com` 对任何仓库都返回 `CORS: *` —— 所以能直连。
 
 - 数据：`data/leaderboards.json`（**4MB**，5 个子榜 Multilingual / Test / Verified / Lite / Multimodal）。
-  文件里带**逐题明细**的长数组，所以体积大 → 与 models.dev 一样做成**点击才加载**。
+  文件里带**逐题明细**的长数组，所以体积大，实测约 1 秒。它曾与 models.dev 一起做成
+  "点击才加载"，现已改成**进页面即加载**：这一页只有这一张榜，读者点进来就是要看它，
+  多一次点击只是一步多余的仪式。代价是首屏等 1 秒 —— 与"打开一个空页面再点一下"
+  相比，那是划算的。
 - 取第一个 **Verified** 子榜（最常被引用），同模型的多次提交按**最高分**去重。
 - ★ **量纲坑**：`resolved` 是**已经在 0–100 的百分数**（Verified 最高 79.2；若按 0–1 比例
   解释则不可能超过 1）。展示时直接用，**绝不能再 ×100**。
@@ -141,8 +144,7 @@ https://openrouter.ai/api/v1/models                       ← 模型清单（只
    所以必然有一部分解析不到 —— 实测**按用量加权的覆盖率 97.7%**，
    落到 slug 的那 2.3% 在页面上标一个「无显示名」标签，**不编名字**。
 
-`swebench` 那类"体量大所以点击才加载"的处理这里**不需要**：两个请求合计约
-1.1MB、一次往返，所以进页面就拉。
+两个请求合计约 1.1MB、一次往返，所以进页面就拉（与 SWE-bench / models.dev 现在的处理一致）。
 
 `?order=top-weekly` 之类的排序参数确实被忽略（上一版测的没错），
 但那是 `api/v1` 的老结论，与用量榜无关。
