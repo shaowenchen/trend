@@ -1,0 +1,763 @@
+{
+ "fetchedAt": "2026-10-01T04:51:49.319Z",
+ "skipped": [
+  {
+   "key": "thedecoder",
+   "name": "The Decoder",
+   "reason": "域名已挂牌出售（停靠页 307 → forsale.godaddy.com），全部 feed 路径只回 114B 跳转壳（2026-10-01 实测）"
+  }
+ ],
+ "sources": [
+  {
+   "key": "openai",
+   "name": "OpenAI",
+   "fetchedAt": "2026-10-01T04:51:35.769Z",
+   "items": [
+    {
+     "title": "Disrupting a coordinated model-distillation campaign",
+     "url": "https://openai.com/index/disrupting-a-coordinated-model-distillation-campaign",
+     "time": "Wed, 30 Sep 2026 10:30:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Helping small businesses put AI to work",
+     "url": "https://openai.com/index/helping-small-businesses-put-ai-to-work",
+     "time": "Wed, 30 Sep 2026 10:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Introducing GPT-6.1 Sol",
+     "url": "https://openai.com/index/introducing-gpt-6-1-sol",
+     "time": "Tue, 29 Sep 2026 10:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "DevDay 2026 Recap",
+     "url": "https://openai.com/index/devday-2026-recap",
+     "time": "Tue, 29 Sep 2026 10:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Introducing dots",
+     "url": "https://openai.com/index/introducing-dots",
+     "time": "Tue, 29 Sep 2026 00:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "How we will do better for Australia",
+     "url": "https://openai.com/index/how-we-will-do-better-for-australia",
+     "time": "Mon, 28 Sep 2026 19:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Towards safety cases for frontier AI training",
+     "url": "https://openai.com/index/towards-safety-cases-for-frontier-ai-training",
+     "time": "Mon, 28 Sep 2026 19:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "The Lenfest Institute grows landmark program with expanded OpenAI support",
+     "url": "https://openai.com/index/lenfest-ai-collaborative-expansion",
+     "time": "Mon, 28 Sep 2026 07:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Are you a Codex Original?",
+     "url": "https://openai.com/form/codex-originals",
+     "time": "Mon, 28 Sep 2026 00:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Basis completes a tax workbook 2x faster with GPT-6 Astra",
+     "url": "https://openai.com/index/basis-tax-workbook-with-astra",
+     "time": "Mon, 28 Sep 2026 00:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Proaction boosts sales 60% and saves 75+ hours with Codex",
+     "url": "https://openai.com/index/proaction",
+     "time": "Fri, 25 Sep 2026 19:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Two years of OpenAI Academy",
+     "url": "https://openai.com/index/two-years-of-openai-academy",
+     "time": "Wed, 23 Sep 2026 16:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "OpenAI extends cyber access to Ukraine for civilian defense",
+     "url": "https://openai.com/index/openai-extends-cyber-access-to-ukraine-for-civilian-defense",
+     "time": "Wed, 23 Sep 2026 13:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "How invideo improves color grading 3x with GPT‑6 Astra",
+     "url": "https://openai.com/index/invideo-builds-with-gpt-6-astra",
+     "time": "Wed, 23 Sep 2026 12:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Ringg’s AI agents resolve up to 65% of customer calls with OpenAI",
+     "url": "https://openai.com/index/ringg",
+     "time": "Wed, 23 Sep 2026 12:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Sam Altman’s remarks at the United Nations Security Council",
+     "url": "https://openai.com/index/sam-altman-un-security-council-remarks",
+     "time": "Wed, 23 Sep 2026 12:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Harvey turns legal context into stronger drafts with GPT-6 Astra",
+     "url": "https://openai.com/index/harvey-from-context-to-confidence-with-astra",
+     "time": "Wed, 23 Sep 2026 12:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Introducing MentalHealthBench",
+     "url": "https://openai.com/index/introducing-mentalhealthbench",
+     "time": "Wed, 23 Sep 2026 10:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "ChatGPT Ads expands to Southeast Asia and Taiwan",
+     "url": "https://openai.com/index/chatgpt-ads-expands-southeast-asia-taiwan",
+     "time": "Wed, 23 Sep 2026 02:00:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Airbnb widens access to GPT-6 Astra and OpenAI frontier models",
+     "url": "https://openai.com/index/airbnb-gpt-6-astra",
+     "time": "Wed, 23 Sep 2026 01:00:00 GMT",
+     "author": ""
+    }
+   ]
+  },
+  {
+   "key": "techcrunch",
+   "name": "TechCrunch · AI",
+   "fetchedAt": "2026-10-01T04:51:37.201Z",
+   "items": [
+    {
+     "title": "Google releases Gemini 4 Argon, called its most powerful model yet",
+     "url": "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+     "time": "Wed, 30 Sep 2026 23:43:07 +0000",
+     "author": "Lucas Ropek"
+    },
+    {
+     "title": "Valor, Atreides, and Sequoia back AI startup Flow Engineering at $750M valuation",
+     "url": "https://techcrunch.com/2026/09/30/valor-atreides-and-sequoia-back-ai-startup-flow-engineering-at-750m-valuation/",
+     "time": "Wed, 30 Sep 2026 21:07:40 +0000",
+     "author": "Julie Bort"
+    },
+    {
+     "title": "OpenAI&#8217;s Jev clone could help the frontier lab stop its swarming agents",
+     "url": "https://techcrunch.com/2026/09/30/openais-jev-clone-could-help-the-frontier-lab-stop-its-swarming-agents/",
+     "time": "Wed, 30 Sep 2026 19:00:57 +0000",
+     "author": "Tim Fernholz"
+    },
+    {
+     "title": "AI voice startup ElevenLabs doubles valuation to $22B",
+     "url": "https://techcrunch.com/2026/09/30/ai-voice-startup-elevenlabs-doubles-valuation-to-22b/",
+     "time": "Wed, 30 Sep 2026 18:23:57 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "Reddit is killing RSS feeds and ending public API access because of AI bots",
+     "url": "https://techcrunch.com/2026/09/30/reddit-is-killing-rss-feeds-ending-public-api-access-because-of-ai-bots/",
+     "time": "Wed, 30 Sep 2026 17:45:00 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "The ugly economics of consumer AI",
+     "url": "https://techcrunch.com/2026/09/30/the-ugly-economics-of-consumer-ai/",
+     "time": "Wed, 30 Sep 2026 17:24:45 +0000",
+     "author": "Russell Brandom"
+    },
+    {
+     "title": "Meta disputes claim that Muse read a user&#8217;s private messages without permission",
+     "url": "https://techcrunch.com/2026/09/30/meta-disputes-claim-that-muse-read-a-users-private-messages-without-permission/",
+     "time": "Wed, 30 Sep 2026 16:24:23 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "DoorDash launches an AI agent you can text to order food",
+     "url": "https://techcrunch.com/2026/09/30/doordash-launches-an-ai-agent-you-can-text-to-order-food/",
+     "time": "Wed, 30 Sep 2026 16:00:24 +0000",
+     "author": "Aisha Malik"
+    },
+    {
+     "title": "Destro AI&#8217;s secret sauce is getting robots and humans on the same page",
+     "url": "https://techcrunch.com/2026/09/30/destro-ais-secret-sauce-is-getting-robots-and-humans-on-the-same-page/",
+     "time": "Wed, 30 Sep 2026 16:00:00 +0000",
+     "author": "Tim Fernholz"
+    },
+    {
+     "title": "Instinct&#8217;s new product recommendations are giving some users the ick",
+     "url": "https://techcrunch.com/2026/09/30/instincts-new-product-recommendations-are-giving-some-users-the-ick/",
+     "time": "Wed, 30 Sep 2026 15:56:28 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "Cerebras Systems’ Andrew Feldman on whether AI can keep scaling at TechCrunch Disrupt 2026",
+     "url": "https://techcrunch.com/2026/09/30/cerebras-systems-andrew-feldman-on-whether-ai-can-keep-scaling-at-techcrunch-disrupt-2026/",
+     "time": "Wed, 30 Sep 2026 14:30:00 +0000",
+     "author": "TechCrunch Events"
+    },
+    {
+     "title": "Restate lands $20M as the need for durable infrastructure increases with AI agents",
+     "url": "https://techcrunch.com/2026/09/30/restate-lands-20m-as-the-need-for-durable-infrastructure-increases-with-ai-agents/",
+     "time": "Wed, 30 Sep 2026 14:27:11 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "3 days left to exhibit: Turn visibility into your next opportunity at TechCrunch Disrupt 2026",
+     "url": "https://techcrunch.com/2026/09/30/3-days-left-to-exhibit-at-techcrunch-disrupt-2026-2/",
+     "time": "Wed, 30 Sep 2026 14:15:00 +0000",
+     "author": "TechCrunch Events"
+    },
+    {
+     "title": "Airbnb adds AI search, more social features",
+     "url": "https://techcrunch.com/2026/09/30/airbnb-adds-ai-search-more-social-features/",
+     "time": "Wed, 30 Sep 2026 12:00:00 +0000",
+     "author": "Ivan Mehta"
+    },
+    {
+     "title": "America.gov gets really weird when you ask it about Minecraft, but it&#8217;s not a glitch",
+     "url": "https://techcrunch.com/2026/09/29/america-gov-gets-really-weird-when-you-ask-it-about-minecraft-but-its-not-a-glitch/",
+     "time": "Tue, 29 Sep 2026 23:30:55 +0000",
+     "author": "Amanda Silberling"
+    },
+    {
+     "title": "The internet is convinced Elon Musk&#8217;s xAI trolled OpenAI&#8217;s &#8216;Dots&#8217; launch",
+     "url": "https://techcrunch.com/2026/09/29/the-internet-is-convinced-elon-musks-xai-trolled-openais-dots-launch/",
+     "time": "Tue, 29 Sep 2026 22:20:59 +0000",
+     "author": "Julie Bort"
+    },
+    {
+     "title": "OpenAI&#8217;s latest features take direct aim at the app store model",
+     "url": "https://techcrunch.com/2026/09/29/openais-latest-features-take-direct-aim-at-the-app-store-model/",
+     "time": "Tue, 29 Sep 2026 20:15:47 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "OpenAI reportedly in talks to raise $30B round at $1.4T valuation",
+     "url": "https://techcrunch.com/2026/09/29/openai-reportedly-in-talks-to-raise-30b-round-at-1-4t-valuation/",
+     "time": "Tue, 29 Sep 2026 19:52:37 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "Here&#8217;s why OpenAI is absent from Nvidia&#8217;s industry-wide effort to end rogue AI agents",
+     "url": "https://techcrunch.com/2026/09/29/heres-why-openai-is-absent-from-nvidias-industry-wide-effort-to-end-rogue-ai-agents/",
+     "time": "Tue, 29 Sep 2026 18:35:00 +0000",
+     "author": "Julie Bort"
+    }
+   ]
+  },
+  {
+   "key": "arstechnica",
+   "name": "Ars Technica · AI",
+   "fetchedAt": "2026-10-01T04:51:39.993Z",
+   "items": [
+    {
+     "title": "Google announces Gemini 4 Argon AI model, but you can&#039;t use it yet",
+     "url": "https://arstechnica.com/google/2026/09/google-announces-gemini-4-argon-ai-model-but-you-cant-use-it-yet/",
+     "time": "Wed, 30 Sep 2026 20:11:08 +0000",
+     "author": "Ryan Whitwam"
+    },
+    {
+     "title": "RFK Jr. thinks AI will free us from the \"tyranny\" of medical facts, expertise",
+     "url": "https://arstechnica.com/health/2026/09/rfk-jr-says-ai-backs-his-anti-vaccine-views-we-checked-it-doesnt/",
+     "time": "Wed, 30 Sep 2026 19:31:25 +0000",
+     "author": "Beth Mole"
+    },
+    {
+     "title": "Trump plan to combat AI risks hinges on Big Tech pals policing themselves",
+     "url": "https://arstechnica.com/tech-policy/2026/09/trump-plan-to-combat-ai-risks-hinges-on-big-tech-pals-policing-themselves/",
+     "time": "Wed, 30 Sep 2026 18:47:01 +0000",
+     "author": "Ashley Belanger"
+    },
+    {
+     "title": "\"An AI did it\" is no defense, says nonprofit suing OpenAI over Hugging Face hack",
+     "url": "https://arstechnica.com/tech-policy/2026/09/lawsuit-demands-openai-halt-unsafe-development-that-caused-hugging-face-hack/",
+     "time": "Wed, 30 Sep 2026 18:25:04 +0000",
+     "author": "Jon Brodkin"
+    },
+    {
+     "title": "Google&#039;s early attempt to pay websites for AI answers is struggling",
+     "url": "https://arstechnica.com/google/2026/09/google-is-paying-100-websites-for-contributions-to-ai-overviews-but-the-amounts-are-tiny/",
+     "time": "Wed, 30 Sep 2026 16:03:48 +0000",
+     "author": "Ryan Whitwam"
+    },
+    {
+     "title": "Google figures out how to watermark AI-designed proteins",
+     "url": "https://arstechnica.com/science/2026/09/google-figures-out-how-to-watermark-ai-designed-proteins/",
+     "time": "Wed, 30 Sep 2026 15:54:52 +0000",
+     "author": "John Timmer"
+    },
+    {
+     "title": "OpenAI delays IPO over AI safety concerns",
+     "url": "https://arstechnica.com/ai/2026/09/openai-delays-ipo-over-ai-safety-concerns/",
+     "time": "Wed, 30 Sep 2026 14:06:15 +0000",
+     "author": "George Hammond, Financial Times"
+    },
+    {
+     "title": "Protests against OpenAI get increasingly creative",
+     "url": "https://arstechnica.com/ai/2026/09/what-iceberg-bay-area-artists-target-openai-with-titanic-themed-protest-art/",
+     "time": "Tue, 29 Sep 2026 21:52:58 +0000",
+     "author": "Cyrus Farivar"
+    },
+    {
+     "title": "AMD acquires World Labs AI startup, upping the ante against Nvidia",
+     "url": "https://arstechnica.com/ai/2026/09/amd-acquires-world-labs-ai-pioneer-fei-fei-lis-world-models-startup/",
+     "time": "Tue, 29 Sep 2026 21:14:49 +0000",
+     "author": "Samuel Axon"
+    },
+    {
+     "title": "Here&#039;s what actually happened in OpenAI&#039;s Australian gov&#039;t server hack",
+     "url": "https://arstechnica.com/ai/2026/09/heres-what-actually-happened-in-openais-australian-govt-server-hack/",
+     "time": "Tue, 29 Sep 2026 18:11:09 +0000",
+     "author": "Kyle Orland"
+    },
+    {
+     "title": "OpenAI says planned GPT-6.1 is too insecure to release",
+     "url": "https://arstechnica.com/ai/2026/09/openai-says-planned-gpt-6-1-is-too-insecure-to-release/",
+     "time": "Tue, 29 Sep 2026 14:22:31 +0000",
+     "author": "Kyle Orland"
+    },
+    {
+     "title": "Anthropic’s IPO pitch includes a warning about human extinction",
+     "url": "https://arstechnica.com/ai/2026/09/anthropics-ipo-pitch-includes-a-warning-about-human-extinction/",
+     "time": "Tue, 29 Sep 2026 14:10:00 +0000",
+     "author": "George Hammond, Financial Times"
+    },
+    {
+     "title": "Interview: Firefox&#039;s chief on why he hopes a redesign will help win users from Chrome",
+     "url": "https://arstechnica.com/gadgets/2026/09/mozillas-head-of-firefox-talks-product-priorities-ai-skepticism-and-browser-choice/",
+     "time": "Tue, 29 Sep 2026 13:00:19 +0000",
+     "author": "Samuel Axon"
+    },
+    {
+     "title": "Experts worry about Nvidia&#039;s AI chip sales in China and influence over Trump",
+     "url": "https://arstechnica.com/tech-policy/2026/09/nvidia-may-sell-more-chips-in-china-as-jensen-huangs-influence-over-trump-grows/",
+     "time": "Mon, 28 Sep 2026 21:49:10 +0000",
+     "author": "Ashley Belanger"
+    },
+    {
+     "title": "Florida invokes extinction fears in legal bid to halt OpenAI development",
+     "url": "https://arstechnica.com/ai/2026/09/florida-asks-court-to-put-the-brakes-on-openais-frontier-ai-development/",
+     "time": "Mon, 28 Sep 2026 20:49:39 +0000",
+     "author": "Kyle Orland"
+    },
+    {
+     "title": "OpenAI halts frontier-model training amid string of agent misalignment incidents",
+     "url": "https://arstechnica.com/ai/2026/09/openai-halts-frontier-model-training-amid-string-of-agent-misalignment-incidents/",
+     "time": "Mon, 28 Sep 2026 16:43:18 +0000",
+     "author": "Kyle Orland"
+    },
+    {
+     "title": "Microsoft goes quiet after church groups ask for 1% of data center costs",
+     "url": "https://arstechnica.com/tech-policy/2026/09/microsoft-goes-quiet-after-church-groups-ask-for-1-of-data-center-costs/",
+     "time": "Mon, 28 Sep 2026 11:00:09 +0000",
+     "author": "Ashley Belanger"
+    },
+    {
+     "title": "Court rules Pentagon can blacklist Anthropic for refusing to enable Claude features",
+     "url": "https://arstechnica.com/tech-policy/2026/09/court-rules-trump-can-blacklist-anthropic-for-refusing-to-enable-claude-features/",
+     "time": "Fri, 25 Sep 2026 21:36:20 +0000",
+     "author": "Jon Brodkin"
+    },
+    {
+     "title": "Tesla workers balk at training Optimus humanoid robots as replacements",
+     "url": "https://arstechnica.com/ai/2026/09/tesla-workers-balk-at-training-optimus-humanoid-robots-as-replacements/",
+     "time": "Fri, 25 Sep 2026 21:10:51 +0000",
+     "author": "Jeremy Hsu"
+    },
+    {
+     "title": "AI was supposed to hit new grads hard. So far, unemployment data says otherwise.",
+     "url": "https://arstechnica.com/ai/2026/09/ai-was-supposed-to-hit-new-grads-hard-so-far-unemployment-data-says-otherwise/",
+     "time": "Fri, 25 Sep 2026 19:11:05 +0000",
+     "author": "Kyle Orland"
+    }
+   ]
+  },
+  {
+   "key": "github",
+   "name": "GitHub Blog",
+   "fetchedAt": "2026-10-01T04:51:41.601Z",
+   "items": [
+    {
+     "title": "Developer policy update: Transparency, state policy, and what’s ahead",
+     "url": "https://github.blog/news-insights/policy-news-and-insights/developer-policy-update-transparency-state-policy-and-whats-ahead/",
+     "time": "Tue, 29 Sep 2026 15:00:00 +0000",
+     "author": "Margaret Tucker"
+    },
+    {
+     "title": "How we found 24 Android vulnerabilities using our open source AI security agent",
+     "url": "https://github.blog/security/how-we-found-24-android-vulnerabilities-using-our-open-source-ai-security-agent/",
+     "time": "Mon, 28 Sep 2026 19:00:00 +0000",
+     "author": "Kevin Stubbings"
+    },
+    {
+     "title": "Highlights from Git 2.56",
+     "url": "https://github.blog/open-source/git/highlights-from-git-2-56/",
+     "time": "Mon, 28 Sep 2026 17:23:33 +0000",
+     "author": "Elijah Newren"
+    },
+    {
+     "title": "GitHub Copilot app for Beginners: How to build custom workflows with canvases",
+     "url": "https://github.blog/ai-and-ml/github-copilot/github-copilot-app-for-beginners-how-to-build-custom-workflows-with-canvases/",
+     "time": "Fri, 25 Sep 2026 18:00:00 +0000",
+     "author": "Kayla Cinnamon"
+    },
+    {
+     "title": "Improving site performance by shipping more CSS",
+     "url": "https://github.blog/engineering/architecture-optimization/improving-site-performance-by-shipping-more-css/",
+     "time": "Fri, 25 Sep 2026 15:00:00 +0000",
+     "author": "Josh Black"
+    },
+    {
+     "title": "When chat is the wrong UI",
+     "url": "https://github.blog/ai-and-ml/github-copilot/when-chat-is-the-wrong-ui/",
+     "time": "Thu, 24 Sep 2026 20:00:00 +0000",
+     "author": "Burke Holland"
+    },
+    {
+     "title": "AI-powered fuzzing with the GitHub Security Lab Taskflow Agent",
+     "url": "https://github.blog/security/application-security/ai-powered-fuzzing-with-the-github-security-lab-taskflow-agent/",
+     "time": "Thu, 24 Sep 2026 18:26:12 +0000",
+     "author": "Antonio Morales"
+    },
+    {
+     "title": "Rendering huge pull requests in the GitHub Copilot app",
+     "url": "https://github.blog/engineering/user-experience/rendering-huge-pull-requests-in-the-github-copilot-app/",
+     "time": "Wed, 23 Sep 2026 18:29:49 +0000",
+     "author": "Alberto Gimeno"
+    },
+    {
+     "title": "Developers want more efficient software. Here’s what over 1,000 GitHub users told us they need.",
+     "url": "https://github.blog/news-insights/research/developers-want-more-efficient-software-heres-what-over-1000-github-users-told-us-they-need/",
+     "time": "Wed, 23 Sep 2026 13:00:00 +0000",
+     "author": "Paull Young"
+    },
+    {
+     "title": "Should you read the code, is RAG dead, and did Skills kill MCP?",
+     "url": "https://github.blog/ai-and-ml/should-you-read-the-code-is-rag-dead-and-did-skills-kill-mcp/",
+     "time": "Fri, 18 Sep 2026 15:00:00 +0000",
+     "author": "GPS"
+    }
+   ]
+  },
+  {
+   "key": "deepmind",
+   "name": "Google DeepMind",
+   "fetchedAt": "2026-10-01T04:51:44.472Z",
+   "items": [
+    {
+     "title": "Gemini 4 Argon: our next era of frontier intelligence",
+     "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/",
+     "time": "Wed, 30 Sep 2026 20:01:45 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing SynthID Bio",
+     "url": "https://deepmind.google/blog/introducing-synthid-bio/",
+     "time": "Wed, 30 Sep 2026 15:03:07 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing Gemini 3.8 Live with Live Avatar",
+     "url": "https://deepmind.google/blog/introducing-gemini-38-live-with-live-avatar/",
+     "time": "Thu, 24 Sep 2026 16:20:39 +0000",
+     "author": ""
+    },
+    {
+     "title": "Advancing Private AI Compute with secure, server-side memory",
+     "url": "https://deepmind.google/blog/advancing-private-ai-compute-with-secure-server-side-memory/",
+     "time": "Wed, 23 Sep 2026 16:00:57 +0000",
+     "author": ""
+    },
+    {
+     "title": "Gemini 3.8 text-to-speech says hello",
+     "url": "https://deepmind.google/blog/say-hello-to-gemini-38-text-to-speech/",
+     "time": "Wed, 23 Sep 2026 15:25:14 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing Gemini 3.8 Live and 3.8 Live Extended Thinking",
+     "url": "https://deepmind.google/blog/introducing-gemini-3-8-live-and-3-8-live-extended-thinking/",
+     "time": "Tue, 15 Sep 2026 17:05:57 +0000",
+     "author": ""
+    },
+    {
+     "title": "AlphaGenome Atlas: A predictive map of every possible DNA letter change in the human genome",
+     "url": "https://deepmind.google/blog/alphagenome-atlas-a-predictive-map-of-every-possible-dna-letter-change-in-the-human-genome/",
+     "time": "Tue, 08 Sep 2026 14:00:15 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing WeatherNext 3, our most advanced and accurate global weather AI model",
+     "url": "https://deepmind.google/blog/introducing-weathernext-3-our-most-advanced-and-accurate-global-weather-ai-model/",
+     "time": "Thu, 03 Sep 2026 15:02:08 +0000",
+     "author": ""
+    },
+    {
+     "title": "Proactive cyber defense for governments and enterprises",
+     "url": "https://deepmind.google/blog/proactive-cyber-defense-for-governments-and-enterprises/",
+     "time": "Wed, 02 Sep 2026 16:24:24 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing Gemini 3.8 Flash and 3.8 Flash Cyber",
+     "url": "https://deepmind.google/blog/introducing-gemini-3-8-flash-and-38-flash-cyber/",
+     "time": "Wed, 02 Sep 2026 16:18:31 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing agentic video understanding with Gemini",
+     "url": "https://deepmind.google/blog/introducing-agentic-video-in-gemini/",
+     "time": "Tue, 01 Sep 2026 17:08:51 +0000",
+     "author": ""
+    },
+    {
+     "title": "Gemini Omni 1.1 Flash lets you build with more control",
+     "url": "https://deepmind.google/blog/gemini-omni-1-1-flash-lets-you-build-with-more-control/",
+     "time": "Thu, 27 Aug 2026 16:11:32 +0000",
+     "author": ""
+    },
+    {
+     "title": "Piloting the world's first double-blind AI evaluations",
+     "url": "https://deepmind.google/blog/piloting-the-worlds-first-double-blind-ai-evaluations/",
+     "time": "Thu, 27 Aug 2026 12:59:16 +0000",
+     "author": ""
+    },
+    {
+     "title": "Intelligent transcription with Gemini 3.5 Transcribe",
+     "url": "https://deepmind.google/blog/intelligent-transcription-with-gemini-3-5-transcribe/",
+     "time": "Wed, 26 Aug 2026 17:01:00 +0000",
+     "author": ""
+    },
+    {
+     "title": "From Atari to EVE Online: Building on 15 Years of AI Research in Games",
+     "url": "https://deepmind.google/blog/from-atari-to-eve-online-building-on-15-years-of-ai-research-in-games/",
+     "time": "Fri, 21 Aug 2026 11:59:48 +0000",
+     "author": ""
+    },
+    {
+     "title": "Introducing Gemini 3.7 Flash",
+     "url": "https://deepmind.google/blog/introducing-gemini-3-7-flash/",
+     "time": "Thu, 13 Aug 2026 17:04:18 +0000",
+     "author": ""
+    },
+    {
+     "title": "Putting sign language AI into users’ hands",
+     "url": "https://deepmind.google/blog/putting-sign-language-ai-into-users-hands/",
+     "time": "Wed, 12 Aug 2026 14:01:59 +0000",
+     "author": ""
+    },
+    {
+     "title": "WeatherNext: AI model achieves breakthrough in forecasting cyclones",
+     "url": "https://deepmind.google/blog/weathernext-ai-model-achieves-breakthrough-in-forecasting-cyclones/",
+     "time": "Thu, 06 Aug 2026 15:06:15 +0000",
+     "author": ""
+    },
+    {
+     "title": "Gemini Robotics ER 2: powering robotics with video understanding, task orchestration, and multi-robot collaboration",
+     "url": "https://deepmind.google/blog/gemini-robotics-er-2-powering-robotics-with-video-understanding-task-orchestration-and-multi-robot-collaboration/",
+     "time": "Thu, 30 Jul 2026 15:00:59 +0000",
+     "author": ""
+    },
+    {
+     "title": "We’re launching Lyria 3.5 in Google Flow Music, with advances across musicality, lyrics, vocals, and creative control",
+     "url": "https://deepmind.google/blog/were-launching-lyria-35-in-google-flow-music-with-advances-across-musicality-lyrics-vocals-and-creative-control/",
+     "time": "Wed, 29 Jul 2026 16:02:10 +0000",
+     "author": ""
+    }
+   ]
+  },
+  {
+   "key": "msr",
+   "name": "Microsoft Research",
+   "fetchedAt": "2026-10-01T04:51:47.127Z",
+   "items": [
+    {
+     "title": "Forecasting space weather risks on power grids",
+     "url": "https://www.microsoft.com/en-us/research/blog/forecasting-space-weather-risks-on-power-grids/",
+     "time": "Wed, 30 Sep 2026 16:00:00 +0000",
+     "author": "Rohan Kannan"
+    },
+    {
+     "title": "Introducing Quine: An AI research system designed for the complexity of biology",
+     "url": "https://www.microsoft.com/en-us/research/blog/introducing-quine-an-ai-research-system-designed-for-the-complexity-of-biology/",
+     "time": "Tue, 29 Sep 2026 14:00:02 +0000",
+     "author": "Nicolo Fusi, Jonathan M. Carlson"
+    },
+    {
+     "title": "One year in: How Microsoft Research Asia – Singapore is advancing research, partnership and talent for real-world impact",
+     "url": "https://www.microsoft.com/en-us/research/blog/one-year-in-how-microsoft-research-asia-singapore-is-advancing-research-partnership-and-talent-for-real-world-impact/",
+     "time": "Mon, 28 Sep 2026 21:00:00 +0000",
+     "author": "Microsoft Research Team"
+    },
+    {
+     "title": "Offloaded inference for real-world physical AI robotics",
+     "url": "https://www.microsoft.com/en-us/research/blog/offloaded-inference-for-real-world-physical-ai-robotics/",
+     "time": "Wed, 23 Sep 2026 16:01:36 +0000",
+     "author": "Ganesh Ananthanarayanan, Matthew Balkwill, Xenofon Foukas, Sanjeev Mehrotra, Bozidar Radunovic, Connor Settle, Ankit Verma, David White, Shawn Cicoria, Mark Martin, Rachel Johnson, Mayur Patel"
+    },
+    {
+     "title": "Improving synthesis prediction of small molecules at scale with RetroChimera",
+     "url": "https://www.microsoft.com/en-us/research/blog/improving-synthesis-prediction-of-small-molecules-at-scale-with-retrochimera/",
+     "time": "Mon, 21 Sep 2026 15:30:19 +0000",
+     "author": "Felix Pultar, John Gardner, Guoqing Liu, Marwin Segler"
+    },
+    {
+     "title": "GigaPath-Flash and GigaTIME-Flash: Toward population-scale discovery with efficient pathology foundation models",
+     "url": "https://www.microsoft.com/en-us/research/blog/gigapath-flash-and-gigatime-flash-toward-population-scale-discovery-with-efficient-pathology-foundation-models/",
+     "time": "Mon, 31 Aug 2026 16:00:00 +0000",
+     "author": "Naoto Usuyama, Jeya Maria Jose Valanarasu, Tristan Naumann"
+    },
+    {
+     "title": "Broadening access to Skala creates a faster path to predictive DFT",
+     "url": "https://www.microsoft.com/en-us/research/blog/broadening-access-to-skala-creates-a-faster-path-to-predictive-dft/",
+     "time": "Thu, 20 Aug 2026 16:00:00 +0000",
+     "author": "Sebastian Ehlert, Stefano Battaglia, Thijs Vogels, Jan Hermann, Jens Wehner, Giulia Luise, Klaas Giesbertz, Chin-Wei Huang, Aaron Kaplan, Kate Milton, Stephanie Marisa Lanius, Derk Kooi, P. Bern&aacute;t Szab&oacute;, Gregor Simm, Rianne van den Berg, Paola Gori Giorgi"
+    },
+    {
+     "title": "MindTopo reveals VLMs&#8217; spatial reasoning abilities",
+     "url": "https://www.microsoft.com/en-us/research/blog/mindtopo-reveals-vlms-spatial-reasoning-abilities/",
+     "time": "Wed, 12 Aug 2026 16:00:00 +0000",
+     "author": "Yunfei Ge, Anbang Liu, Qineng Wang, Johnalbert Garnica, Zihan Wang, Reuben Tan, Jianfeng Gao, Ruohan Zhang, Yining Hong, Jiajun Wu, Manling Li"
+    },
+    {
+     "title": "Introducing CARE-X: Towards Clinically Useful Radiology VLMs with Auxiliary Supervision, Reward-Aligned Learning, and Tool-Augmented Measurement",
+     "url": "https://www.microsoft.com/en-us/research/blog/introducing-care-x-towards-clinically-useful-radiology-vlms-with-auxiliary-supervision-reward-aligned-learning-and-tool-augmented-measurement/",
+     "time": "Tue, 11 Aug 2026 16:00:00 +0000",
+     "author": "Mercy Ranjit, Nikhilesh E, Dr. Abhyuday Kumara Swamy, Tanuja Ganu"
+    },
+    {
+     "title": "Orchard: An open framework for scalable agentic AI",
+     "url": "https://www.microsoft.com/en-us/research/blog/orchard-an-open-framework-for-scalable-agentic-ai/",
+     "time": "Mon, 03 Aug 2026 16:00:00 +0000",
+     "author": "Baolin Peng, Wenlin Yao, Qianhui Wu, Hao Cheng, Jianfeng Gao"
+    }
+   ]
+  },
+  {
+   "key": "nvidia",
+   "name": "NVIDIA Blog",
+   "fetchedAt": "2026-10-01T04:51:48.519Z",
+   "items": [
+    {
+     "title": "NVIDIA Opens Applications for 2027–2028 Graduate Fellowships With Awards Up to $60,000",
+     "url": "https://blogs.nvidia.com/blog/applications-open-graduate-fellowship-awards-2026/",
+     "time": "Wed, 30 Sep 2026 17:00:21 +0000",
+     "author": "Sharon Gibbons"
+    },
+    {
+     "title": "From Training to Production, NVIDIA and CoreWeave Close the Loop on Agentic AI",
+     "url": "https://blogs.nvidia.com/blog/coreweave-agentic-ai-vera-rubin/",
+     "time": "Wed, 30 Sep 2026 15:00:00 +0000",
+     "author": "Stuart Pitts"
+    },
+    {
+     "title": "How Open Science Can Help Researchers Prepare for the Next Pandemic",
+     "url": "https://blogs.nvidia.com/blog/open-protein-dataset/",
+     "time": "Thu, 24 Sep 2026 14:00:50 +0000",
+     "author": "Anthony Costa"
+    },
+    {
+     "title": "Contain the Chaos: ‘CONTROL Resonant’ Launches on GeForce NOW",
+     "url": "https://blogs.nvidia.com/blog/geforce-now-thursday-control-resonant/",
+     "time": "Thu, 24 Sep 2026 13:00:36 +0000",
+     "author": "GeForce NOW Community"
+    },
+    {
+     "title": "Sakeena Fiza Helps NVIDIA Hardware Succeed at Scale",
+     "url": "https://blogs.nvidia.com/blog/nvidia-life-sakeena-fiza/",
+     "time": "Wed, 23 Sep 2026 15:00:32 +0000",
+     "author": "Matthew Leib"
+    },
+    {
+     "title": "At AI Day Singapore, NVIDIA and Partners Showcase AI Advancements Across Southeast Asia",
+     "url": "https://blogs.nvidia.com/blog/ai-day-singapore/",
+     "time": "Wed, 23 Sep 2026 02:30:22 +0000",
+     "author": "NVIDIA Writers"
+    },
+    {
+     "title": "NVIDIA Isaac ROS 5.0 Advances Agentic, Open Source Robotics Development",
+     "url": "https://blogs.nvidia.com/blog/isaac-ros-5-0-agentic-open-source-robotics/",
+     "time": "Tue, 22 Sep 2026 12:00:41 +0000",
+     "author": "Katie Washabaugh"
+    },
+    {
+     "title": "NVIDIA Launches DSX Ready to Qualify Power and Cooling Products for AI Factories",
+     "url": "https://blogs.nvidia.com/blog/dsx-ready-ai-factories-power-cooling/",
+     "time": "Mon, 21 Sep 2026 18:00:07 +0000",
+     "author": "Vishal Ganeriwala"
+    },
+    {
+     "title": "Why Deploying Physical AI at Scale Demands Safety at Every Layer",
+     "url": "https://blogs.nvidia.com/blog/physical-ai-halos-safety/",
+     "time": "Mon, 21 Sep 2026 16:00:46 +0000",
+     "author": "Riccardo Mariani"
+    },
+    {
+     "title": "From Enablement to Execution, Egypt’s AI Ecosystem Reaches Production Scale",
+     "url": "https://blogs.nvidia.com/blog/egypt-africa-ai-ecosystem/",
+     "time": "Mon, 21 Sep 2026 16:00:10 +0000",
+     "author": "Fatima Tambajang"
+    },
+    {
+     "title": "AI Security Is an Engineering Problem — How to Solve It at Every Layer of the Agent Stack",
+     "url": "https://blogs.nvidia.com/blog/ai-security-agent-stack/",
+     "time": "Mon, 21 Sep 2026 14:51:34 +0000",
+     "author": "Saša Zdjelar"
+    },
+    {
+     "title": "5 Companies Using NVIDIA AI for Clean Energy",
+     "url": "https://blogs.nvidia.com/blog/clean-energy-nvidia-ai/",
+     "time": "Mon, 21 Sep 2026 10:00:35 +0000",
+     "author": "Zoe Kessler"
+    },
+    {
+     "title": "Cute Critters Come to the Cloud: ‘Aniimo’ Launches on GeForce NOW",
+     "url": "https://blogs.nvidia.com/blog/geforce-now-thursday-aniimo/",
+     "time": "Thu, 17 Sep 2026 13:00:55 +0000",
+     "author": "GeForce NOW Community"
+    },
+    {
+     "title": "NVIDIA Vera Rubin NVL72 Delivers Leading Performance in MLPerf Inference v6.1 Debut",
+     "url": "https://blogs.nvidia.com/blog/vera-rubin-nvl72-mlperf-inference/",
+     "time": "Wed, 16 Sep 2026 15:00:48 +0000",
+     "author": "Zhihan Jiang"
+    },
+    {
+     "title": "Emerald AI, Google and NVIDIA Launch Alliance to Advance Flexible AI Data Centers",
+     "url": "https://blogs.nvidia.com/blog/ai-energy-management-alliance/",
+     "time": "Wed, 16 Sep 2026 13:00:33 +0000",
+     "author": "Josh Parker"
+    },
+    {
+     "title": "University of Manchester Uses NVIDIA Earth-2 to Forecast Air Pollution Across the UK",
+     "url": "https://blogs.nvidia.com/blog/uk-air-pollution-research-earth-2/",
+     "time": "Wed, 16 Sep 2026 05:00:42 +0000",
+     "author": "Isha Salian"
+    },
+    {
+     "title": "‘Now We Can Know Everything and Do Anything,’ Jensen Huang Says at Dreamforce",
+     "url": "https://blogs.nvidia.com/blog/jensen-huang-dreamforce/",
+     "time": "Tue, 15 Sep 2026 22:24:34 +0000",
+     "author": "Brian Caulfield"
+    },
+    {
+     "title": "From Megawatts to Tokens: How NVIDIA Maximizes AI Factory Production",
+     "url": "https://blogs.nvidia.com/blog/from-megawatts-to-tokens-how-nvidia-maximizes-ai-factory-production/",
+     "time": "Tue, 15 Sep 2026 16:55:59 +0000",
+     "author": "Vishal Ganeriwala"
+    }
+   ]
+  }
+ ]
+}

@@ -30,6 +30,7 @@
 | 🗂️ OpenRouter 模型库 | `openrouter.ai/api/v1/models` | 200 JSON（0.76MB，464 个模型） | `*` | ✅ 可直连（见 §7） |
 | 📈 GitHub Trending | `github.com/trending` | 200 **HTML**（650KB） | **无** | ❌ 无 CORS → **构建期快照**（见 §8） |
 | 📰 AI 新闻（8 源） | HN·Algolia / dev.to / TechCrunch / The Verge / Latent Space / Interconnects / arXiv / lobste.rs | 全 200 | 2 源 ✓ / 6 源 无 | 📸 全部**构建期快照**（见 §9） |
+| 📣 AI 官方要闻（8 家一手） | openai.com/news 等 7 家 RSS | 全 200 | 无（快照） | 📸 **构建期快照**（见 §10）；The Decoder ❌ 域名挂牌出售（观察项） |
 | 🐟 摸摸鱼热榜 | `momoyu.cc/api/hot/list` | 200 JSON（76KB，13 榜） | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
@@ -316,3 +317,26 @@ top.json 拦截、VentureBeat 稳定 429、smol.ai /rss 404。
   更接近数据真相）；`extra` 是站方热度文字（'552 万'），保留原文不解析成数字。
 - AI 过滤在**页面端**做（`isAiText`：中文子串 + 英文词边界），"全部 / 仅 AI"
   由读者切换 —— 快照存全量，过滤口径可迭代不用重抓。
+
+---
+
+## 10. AI 官方要闻（2026-10-01 新增，8 家一手信源，构建期快照）
+
+用户点名的一手信源与逐源实测（`scripts/fetch-ai-press.mjs`，快照
+`assets/data/ai-press.json`；解析器与 §9 同一份，`parseRssItems`）：
+
+| 信源 | 实测端点 | HTTP | 条目 | 备注 |
+|---|---|---|---|---|
+| OpenAI | `openai.com/news/rss.xml` | 200 RSS | 1240（全量档案） | /blog/rss.xml 同内容；只取前 20 |
+| TechCrunch · AI | `techcrunch.com/category/artificial-intelligence/feed/` | 200 RSS | 19 | ⚠️ 会 429（§9 已知），逐源回退兜住 |
+| Ars Technica | `arstechnica.com/ai/feed/` | 200 RSS | 20 | AI 频道 feed |
+| GitHub Blog | `github.blog/feed/` | 200 RSS | 10 | AI 分类 feed **404**，用主 feed |
+| Google DeepMind | `deepmind.google/blog/rss.xml` | 200 RSS | 100 | 单行 XML（按行统计会误判"1 条"） |
+| 微软研究院 | `microsoft.com/en-us/research/feed/` | 200 RSS | 10 | blogs.microsoft.com/ai/feed 已 **410 Gone**（博客合并） |
+| NVIDIA | `blogs.nvidia.com/feed/` | 200 RSS | 18 | 主 feed 本就 AI 为主 |
+| ❌ The Decoder | `thedecoder.com`（/feed、/rss、/rss.xml 全试） | 200**壳** | 0 | **域名已挂牌出售**：114B 停靠跳转页 307 → `forsale.godaddy.com/forsale/thedecoder.com`（GoDaddy/Afternic）→ **观察项**，如实显示在面板上，不硬上 |
+
+口径：每源前 20 条，按时间倒序混合，条目标来源；官方 RSS 没有统一的热度
+口径，**不硬造一列**（面板不带热度列，卡片主数值是发布时间）。
+失败语义与 §9 相同（逐源回退、全失败不提交）；观察项清单（`PRESS_OBSERVED`）
+跟着快照走，页面显示"观察项：The Decoder"。

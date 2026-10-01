@@ -19,7 +19,8 @@
     "test:live": "node scripts/live-check.mjs",
     "snap:gh-trending": "node scripts/fetch-gh-trending.mjs",
     "snap:ai-news": "node scripts/fetch-ai-news.mjs",
-    "snap:momoyu": "node scripts/fetch-momoyu-hot.mjs"
+    "snap:momoyu": "node scripts/fetch-momoyu-hot.mjs",
+    "snap:ai-press": "node scripts/fetch-ai-press.mjs"
   },
   "dependencies": {},
   "devDependencies": {}

@@ -79,6 +79,7 @@ export const SITE_FILES = [
   // 构建直接失败，而不是线上悄悄 404）
   'assets/data/gh-trending.json',
   'assets/data/ai-news.json',
+  'assets/data/ai-press.json',
   'assets/data/momoyu-hot.json',
   ...BOARD_PAGES.map((id) => `${id}.html`),
   ...BOARD_PAGES.map((id) => `en/${id}.html`),

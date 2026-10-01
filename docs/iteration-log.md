@@ -73,9 +73,12 @@
       "全部/仅 AI"切换。
 - [x] 本地全绿（i18n 9 / ui 7 / trend 95 / ainews 13 / site 36）+ 构建通过 +
       无头实测两页有数据（aiNews 149 条 8 组、momoyu 246 条 13 组）。
-- [ ] 推送上线 + 线上实测 + 微信交付。
-- [ ] **待推**：refresh-snapshots.yml（三合一每日 cron，替代原 gh-trending
-      单独工作流）—— 仍需带 workflow 权限的凭据。
+- [x] 推送上线（5e84c3d）+ 线上实测通过：aiNews（149 条 · 8 组）、
+      momoyu（246 条 · 13 组）、en/aiNews 全部 200 且有数据，
+      快照 JSON 线上可取（39KB / 45KB）。
+- [ ] **待推**：e47b679（refresh-snapshots.yml 三合一每日 cron，替代原
+      gh-trending 单独工作流）—— 仍需带 workflow 权限的凭据。推送前
+      快照不会每日自动刷新（面板照常工作，只是数据停在入库时刻）。
 
 ### 每日快照工作流（待推送后生效）
 
@@ -88,3 +91,17 @@ continue-on-error（部分成功仍提交成功部分），diff 为空不提交�
 - 本机 3.5G 内存：无头 chrome 一次一条；起渲染前 `free -h`。
 - datasets-server 校准数据当天已打过几百个请求，桶回填需 ~70s，勿连测。
 - 微信通知：`/home/shaowenchen/Projects/.dsh-hooks/notify.sh "…"`（失败不重试）。
+
+## 2026-10-01 · 第三轮：AI 官方要闻（用户点名 8 家一手信源）
+
+- [x] 逐源实测：7 家 RSS 全通（OpenAI/TechCrunch·AI/Ars·AI/GitHub Blog/
+      DeepMind/MSR/NVIDIA）；**The Decoder 域名挂牌出售**（GoDaddy 停靠页）
+      → 观察项，快照 skipped 字段如实记录并在页面显示（trend-sources.md §10）。
+- [x] fetch-ai-press.mjs（复用 §9 的 parseRssItems，逐源回退 + 直跑守卫）；
+      aiPress 面板与 aiNews 共用 mountNewsPanel 工厂（一手源无热度口径 →
+      不硬造列，卡片主数值是时间；观察项进 note）。
+- [x] 快照入库 7 源 117 条；本地全绿（trend 95 / ainews 16 / site 36 等）+
+      无头实测（117 条 · 7 组 · 观察项声明可见）。
+- [ ] 推送上线 + 线上实测（DoD：≥6 源有条目、页面 200）+ 微信交付。
+- [ ] refresh-snapshots.yml 补第 4 步（fetch-ai-press）—— 与工作流一起待
+      workflow 权限凭据推送。

@@ -1628,6 +1628,7 @@ async function loadGhTrending(view = 'ai') {
  * 旧快照原样保留（页面照常显示旧快照与它的抓取时刻）。
  */
 const AI_NEWS_SNAP_URL = new URL('./data/ai-news.json', import.meta.url).href;
+const AI_PRESS_SNAP_URL = new URL('./data/ai-press.json', import.meta.url).href;
 const MOMOYU_SNAP_URL = new URL('./data/momoyu-hot.json', import.meta.url).href;
 
 /** AI 新闻快照 → 面板行（坏条目剔除；score 缺失为 null，空值恒排最后） */
@@ -1651,22 +1652,32 @@ export function flattenAiNews(snap) {
   return out;
 }
 
-/** 面板：AI 新闻热点（8 源聚合，按来源分组，按时间倒序） */
-async function loadAiNews() {
+/**
+ * 新闻类面板的公共骨架：aiNews（聚合/社区源）与 aiPress（一手信源）形状相同
+ * （都是 {fetchedAt, sources:[{key,name,fetchedAt,items}]}），只差面板身份与
+ * 快照地址 —— 抽成一个工厂，避免两份 100 行的复制（复制的失效方式就是
+ * 改了这边忘了那边）。
+ */
+async function mountNewsPanel({ id, iconName, snapUrl, cacheKey, showScore = true }) {
   const p = panel({
-    id: 'aiNews',
-    iconName: 'file',
-    title: L('p.aiNews.title'),
-    hint: L('p.aiNews.hint'),
+    id,
+    iconName,
+    title: L(`p.${id}.title`),
+    hint: L(`p.${id}.hint`),
   });
   try {
-    const snap = await cachedJson('ai-news', AI_NEWS_SNAP_URL);
+    const snap = await cachedJson(cacheKey, snapUrl);
     const rows = flattenAiNews(snap);
     if (!rows.length) throw new Error(L('err.noNews'));
     // 标"最老来源"的抓取时刻：有源失联时读者能看到最旧的块有多旧 ——
     // 比标"最新"诚实（快照的价值判断权在读的人，不在写的人）
     const times = (snap.sources || []).map((x) => Date.parse(x.fetchedAt)).filter(Number.isFinite);
     const oldest = times.length ? Math.min(...times) : Date.now();
+    // 观察项（一手源里取不到的，如实跟着快照走）：aiPress 用，aiNews 没有
+    const skipped = (snap.skipped || []).map((x) => x.name).filter(Boolean);
+    const note =
+      L('st.aiNewsSnap', { time: fmtStamp(oldest) }) +
+      (skipped.length ? ` · ${L('st.pressSkipped', { names: skipped.join(' / ') })}` : '');
     p.status('', 'ok');
     mountBoard(p, {
       rows,
@@ -1679,7 +1690,11 @@ async function loadAiNews() {
         },
         { label: L('col.source'), cls: 'col-2', field: 'source', cell: (r) => `<span class="tag">${esc(r.source)}</span>` },
         { label: L('col.date'), cls: 'col-2', field: 'time', cell: (r) => (r.time ? fmtStamp(Date.parse(r.time)) : '—') },
-        { label: L('col.hot'), num: true, cls: 'col-2', field: 'score', cell: (r) => compact(r.score) ?? '—' },
+        // 一手博客没有统一的热度口径（官方 RSS 不带浏览/点赞数）—— aiPress 不显示这列，
+        // 硬造一个口径反而是编数据
+        ...(showScore
+          ? [{ label: L('col.hot'), num: true, cls: 'col-2', field: 'score', cell: (r) => compact(r.score) ?? '—' }]
+          : []),
       ],
       defaultSort: { index: 3, dir: 'desc' },
       searchFields: ['title', 'source'],
@@ -1687,10 +1702,13 @@ async function loadAiNews() {
       groupLabel: L('ui.allSources'),
       placeholder: L('ui.searchNews'),
       transform: withRank,
-      note: L('st.aiNewsSnap', { time: fmtStamp(oldest) }),
+      note,
       card: {
         title: (r) => esc(r.title),
-        value: (r) => `<span class="v-num">${compact(r.score) ?? '—'}</span> <span class="v-unit">${L('col.hot')}</span>`,
+        value: (r) =>
+          showScore
+            ? `<span class="v-num">${compact(r.score) ?? '—'}</span> <span class="v-unit">${L('col.hot')}</span>`
+            : `<span class="v-num">${r.time ? fmtStamp(Date.parse(r.time)) : '—'}</span>`,
         meta: (r) =>
           `<span class="tag">${esc(r.source)}</span>` +
           (r.time ? `<span class="tag">${fmtStamp(Date.parse(r.time))}</span>` : ''),
@@ -1701,6 +1719,16 @@ async function loadAiNews() {
     p.status(L('st.failed', { msg: e.message }), 'err');
     p.body('');
   }
+}
+
+/** 面板：AI 新闻热点（8 个聚合/社区源，带热度口径） */
+function loadAiNews() {
+  return mountNewsPanel({ id: 'aiNews', iconName: 'file', snapUrl: AI_NEWS_SNAP_URL, cacheKey: 'ai-news' });
+}
+
+/** 面板：AI 官方要闻（8 家一手信源，无热度口径但带观察项声明） */
+function loadAiPress() {
+  return mountNewsPanel({ id: 'aiPress', iconName: 'file', snapUrl: AI_PRESS_SNAP_URL, cacheKey: 'ai-press', showScore: false });
 }
 
 /** 摸摸鱼快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换） */
@@ -2791,6 +2819,7 @@ const BOARD_LOADERS = {
   datasets: () => loadDatasets(),
   papers: () => loadPapers(),
   aiNews: () => loadAiNews(),
+  aiPress: () => loadAiPress(),
   repos: () => loadRepos('week'),
   ghTrending: () => loadGhTrending('ai'),
   momoyu: () => loadMomoyu('all'),

@@ -13,6 +13,7 @@ import {
   parseRssItems, parseAtomEntries, normalizeHn, normalizeDevTo, normalizeLobsters,
   NEWS_SOURCES,
 } from '../../../scripts/fetch-ai-news.mjs';
+import { PRESS_SOURCES, PRESS_OBSERVED } from '../../../scripts/fetch-ai-press.mjs';
 import { normalizeMomoyu } from '../../../scripts/fetch-momoyu-hot.mjs';
 
 let pass = 0;
@@ -155,6 +156,27 @@ t('★ NEWS_SOURCES：8 个源、key 唯一、URL 都成型（少一个源就是
   assert.equal(new Set(NEWS_SOURCES.map((s) => s.key)).size, 8, 'key 不得重复');
   for (const s of NEWS_SOURCES) assert.ok(/^https:\/\//.test(s.url), `${s.key} 的 URL 异常`);
   assert.equal(new Set(NEWS_SOURCES.map((s) => s.kind)).size, 5, 'kind 覆盖 hn/devto/rss/atom/lobsters');
+});
+
+t('★ PRESS_SOURCES：7 个一手源全部 RSS、key 唯一（第 8 家 The Decoder 是观察项）', () => {
+  assert.equal(PRESS_SOURCES.length, 7, '2026-10-01 实测：The Decoder 域名挂牌出售，7 家可用');
+  assert.equal(new Set(PRESS_SOURCES.map((s) => s.key)).size, 7);
+  for (const s of PRESS_SOURCES) assert.ok(/^https:\/\//.test(s.url), `${s.key} 的 URL 异常`);
+});
+
+t('★ PRESS_OBSERVED：观察项如实记录（含原因），页面的"观察项：…"声明来自快照', () => {
+  assert.ok(Array.isArray(PRESS_OBSERVED));
+  const dec = PRESS_OBSERVED.find((x) => x.key === 'thedecoder');
+  assert.ok(dec, 'The Decoder 应在观察项里（域名停靠出售，2026-10-01 实测）');
+  assert.ok(dec.reason.includes('forsale') || dec.reason.length > 10, '原因要写清楚，不是一句"不可用"');
+});
+
+t('★ fetch-ai-press.mjs 也有直跑守卫（import PRESS_SOURCES 不触发抓取）', () => {
+  assert.match(
+    readFileSync(new URL('../../../scripts/fetch-ai-press.mjs', import.meta.url), 'utf8'),
+    /if \(isMain\)/,
+    'fetch-ai-press.mjs 缺直跑守卫'
+  );
 });
 
 t('★ 脚本有直跑守卫：import 不产生任何网络副作用（主流程只在直接运行时走）', () => {
