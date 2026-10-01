@@ -75,9 +75,11 @@ export const SITE_FILES = [
   'assets/tags.js',
   'assets/ui.js',
   'assets/i18n.js',
-  // GitHub Trending 的构建期快照（scripts/fetch-gh-trending.mjs 生成并提交；
-  // 在白名单里 = 文件缺失会让构建直接失败，而不是线上悄悄 404）
+  // 构建期快照（scripts/fetch-*.mjs 生成并提交；在白名单里 = 文件缺失会让
+  // 构建直接失败，而不是线上悄悄 404）
   'assets/data/gh-trending.json',
+  'assets/data/ai-news.json',
+  'assets/data/momoyu-hot.json',
   ...BOARD_PAGES.map((id) => `${id}.html`),
   ...BOARD_PAGES.map((id) => `en/${id}.html`),
 ];

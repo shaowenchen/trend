@@ -30,8 +30,10 @@ export const BOARD_IDS = [
   'spaces',
   'datasets',
   'papers',
+  'aiNews',
   'repos',
   'ghTrending',
+  'momoyu',
   'newmodels',
   'openrouter',
   'orCatalog',
@@ -74,8 +76,10 @@ export const BOARD_TAGS = {
   spaces: ['HuggingFace', 'Community'],
   datasets: ['HuggingFace', 'Community'],
   papers: ['HuggingFace', 'Papers', 'Community'],
+  aiNews: ['News', 'Community'],
   repos: ['GitHub', 'Community'],
   ghTrending: ['GitHub', 'Trends', 'Community'],
+  momoyu: ['momoyu', 'Trends', 'Community'],
   newmodels: ['models.dev', 'Models'],
   openrouter: ['OpenRouter', 'Models'],
   orCatalog: ['OpenRouter', 'Models'],
@@ -105,6 +109,8 @@ export const ALL_TAGS = [...new Set(Object.values(BOARD_TAGS).flat())];
  * 未知标签默认归到 `topic`，所以新增标签时忘了登记也只是分组不够准，不会丢。
  */
 export const TAG_KINDS = {
+  News: 'source',
+  momoyu: 'source',
   HuggingFace: 'source',
   Aider: 'source',
   GitHub: 'source',

@@ -1,0 +1,1015 @@
+{
+ "fetchedAt": "2026-10-01T03:48:02.539Z",
+ "sources": [
+  {
+   "key": "hn",
+   "name": "Hacker News · AI",
+   "fetchedAt": "2026-10-01T03:47:47.547Z",
+   "items": [
+    {
+     "title": "Show HN: Lathoa, a math app for kids where the AI is wrong on purpose",
+     "url": "https://news.ycombinator.com/item?id=49909648",
+     "time": "2026-09-30T14:38:57Z",
+     "score": 39,
+     "author": "thanouil1411"
+    },
+    {
+     "title": "Launch HN: Coverage Cat (YC S22) – Umbrella insurance via your personal agent",
+     "url": "https://news.ycombinator.com/item?id=49804931",
+     "time": "2026-09-22T17:26:36Z",
+     "score": 54,
+     "author": "botacode"
+    },
+    {
+     "title": "Show HN: AI·rete·RAG – a Rete rule engine decides, RAG explains why",
+     "url": "https://news.ycombinator.com/item?id=49803683",
+     "time": "2026-09-22T16:15:06Z",
+     "score": 46,
+     "author": "ZaharaHussain"
+    },
+    {
+     "title": "Ask HN: Are we losing our engineering literacy?",
+     "url": "https://news.ycombinator.com/item?id=49685036",
+     "time": "2026-09-13T15:23:57Z",
+     "score": 22,
+     "author": "smugglerFlynn"
+    },
+    {
+     "title": "Show HN: Godot and Rust based multiplexer (terminal panes and more)",
+     "url": "https://news.ycombinator.com/item?id=49660676",
+     "time": "2026-09-11T16:03:05Z",
+     "score": 97,
+     "author": "1nv1n"
+    },
+    {
+     "title": "Why can AI generate Super Mario but not a wedge ramp for my robot vacuum?",
+     "url": "https://news.ycombinator.com/item?id=49405520",
+     "time": "2026-08-23T01:45:17Z",
+     "score": 11,
+     "author": "zhuchaokn"
+    },
+    {
+     "title": "Show HN: OzBrain, a shared brain for knowledge between agents and your team",
+     "url": "https://news.ycombinator.com/item?id=49394827",
+     "time": "2026-08-21T23:09:06Z",
+     "score": 93,
+     "author": "dariusmonsef"
+    },
+    {
+     "title": "Launch HN: OneCLI (YC S26) – OSS sandboxed agent harness for teams",
+     "url": "https://news.ycombinator.com/item?id=49363710",
+     "time": "2026-08-19T16:29:02Z",
+     "score": 88,
+     "author": "guyb3"
+    },
+    {
+     "title": "Show HN: Draco – A single-binary, self-hostable Firecrawl alternative in Rust",
+     "url": "https://news.ycombinator.com/item?id=49148163",
+     "time": "2026-08-02T20:48:45Z",
+     "score": 15,
+     "author": "ccheshirecat"
+    },
+    {
+     "title": "Show HN: Tines 3B – safe workflow automation for when everyone builds software",
+     "url": "https://news.ycombinator.com/item?id=49084371",
+     "time": "2026-07-28T14:23:55Z",
+     "score": 27,
+     "author": "retsol"
+    },
+    {
+     "title": "Launch HN: Screenpipe (YC S26) – Record how you work and turn that into agents",
+     "url": "https://news.ycombinator.com/item?id=49024620",
+     "time": "2026-07-23T16:48:38Z",
+     "score": 88,
+     "author": "louis030195"
+    },
+    {
+     "title": "Launch HN: Bloomy (YC S26) – AI-powered mastery learning for K-12",
+     "url": "https://news.ycombinator.com/item?id=48981136",
+     "time": "2026-07-20T16:32:10Z",
+     "score": 102,
+     "author": "alexsouthmayd"
+    },
+    {
+     "title": "Launch HN: Agnost AI (YC S26) – Extract user feedback from agent conversations",
+     "url": "https://news.ycombinator.com/item?id=48908950",
+     "time": "2026-07-14T16:06:18Z",
+     "score": 85,
+     "author": "laalshaitaan"
+    },
+    {
+     "title": "Show HN: Sx 2.0 – Share AI skills with your team through a Dropbox folder",
+     "url": "https://news.ycombinator.com/item?id=48900319",
+     "time": "2026-07-13T23:26:52Z",
+     "score": 44,
+     "author": "detkin"
+    },
+    {
+     "title": "Show HN: Juggler – an open-source GUI coding agent, by the creator of JUCE",
+     "url": "https://news.ycombinator.com/item?id=48883305",
+     "time": "2026-07-12T18:28:15Z",
+     "score": 280,
+     "author": "julesrms"
+    },
+    {
+     "title": "Show HN: Rowboat – Open-source, local-first alternative to Claude Desktop",
+     "url": "https://news.ycombinator.com/item?id=48819808",
+     "time": "2026-07-07T16:10:44Z",
+     "score": 219,
+     "author": "segmenta"
+    },
+    {
+     "title": "Show HN: Frugon – Find which LLM calls a cheaper model could handle (local, MIT)",
+     "url": "https://news.ycombinator.com/item?id=48816724",
+     "time": "2026-07-07T12:20:54Z",
+     "score": 67,
+     "author": "jarodrh"
+    },
+    {
+     "title": "Show HN: Smart model routing directly in Claude, Codex and Cursor",
+     "url": "https://news.ycombinator.com/item?id=48688700",
+     "time": "2026-06-26T16:40:11Z",
+     "score": 216,
+     "author": "adchurch"
+    },
+    {
+     "title": "Show HN: OpenKnowledge – open source AI-first alternative to Obsidian/Notion",
+     "url": "https://news.ycombinator.com/item?id=48675435",
+     "time": "2026-06-25T16:04:46Z",
+     "score": 381,
+     "author": "engomez"
+    },
+    {
+     "title": "Show HN: RLM-based local debugger for AI agent traces",
+     "url": "https://news.ycombinator.com/item?id=48649137",
+     "time": "2026-06-23T18:21:52Z",
+     "score": 27,
+     "author": "mikepollard_dev"
+    }
+   ]
+  },
+  {
+   "key": "devto",
+   "name": "dev.to · AI",
+   "fetchedAt": "2026-10-01T03:47:48.486Z",
+   "items": [
+    {
+     "title": "Prompt Injection Is the New SQL Injection (and We're Not Ready)",
+     "url": "https://dev.to/james_anderson_h/prompt-injection-is-the-new-sql-injection-and-were-not-ready-4ea4",
+     "time": "2026-09-27T05:32:50Z",
+     "score": 99,
+     "author": "james_anderson_h"
+    },
+    {
+     "title": "Claude e Obsidian - Como uma QA utiliza essas ferramentas no dia-a-dia",
+     "url": "https://dev.to/he4rt/claude-e-obsidian-como-uma-qa-utiliza-essas-ferramentas-no-dia-a-dia-51jc",
+     "time": "2026-09-28T23:03:40Z",
+     "score": 104,
+     "author": "m4rri4nne"
+    },
+    {
+     "title": "Building an Offline Arduino UNO Q Cyberdeck That Identifies Birdsong and Draws Vintage Field Notes",
+     "url": "https://dev.to/cloudinary/building-an-offline-arduino-uno-q-cyberdeck-that-identifies-birdsong-and-draws-vintage-field-notes-1cjg",
+     "time": "2026-09-30T19:36:21Z",
+     "score": 11,
+     "author": "jenlooper"
+    },
+    {
+     "title": "Dear Coder: Open This If You're Feeling AI FOMO",
+     "url": "https://dev.to/canro91/dear-coder-open-this-if-youre-feeling-ai-fomo-58d4",
+     "time": "2026-09-28T05:00:00Z",
+     "score": 69,
+     "author": "canro91"
+    },
+    {
+     "title": "Implementation is where judgements go to become invisible",
+     "url": "https://dev.to/tom_jones_230c4659491adcd/implementation-is-where-judgements-go-to-become-invisible-4p1h",
+     "time": "2026-09-27T22:38:21Z",
+     "score": 19,
+     "author": "tom_jones_230c4659491adcd"
+    },
+    {
+     "title": "Are Frontend Developers Cooked? Is Frontend design safe?",
+     "url": "https://dev.to/erikch/are-frontend-developers-cooked-is-frontend-design-safe-nn8",
+     "time": "2026-09-30T20:38:21Z",
+     "score": 16,
+     "author": "erikch"
+    },
+    {
+     "title": "AI Agent Governance on AWS: Block Agents, Prove EU AI Act Compliance",
+     "url": "https://dev.to/aws-builders/ai-agent-governance-on-aws-block-agents-prove-eu-ai-act-compliance-1829",
+     "time": "2026-09-29T13:27:38Z",
+     "score": 50,
+     "author": "sarvar_04"
+    },
+    {
+     "title": "Half the AI agents in production are if-statements with a GPU bill",
+     "url": "https://dev.to/cyclopt_dimitrisk/half-the-ai-agents-in-production-are-if-statements-with-a-gpu-bill-4934",
+     "time": "2026-09-28T07:45:38Z",
+     "score": 43,
+     "author": "cyclopt_dimitrisk"
+    },
+    {
+     "title": "Devlog: I Built a 3D Library in Three.js Without a Level Editor — So I Made My Own",
+     "url": "https://dev.to/mikachu/devlog-i-built-a-3d-library-in-threejs-without-a-level-editor-so-i-made-my-own-500i",
+     "time": "2026-09-24T11:06:58Z",
+     "score": 18,
+     "author": "mikachu"
+    },
+    {
+     "title": "I'm an ER doctor. After decades without touching code, I built 3 websites with AI in one month — on my phone.",
+     "url": "https://dev.to/branislav_kuga_4118d3b3ab/im-an-er-doctor-after-decades-without-touching-code-i-built-3-websites-with-ai-in-one-month-on-5ccm",
+     "time": "2026-09-28T20:43:37Z",
+     "score": 17,
+     "author": "branislav_kuga_4118d3b3ab"
+    },
+    {
+     "title": "Say Please (if only as a reminder)",
+     "url": "https://dev.to/btarbox/say-please-if-only-as-a-reminder-1bc9",
+     "time": "2026-09-29T15:11:51Z",
+     "score": 10,
+     "author": "btarbox"
+    },
+    {
+     "title": "Count It or Compute It: When a Tool Returns Rows, the Models That Count Them Right Spend the Tokens",
+     "url": "https://dev.to/gde/count-it-or-compute-it-when-a-tool-returns-rows-the-models-that-count-them-right-spend-the-tokens-2hae",
+     "time": "2026-09-28T19:04:50Z",
+     "score": 15,
+     "author": "xbill"
+    },
+    {
+     "title": "Who's Accountable When the AI Was Just Following Instructions?",
+     "url": "https://dev.to/james_anderson_h/whos-accountable-when-the-ai-was-just-following-instructions-1efl",
+     "time": "2026-09-29T08:52:35Z",
+     "score": 31,
+     "author": "james_anderson_h"
+    },
+    {
+     "title": "Chain-of-Thought Faithfulness: Toggling 'Reasoning Mode' Made One Model 5x More Likely to Follow Its Own Mistakes",
+     "url": "https://dev.to/dj29/chain-of-thought-faithfulness-toggling-reasoning-mode-made-one-model-5x-more-likely-to-follow-39b3",
+     "time": "2026-09-27T07:59:44Z",
+     "score": 46,
+     "author": "dj29"
+    },
+    {
+     "title": "Your Metric Is Not Your State",
+     "url": "https://dev.to/kenwalger/your-metric-is-not-your-state-2lfl",
+     "time": "2026-09-29T16:13:00Z",
+     "score": 17,
+     "author": "kenwalger"
+    },
+    {
+     "title": "I Tried to Prompt a 3D DEV Library Into Existence. Then I Had to Build My Own Level Editor.",
+     "url": "https://dev.to/mikachu/i-tried-to-prompt-a-3d-dev-library-into-existence-then-i-had-to-build-my-own-level-editor-37gf",
+     "time": "2026-09-27T13:04:40Z",
+     "score": 23,
+     "author": "mikachu"
+    },
+    {
+     "title": "If AI Writes the Code and AI Reviews the Code, What Exactly Is the Developer Verifying?",
+     "url": "https://dev.to/robertadam987_/if-ai-writes-the-code-and-ai-reviews-the-code-what-exactly-is-the-developer-verifying-b5h",
+     "time": "2026-09-26T03:59:59Z",
+     "score": 42,
+     "author": "robertadam987_"
+    },
+    {
+     "title": "When Code Gets Cheap, Verification Becomes Expensive: How AI changes the economics of software architecture",
+     "url": "https://dev.to/remojansen/when-code-gets-cheap-verification-becomes-expensive-how-ai-changes-the-economics-of-software-632",
+     "time": "2026-09-28T21:52:55Z",
+     "score": 18,
+     "author": "remojansen"
+    },
+    {
+     "title": "Confident Isn't Accurate: How AI Hallucinations Actually Work",
+     "url": "https://dev.to/ale3oula/confident-isnt-accurate-how-ai-hallucinations-actually-work-4djo",
+     "time": "2026-09-29T17:11:47Z",
+     "score": 27,
+     "author": "ale3oula"
+    },
+    {
+     "title": "100% vuln detection wasn't enough: measuring whether AI respects the patch",
+     "url": "https://dev.to/unit_500_c36d1b1011fdf39c/100-vuln-detection-wasnt-enough-measuring-whether-ai-respects-the-patch-dg4",
+     "time": "2026-09-24T13:18:19Z",
+     "score": 7,
+     "author": "unit_500_c36d1b1011fdf39c"
+    }
+   ]
+  },
+  {
+   "key": "techcrunch",
+   "name": "TechCrunch · AI",
+   "fetchedAt": "2026-10-01T03:47:49.927Z",
+   "items": [
+    {
+     "title": "Google releases Gemini 4 Argon, called its most powerful model yet",
+     "url": "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+     "time": "Wed, 30 Sep 2026 23:43:07 +0000",
+     "author": "Lucas Ropek"
+    },
+    {
+     "title": "Valor, Atreides, and Sequoia back AI startup Flow Engineering at $750M valuation",
+     "url": "https://techcrunch.com/2026/09/30/valor-atreides-and-sequoia-back-ai-startup-flow-engineering-at-750m-valuation/",
+     "time": "Wed, 30 Sep 2026 21:07:40 +0000",
+     "author": "Julie Bort"
+    },
+    {
+     "title": "OpenAI&#8217;s Jev clone could help the frontier lab stop its swarming agents",
+     "url": "https://techcrunch.com/2026/09/30/openais-jev-clone-could-help-the-frontier-lab-stop-its-swarming-agents/",
+     "time": "Wed, 30 Sep 2026 19:00:57 +0000",
+     "author": "Tim Fernholz"
+    },
+    {
+     "title": "AI voice startup ElevenLabs doubles valuation to $22B",
+     "url": "https://techcrunch.com/2026/09/30/ai-voice-startup-elevenlabs-doubles-valuation-to-22b/",
+     "time": "Wed, 30 Sep 2026 18:23:57 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "Reddit is killing RSS feeds and ending public API access because of AI bots",
+     "url": "https://techcrunch.com/2026/09/30/reddit-is-killing-rss-feeds-ending-public-api-access-because-of-ai-bots/",
+     "time": "Wed, 30 Sep 2026 17:45:00 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "The ugly economics of consumer AI",
+     "url": "https://techcrunch.com/2026/09/30/the-ugly-economics-of-consumer-ai/",
+     "time": "Wed, 30 Sep 2026 17:24:45 +0000",
+     "author": "Russell Brandom"
+    },
+    {
+     "title": "Meta disputes claim that Muse read a user&#8217;s private messages without permission",
+     "url": "https://techcrunch.com/2026/09/30/meta-disputes-claim-that-muse-read-a-users-private-messages-without-permission/",
+     "time": "Wed, 30 Sep 2026 16:24:23 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "DoorDash launches an AI agent you can text to order food",
+     "url": "https://techcrunch.com/2026/09/30/doordash-launches-an-ai-agent-you-can-text-to-order-food/",
+     "time": "Wed, 30 Sep 2026 16:00:24 +0000",
+     "author": "Aisha Malik"
+    },
+    {
+     "title": "Destro AI&#8217;s secret sauce is getting robots and humans on the same page",
+     "url": "https://techcrunch.com/2026/09/30/destro-ais-secret-sauce-is-getting-robots-and-humans-on-the-same-page/",
+     "time": "Wed, 30 Sep 2026 16:00:00 +0000",
+     "author": "Tim Fernholz"
+    },
+    {
+     "title": "Instinct&#8217;s new product recommendations are giving some users the ick",
+     "url": "https://techcrunch.com/2026/09/30/instincts-new-product-recommendations-are-giving-some-users-the-ick/",
+     "time": "Wed, 30 Sep 2026 15:56:28 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "Cerebras Systems’ Andrew Feldman on whether AI can keep scaling at TechCrunch Disrupt 2026",
+     "url": "https://techcrunch.com/2026/09/30/cerebras-systems-andrew-feldman-on-whether-ai-can-keep-scaling-at-techcrunch-disrupt-2026/",
+     "time": "Wed, 30 Sep 2026 14:30:00 +0000",
+     "author": "TechCrunch Events"
+    },
+    {
+     "title": "Restate lands $20M as the need for durable infrastructure increases with AI agents",
+     "url": "https://techcrunch.com/2026/09/30/restate-lands-20m-as-the-need-for-durable-infrastructure-increases-with-ai-agents/",
+     "time": "Wed, 30 Sep 2026 14:27:11 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "3 days left to exhibit: Turn visibility into your next opportunity at TechCrunch Disrupt 2026",
+     "url": "https://techcrunch.com/2026/09/30/3-days-left-to-exhibit-at-techcrunch-disrupt-2026-2/",
+     "time": "Wed, 30 Sep 2026 14:15:00 +0000",
+     "author": "TechCrunch Events"
+    },
+    {
+     "title": "Airbnb adds AI search, more social features",
+     "url": "https://techcrunch.com/2026/09/30/airbnb-adds-ai-search-more-social-features/",
+     "time": "Wed, 30 Sep 2026 12:00:00 +0000",
+     "author": "Ivan Mehta"
+    },
+    {
+     "title": "America.gov gets really weird when you ask it about Minecraft, but it&#8217;s not a glitch",
+     "url": "https://techcrunch.com/2026/09/29/america-gov-gets-really-weird-when-you-ask-it-about-minecraft-but-its-not-a-glitch/",
+     "time": "Tue, 29 Sep 2026 23:30:55 +0000",
+     "author": "Amanda Silberling"
+    },
+    {
+     "title": "The internet is convinced Elon Musk&#8217;s xAI trolled OpenAI&#8217;s &#8216;Dots&#8217; launch",
+     "url": "https://techcrunch.com/2026/09/29/the-internet-is-convinced-elon-musks-xai-trolled-openais-dots-launch/",
+     "time": "Tue, 29 Sep 2026 22:20:59 +0000",
+     "author": "Julie Bort"
+    },
+    {
+     "title": "OpenAI&#8217;s latest features take direct aim at the app store model",
+     "url": "https://techcrunch.com/2026/09/29/openais-latest-features-take-direct-aim-at-the-app-store-model/",
+     "time": "Tue, 29 Sep 2026 20:15:47 +0000",
+     "author": "Sarah Perez"
+    },
+    {
+     "title": "OpenAI reportedly in talks to raise $30B round at $1.4T valuation",
+     "url": "https://techcrunch.com/2026/09/29/openai-reportedly-in-talks-to-raise-30b-round-at-1-4t-valuation/",
+     "time": "Tue, 29 Sep 2026 19:52:37 +0000",
+     "author": "Marina Temkin"
+    },
+    {
+     "title": "Here&#8217;s why OpenAI is absent from Nvidia&#8217;s industry-wide effort to end rogue AI agents",
+     "url": "https://techcrunch.com/2026/09/29/heres-why-openai-is-absent-from-nvidias-industry-wide-effort-to-end-rogue-ai-agents/",
+     "time": "Tue, 29 Sep 2026 18:35:00 +0000",
+     "author": "Julie Bort"
+    }
+   ]
+  },
+  {
+   "key": "theverge",
+   "name": "The Verge · AI",
+   "fetchedAt": "2026-10-01T03:47:53.813Z",
+   "items": [
+    {
+     "title": "Elon Musk’s Grokipedia has a ‘newly refreshed’ design",
+     "url": "https://www.theverge.com/tech/1003068/elon-musk-grokipedia-v-0-3-spacexai",
+     "time": "2026-09-30T20:23:45-04:00",
+     "author": "Jay Peters"
+    },
+    {
+     "title": "Google announces Gemini 4 and says it&#8217;s so capable that only &#8216;trusted cyber defenders&#8217; can have it right now",
+     "url": "https://www.theverge.com/tech/1002980/google-gemini-4-argon",
+     "time": "2026-09-30T16:41:41-04:00",
+     "author": "Jay Peters"
+    },
+    {
+     "title": "The AI Tamagotchis are coming",
+     "url": "https://www.theverge.com/ai-artificial-intelligence/1002779/openai-dots-meta-muse-ai-agents-hardware-devices",
+     "time": "2026-09-30T14:07:38-04:00",
+     "author": "Hayden Field"
+    },
+    {
+     "title": "Here&#8217;s what AI leaders are saying about Trump’s new safety plan",
+     "url": "https://www.theverge.com/ai-artificial-intelligence/1002636/ai-execs-trump-self-policing-deal-comments",
+     "time": "2026-09-30T13:15:49-04:00",
+     "author": "Jess Weatherbed"
+    },
+    {
+     "title": "All the latest news on Meta’s cute, creepy Muse AI agent",
+     "url": "https://www.theverge.com/ai-artificial-intelligence/1002671/meta-muse-ai",
+     "time": "2026-09-30T11:18:49-04:00",
+     "author": "Stevie Bonifield"
+    },
+    {
+     "title": "Google reportedly tests paying publishers for AI search results",
+     "url": "https://www.theverge.com/tech/1002665/google-paying-publishers-ai-search-features",
+     "time": "2026-09-30T10:51:49-04:00",
+     "author": "Emma Roth"
+    },
+    {
+     "title": "Instagram is adding an AI ‘assistant’ to tell you how to post",
+     "url": "https://www.theverge.com/tech/1002402/instagram-ai-edits-assistant-creators-analytics-youtube",
+     "time": "2026-09-30T10:30:00-04:00",
+     "author": "Mia Sato"
+    },
+    {
+     "title": "Here’s how tech leaders will self-police AI safety under Trump’s deal",
+     "url": "https://www.theverge.com/ai-artificial-intelligence/1002584/trump-us-ai-safety-deal-self-regulation-tech-execs",
+     "time": "2026-09-30T08:24:32-04:00",
+     "author": "Jess Weatherbed"
+    },
+    {
+     "title": "Sam Altman says OpenAI won’t go public until its models are safe",
+     "url": "https://www.theverge.com/ai-artificial-intelligence/1002505/sam-altman-openai-ipo-devday-ai-safety",
+     "time": "2026-09-29T20:19:13-04:00",
+     "author": "Hayden Field"
+    },
+    {
+     "title": "Trump orders US government to call AI ‘Super Intelligence’",
+     "url": "https://www.theverge.com/policy/1002468/trump-ai-superintelligence-executive-order-ai",
+     "time": "2026-09-29T18:25:45-04:00",
+     "author": "Lauren Feiner"
+    }
+   ]
+  },
+  {
+   "key": "latentspace",
+   "name": "Latent Space",
+   "fetchedAt": "2026-10-01T03:47:56.046Z",
+   "items": [
+    {
+     "title": "Why Dwarkesh is Wrong about Computer Use + How OpenAI shipped its Jev competitor in 1 Week",
+     "url": "https://www.latent.space/p/devday-2026",
+     "time": "Wed, 30 Sep 2026 22:23:40 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] OpenAI DevDay 2026: Dots, 6.1 Sol, Ultrafast, Decisions API, Agents API, Spaces, Marketplace, and 1.2 Billion ChatGPT WAU",
+     "url": "https://www.latent.space/p/ainews-openai-devday-2026-dots-61",
+     "time": "Wed, 30 Sep 2026 05:53:10 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] AMD buys World Labs for $8.2B, as Atlas solves sparse reconstruction problem for robotics, design and more",
+     "url": "https://www.latent.space/p/ainews-amd-buys-world-labs-for-82b",
+     "time": "Tue, 29 Sep 2026 02:55:27 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] Opus 5.5 is good at explainer videos",
+     "url": "https://www.latent.space/p/ainews-opus-55-is-good-at-explainer",
+     "time": "Tue, 29 Sep 2026 02:44:29 GMT",
+     "author": ""
+    },
+    {
+     "title": "Claude Code’s Next Era — Thariq Shihipar, Anthropic",
+     "url": "https://www.latent.space/p/thariq",
+     "time": "Tue, 29 Sep 2026 01:48:18 GMT",
+     "author": ""
+    },
+    {
+     "title": "OpenRouter: from Seed to Stripe — with OpenRouter’s Alex Atallah & AMP’s Anjney Midha",
+     "url": "https://www.latent.space/p/openrouter",
+     "time": "Fri, 25 Sep 2026 23:14:41 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] The Future of Latent Space",
+     "url": "https://www.latent.space/p/ainews-the-future-of-latent-space",
+     "time": "Fri, 25 Sep 2026 05:37:00 GMT",
+     "author": ""
+    },
+    {
+     "title": "Runway’s WorldPrompt and the Engineering of Real-Time Worlds",
+     "url": "https://www.latent.space/p/runway",
+     "time": "Fri, 25 Sep 2026 01:30:57 GMT",
+     "author": "Richard MacManus"
+    },
+    {
+     "title": "Foundries vs Navigators: Lowering the Cost of Science",
+     "url": "https://www.latent.space/p/foundries-vs-navigators-lowering",
+     "time": "Thu, 24 Sep 2026 15:03:16 GMT",
+     "author": "Adrian Sanborn"
+    },
+    {
+     "title": "[AINews] Meta Connect 2026: Muse glasses, voice, video, and Charm",
+     "url": "https://www.latent.space/p/ainews-meta-connect-2026-muse-glasses",
+     "time": "Thu, 24 Sep 2026 08:12:59 GMT",
+     "author": ""
+    },
+    {
+     "title": "🔬Bio-security is an AI Arms Race - Eric Nguyen (CEO, Radical Numerics)",
+     "url": "https://www.latent.space/p/bio-security-is-an-ai-arms-race-eric",
+     "time": "Wed, 23 Sep 2026 13:27:18 GMT",
+     "author": "RJ Honicky"
+    },
+    {
+     "title": "[AINews] Claude Opus 5.5, the new default model for AINews — and everybody cuts prices 40-50%",
+     "url": "https://www.latent.space/p/ainews-claude-opus-55-the-new-default",
+     "time": "Wed, 23 Sep 2026 06:41:41 GMT",
+     "author": ""
+    },
+    {
+     "title": "🔬 An Oscar, Two Asteroids, and the Algorithm in Your sklearn: John Platt on AI for Science",
+     "url": "https://www.latent.space/p/john-platt",
+     "time": "Tue, 22 Sep 2026 21:07:39 GMT",
+     "author": "Brandon Anderson"
+    },
+    {
+     "title": "[AINews] Xiaomi MiMo-V2.6-Pro 1T-A42B: the new top Open Weights model, trained for $3M",
+     "url": "https://www.latent.space/p/ainews-xiaomi-mimo-v26-pro-1t-a42b",
+     "time": "Tue, 22 Sep 2026 06:30:56 GMT",
+     "author": ""
+    },
+    {
+     "title": "Jev: System One models for Prod, not God — with Diogo Almeida, CEO, TypeSafe AI",
+     "url": "https://www.latent.space/p/jev",
+     "time": "Mon, 21 Sep 2026 22:13:49 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] Here are 6 Clones of Jev in 2 days",
+     "url": "https://www.latent.space/p/ainews-here-are-6-clones-of-jev-in",
+     "time": "Sat, 19 Sep 2026 05:48:28 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] not much happened today",
+     "url": "https://www.latent.space/p/ainews-not-much-happened-today-612",
+     "time": "Fri, 18 Sep 2026 06:28:43 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] Reality Checks on AI News (Yegge shuts down Gas Town, Databricks’ +60% Astra cost)",
+     "url": "https://www.latent.space/p/ainews-reality-checks-on-ai-news",
+     "time": "Thu, 17 Sep 2026 07:28:25 GMT",
+     "author": ""
+    },
+    {
+     "title": "Underwriting Superintelligence: Backing Agents you can Sue — Rune Kvist, AIUC",
+     "url": "https://www.latent.space/p/aiuc",
+     "time": "Wed, 16 Sep 2026 18:07:45 GMT",
+     "author": ""
+    },
+    {
+     "title": "[AINews] Jev: a “System One Model” that only decides/classifies/routes/scores — >100x faster, >200x cheaper than small frontier LLMs",
+     "url": "https://www.latent.space/p/ainews-jev-a-system-one-model-that",
+     "time": "Wed, 16 Sep 2026 11:09:53 GMT",
+     "author": ""
+    }
+   ]
+  },
+  {
+   "key": "interconnects",
+   "name": "Interconnects",
+   "fetchedAt": "2026-10-01T03:47:57.491Z",
+   "items": [
+    {
+     "title": "Debating RSI, the US-China Gap, and Jaggedness with JS Denain of Epoch AI",
+     "url": "https://www.interconnects.ai/p/debating-rsi-the-us-china-gap-and",
+     "time": "Tue, 22 Sep 2026 13:37:45 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "The current balance of power in open models",
+     "url": "https://www.interconnects.ai/p/the-current-balance-of-power-in-open",
+     "time": "Mon, 21 Sep 2026 11:56:56 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Why I still haven’t bought into true RSI",
+     "url": "https://www.interconnects.ai/p/where-i-stand-on-rsi",
+     "time": "Sat, 19 Sep 2026 15:42:20 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Open-Source AI & Open Models Reading List",
+     "url": "https://www.interconnects.ai/p/open-source-ai-reading-list",
+     "time": "Fri, 11 Sep 2026 12:36:25 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "One resignation turned the embers of AI fear into a wildfire",
+     "url": "https://www.interconnects.ai/p/one-resignation-turned-the-embers",
+     "time": "Thu, 10 Sep 2026 15:28:52 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "When will average people feel AI’s impact?",
+     "url": "https://www.interconnects.ai/p/when-will-average-people-feel-ais",
+     "time": "Wed, 09 Sep 2026 11:01:23 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Latest open artifacts (#24): Motif-3, GLM-5.3, Hy4-preview and open model licenses",
+     "url": "https://www.interconnects.ai/p/latest-open-artifacts-24-motif-3",
+     "time": "Tue, 08 Sep 2026 14:15:25 GMT",
+     "author": "Florian Brand"
+    },
+    {
+     "title": "Teaching Everyone to Fish for Tokens",
+     "url": "https://www.interconnects.ai/p/teaching-everyone-to-fish-for-tokens",
+     "time": "Mon, 17 Aug 2026 15:07:49 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "GLM-5.3: How Chinese labs keep stride with the frontier",
+     "url": "https://www.interconnects.ai/p/glm-53-how-chinese-labs-keep-stride",
+     "time": "Fri, 14 Aug 2026 21:23:35 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "I wrote an AI textbook — how long until AI can do it better?",
+     "url": "https://www.interconnects.ai/p/i-wrote-an-ai-textbook-how-long-until",
+     "time": "Wed, 12 Aug 2026 13:01:16 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "5 useful things you'll learn in my new post-training textbook (shipping now!)",
+     "url": "https://www.interconnects.ai/p/5-useful-things-youll-learn-in-my",
+     "time": "Mon, 10 Aug 2026 13:02:42 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Lessons from the hacks",
+     "url": "https://www.interconnects.ai/p/lessons-from-the-hacks",
+     "time": "Sun, 09 Aug 2026 14:57:11 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Introducing our Artifacts Hub and Adoption Dashboard",
+     "url": "https://www.interconnects.ai/p/introducing-our-artifacts-hub-and",
+     "time": "Mon, 03 Aug 2026 14:03:08 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Latest open artifacts (#23): Laguna S2.1, Inkling, & Kimi K3 show the utility of open models on the Pareto frontier",
+     "url": "https://www.interconnects.ai/p/latest-open-artifacts-23-laguna-s21",
+     "time": "Sun, 02 Aug 2026 13:01:40 GMT",
+     "author": "Florian Brand"
+    },
+    {
+     "title": "Open models recap: more on Kimi K3, Qwen 3.8, Xi's WAIC speech, distillation, the open-closed gap, and what's next",
+     "url": "https://www.interconnects.ai/p/open-models-recap-more-on-kimi-k3",
+     "time": "Wed, 22 Jul 2026 14:09:04 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Kimi K3: The open-weights escalation",
+     "url": "https://www.interconnects.ai/p/kimi-k3-the-open-weights-escalation",
+     "time": "Mon, 20 Jul 2026 15:48:28 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "6 months to live for open models",
+     "url": "https://www.interconnects.ai/p/6-months-to-live-for-open-models",
+     "time": "Sun, 12 Jul 2026 16:47:42 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Latest open artifacts (#22): Zyphra, Cohere, and Poolside are expanding the breadth of the ecosystem",
+     "url": "https://www.interconnects.ai/p/artifacts-22-zyphra-cohere-and-poolside",
+     "time": "Sun, 28 Jun 2026 17:03:07 GMT",
+     "author": "Florian Brand"
+    },
+    {
+     "title": "GLM-5.2 is the step change for open agents",
+     "url": "https://www.interconnects.ai/p/glm-52-is-the-step-change-for-open",
+     "time": "Mon, 22 Jun 2026 14:52:45 GMT",
+     "author": "Nathan Lambert"
+    },
+    {
+     "title": "Banning Open Source AI Would Be A Mistake",
+     "url": "https://www.interconnects.ai/p/banning-open-source-ai-would-be-a",
+     "time": "Fri, 19 Jun 2026 13:02:47 GMT",
+     "author": "Nathan Lambert"
+    }
+   ]
+  },
+  {
+   "key": "arxiv",
+   "name": "arXiv · cs.AI",
+   "fetchedAt": "2026-10-01T03:47:59.487Z",
+   "items": [
+    {
+     "title": "Semifactual Credit-Augmented Policy Optimization",
+     "url": "https://arxiv.org/abs/2609.40360v1",
+     "time": "2026-09-30T17:59:56Z",
+     "author": "Junshu Pan"
+    },
+    {
+     "title": "ViTeX-Bench: Benchmarking High-Fidelity Video Scene Text Editing",
+     "url": "https://arxiv.org/abs/2609.40356v1",
+     "time": "2026-09-30T17:59:33Z",
+     "author": "Xinghao Chen"
+    },
+    {
+     "title": "Turbo Harness: Instance-Adaptive Harness Optimization",
+     "url": "https://arxiv.org/abs/2609.40330v1",
+     "time": "2026-09-30T17:56:09Z",
+     "author": "Tunyu Zhang"
+    },
+    {
+     "title": "WorldAuditBench: Interactive 3D World Auditing with Multimodal Agents",
+     "url": "https://arxiv.org/abs/2609.40325v1",
+     "time": "2026-09-30T17:55:29Z",
+     "author": "Ziyan Jiang"
+    },
+    {
+     "title": "Cogentic: Multi-Agent Orchestration for Automated Proof Discovery",
+     "url": "https://arxiv.org/abs/2609.40324v1",
+     "time": "2026-09-30T17:55:22Z",
+     "author": "Yang Cai"
+    },
+    {
+     "title": "MatLoom: Layered Text-to-Material Generation in a Compact Program Space",
+     "url": "https://arxiv.org/abs/2609.40322v1",
+     "time": "2026-09-30T17:55:06Z",
+     "author": "Anson Y. Lam"
+    },
+    {
+     "title": "Scaling Laws for Looped Mixture of Experts",
+     "url": "https://arxiv.org/abs/2609.40316v1",
+     "time": "2026-09-30T17:53:47Z",
+     "author": "Yanbei Chen"
+    },
+    {
+     "title": "DynaHarness: A Dynamic Physical Harness for Self-Evolving Robot Agents",
+     "url": "https://arxiv.org/abs/2609.40306v1",
+     "time": "2026-09-30T17:52:09Z",
+     "author": "Haoyuan Deng"
+    },
+    {
+     "title": "How Much of a Harness Does a Strong Agent Need for Autonomous ML Engineering?",
+     "url": "https://arxiv.org/abs/2609.40303v1",
+     "time": "2026-09-30T17:51:30Z",
+     "author": "Kirill Brilliantov"
+    },
+    {
+     "title": "CAS II: Symmetric Partitions as Kolmogorov Models",
+     "url": "https://arxiv.org/abs/2609.40290v1",
+     "time": "2026-09-30T17:49:15Z",
+     "author": "Romie Banerjee"
+    },
+    {
+     "title": "Linguistic Loopholes in LLM Unlearning: From a 174-Language Benchmark to Coverage-Aware Unlearning",
+     "url": "https://arxiv.org/abs/2609.40286v1",
+     "time": "2026-09-30T17:48:13Z",
+     "author": "Tyler Skow"
+    },
+    {
+     "title": "PivotOPD: Learning to Recover from Pivotal Mistakes in Multi-Turn Agents",
+     "url": "https://arxiv.org/abs/2609.40285v1",
+     "time": "2026-09-30T17:48:11Z",
+     "author": "Yinghui He"
+    },
+    {
+     "title": "cua-speedrun: Standardized Benchmarking of the Speed of Computer-Use Agents",
+     "url": "https://arxiv.org/abs/2609.40284v1",
+     "time": "2026-09-30T17:48:06Z",
+     "author": "Pranjal Aggarwal"
+    },
+    {
+     "title": "Belief-Aware Multi-Agent Path Finding under Map Uncertainty",
+     "url": "https://arxiv.org/abs/2609.40269v1",
+     "time": "2026-09-30T17:44:19Z",
+     "author": "Viraj Parimi"
+    },
+    {
+     "title": "ComputerSD: Online Self-Distillation from Real-Time Feedback for Computer-Use Agents",
+     "url": "https://arxiv.org/abs/2609.40253v1",
+     "time": "2026-09-30T17:40:09Z",
+     "author": "Yong Du"
+    },
+    {
+     "title": "EviRover: Reinforcing Agentic Perception Beyond a Glance",
+     "url": "https://arxiv.org/abs/2609.40230v1",
+     "time": "2026-09-30T17:30:09Z",
+     "author": "Kaixuan Fan"
+    },
+    {
+     "title": "PhantomEnvironments: Training LLM Agents in Fictional Worlds",
+     "url": "https://arxiv.org/abs/2609.40221v1",
+     "time": "2026-09-30T17:26:57Z",
+     "author": "Anmol Kabra"
+    },
+    {
+     "title": "Learning Skills from Historical Action Trajectories: Action Experience Dictionary for World Action Models",
+     "url": "https://arxiv.org/abs/2609.40219v1",
+     "time": "2026-09-30T17:26:38Z",
+     "author": "Qi Lyu"
+    },
+    {
+     "title": "SCB: SpeechConversationBench for Evaluating Multi-Turn Reasoning in Speech-to-Speech Models",
+     "url": "https://arxiv.org/abs/2609.40198v1",
+     "time": "2026-09-30T17:13:30Z",
+     "author": "Kanpat Vesessook"
+    },
+    {
+     "title": "MemLife: Curating and Reasoning over Long-Term Egocentric Video Memories",
+     "url": "https://arxiv.org/abs/2609.40195v1",
+     "time": "2026-09-30T17:11:33Z",
+     "author": "Guangzhi Xiong"
+    }
+   ]
+  },
+  {
+   "key": "lobsters",
+   "name": "lobste.rs · AI",
+   "fetchedAt": "2026-10-01T03:48:01.939Z",
+   "items": [
+    {
+     "title": "Text-to-meowdio models",
+     "url": "https://www.kmjn.org/notes/text_to_meowdio_models.html",
+     "time": "2026-09-29T11:51:35.804-05:00",
+     "score": 2,
+     "author": ""
+    },
+    {
+     "title": "A Brief Perspective on Deep Learning Using Common Lisp",
+     "url": "https://www.youtube.com/watch?v=Yo4eqoRC1o0",
+     "time": "2026-09-26T12:34:14.313-05:00",
+     "score": 2,
+     "author": ""
+    },
+    {
+     "title": "Goodbye Google",
+     "url": "https://robert.ocallahan.org/2026/09/goodbye-google.html",
+     "time": "2026-09-25T00:51:12.558-05:00",
+     "score": 108,
+     "author": ""
+    },
+    {
+     "title": "Combining Machine Learning and Homomorphic Encryption in the Apple Ecosystem",
+     "url": "https://machinelearning.apple.com/research/homomorphic-encryption",
+     "time": "2026-09-24T08:27:42.590-05:00",
+     "score": 2,
+     "author": ""
+    },
+    {
+     "title": "A Continual learning model trained from scratch on 8GB VRAM laptop with batch-1 stream of data",
+     "url": "https://github.com/volotat/mini-AGI/",
+     "time": "2026-09-21T12:22:31.908-05:00",
+     "score": 4,
+     "author": ""
+    },
+    {
+     "title": "ChatGPT now knows what you do on other websites via ad collector",
+     "url": "https://www.buchodi.com/chatgpt-now-knows-what-you-do-on-other-websites-via-ad-collector/",
+     "time": "2026-09-20T12:43:10.204-05:00",
+     "score": 60,
+     "author": ""
+    },
+    {
+     "title": "Laya — 33ms Multilingual System 1 Decision Engine",
+     "url": "https://laya.convaiinnovations.com/",
+     "time": "2026-09-19T11:31:05.897-05:00",
+     "score": 7,
+     "author": ""
+    },
+    {
+     "title": "I Built Non-Autoregressive Decision Models a Year Ago. Then a Frontier Lab Called It a \"Breakthrough\"",
+     "url": "https://dev.to/nandakishor_m_6cc0adfde9f/i-built-non-autoregressive-decision-models-a-year-ago-then-a-frontier-lab-called-it-a-18me",
+     "time": "2026-09-19T08:41:57.630-05:00",
+     "score": 61,
+     "author": ""
+    },
+    {
+     "title": "How OpenAI Used Its Own LLMs to Design Its Jalapeño Chip",
+     "url": "https://spectrum.ieee.org/llms-for-chip-design",
+     "time": "2026-09-19T04:52:30.528-05:00",
+     "score": 3,
+     "author": ""
+    },
+    {
+     "title": "Model Training Incidents are Negligence",
+     "url": "https://taggart-tech.com/lying/",
+     "time": "2026-09-15T08:55:32.736-05:00",
+     "score": 2,
+     "author": ""
+    },
+    {
+     "title": "openarm: A fully open-source humanoid arm for physical AI research and deployment in contact-rich environments",
+     "url": "https://github.com/enactic/OpenArm",
+     "time": "2026-09-15T07:52:26.056-05:00",
+     "score": 4,
+     "author": ""
+    },
+    {
+     "title": "A Letter from a Machine Learning Engineer",
+     "url": "https://nemin.hu/llm-letter/index.html",
+     "time": "2026-09-14T12:58:22.527-05:00",
+     "score": 27,
+     "author": ""
+    },
+    {
+     "title": "Why don’t machine learning research agents overfit?",
+     "url": "https://www.amazon.science/blog/why-dont-machine-learning-research-agents-overfit",
+     "time": "2026-09-14T12:19:19.998-05:00",
+     "score": 0,
+     "author": ""
+    },
+    {
+     "title": "We Must Pace the Frontier",
+     "url": "https://darioamodei.com/post/we-must-pace-the-frontier",
+     "time": "2026-09-12T09:35:49.690-05:00",
+     "score": 10,
+     "author": ""
+    },
+    {
+     "title": "Retrospectively Reverse-Engineering Apple's Neural Engine",
+     "url": "https://eiln.github.io/posts/ane.html",
+     "time": "2026-09-11T12:23:45.395-05:00",
+     "score": 5,
+     "author": ""
+    },
+    {
+     "title": "Efficient and accurate systems for querying unstructured data",
+     "url": "https://stacks.stanford.edu/file/fk030tb6783/thesis-augmented.pdf",
+     "time": "2026-09-09T15:38:35.316-05:00",
+     "score": 4,
+     "author": ""
+    },
+    {
+     "title": "Better AI code comment detector",
+     "url": "https://entropicthoughts.com/better-ai-comment-classifier",
+     "time": "2026-09-09T13:27:24.767-05:00",
+     "score": 9,
+     "author": ""
+    },
+    {
+     "title": "Using machine learning on my Guitar Hero Controller",
+     "url": "https://p0ly.com/ml_strummer.html",
+     "time": "2026-09-04T10:23:26.707-05:00",
+     "score": 1,
+     "author": ""
+    },
+    {
+     "title": "LLMs and self-referentiality",
+     "url": "https://scottaaronson.blog/?p=10046",
+     "time": "2026-09-03T08:39:13.344-05:00",
+     "score": 4,
+     "author": ""
+    },
+    {
+     "title": "US government backs OpenAI in New York Times copyright case",
+     "url": "https://www.reuters.com/legal/litigation/us-government-backs-openai-new-york-times-copyright-case-2026-09-02/",
+     "time": "2026-09-02T20:13:14.049-05:00",
+     "score": 6,
+     "author": ""
+    }
+   ]
+  }
+ ]
+}

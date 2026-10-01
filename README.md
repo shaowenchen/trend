@@ -16,22 +16,23 @@
 ## 页面
 
 **一个面板一页**：每条趋势（榜单）是一个独立地址，首页每张卡片正好对应一个 ——
-不把十九个面板堆在一页里。
+不把二十一个面板堆在一页里。
 
 | 地址 | 作用 |
 |---|---|
-| `index.html` | 中文入口页：十九个面板的入口卡片 |
+| `index.html` | 中文入口页：二十一个面板的入口卡片 |
 | `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
 | `eval.html` `aider.html` | 评测与编程能力榜 |
 | `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
 | `newmodels.html` `swebench.html` | 大体积榜（4MB / 4.8MB，进页面即加载） |
 | `openrouter.html` `orCatalog.html` | OpenRouter 用量榜（1.1MB）与模型库（0.76MB，进页面就拉） |
 | `ghTrending.html` | GitHub Trending 每日榜（**构建期快照**，Actions 每日刷新） |
+| `aiNews.html` `momoyu.html` | AI 新闻热点（8 源快照）与摸摸鱼热榜（13 榜聚合快照） |
 | `tags.html` | 全部标签（来源 + 分类），每个标签带条数 |
 | `tag.html?t=<标签>` | 含该标签的榜单，卡片式 |
 | `en/…` | 以上每一个的英文版（含标签页），文件名相同 |
 
-页头**三样**：左上角「首页」与「标签」，右上角切换语言。十九个榜单不进页头 ——
+页头**三样**：左上角「首页」与「标签」，右上角切换语言。二十一个榜单不进页头 ——
 它们就是首页的入口卡片（下面一格一张卡），页头再列一遍等于同一份目录出现两次。
 页面**下方**另有一条由 `trend.js` 生成的 `.board-links`，列出全部面板并带
 「刷新数据」按钮 —— 那是"看完了换下一个"的那条路。
@@ -60,7 +61,7 @@
 > `site.test.js` 要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」），
 > 以及两条"英文页里不许有中文 / 中文页里不许有整句英文"的断言。
 
-## 十九个面板
+## 二十一个面板
 
 每个面板都有自己的页面（下表第一列即地址的文件名去掉 `.html`）：
 
@@ -74,8 +75,10 @@
 | 正在流行的 AI 应用 | `spaces` | HuggingFace Spaces API | `sort=trendingScore` |
 | 正在流行的数据集 | `datasets` | HuggingFace Datasets API | `sort=trendingScore` |
 | 每日论文热榜 | `papers` | HF `daily_papers` | 按点赞数排序 |
+| AI 新闻热点 | `aiNews` | HN(Algolia) · dev.to · TechCrunch · The Verge · Latent Space · Interconnects · arXiv·cs.AI · lobste.rs | **8 源每日快照聚合**（部分源无 CORS）；按时间倒序、可按来源分组；页面标"最老来源抓取于 …"，某源失联保留其旧块与旧时刻 |
 | 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
 | GitHub Trending | `ghTrending` | `github.com/trending`（HTML 解析） | **构建期快照**（页面无 CORS，浏览器直连做不了）；默认**仅 AI 相关**可切全部；每日 Actions 刷新，失败保留旧快照 |
+| 摸摸鱼热榜 | `momoyu` | `momoyu.cc/api/hot/list` | 13 个中文热榜聚合（知乎 · 微博 · 豆瓣 · 虎扑 · IT之家 …）的**构建期快照**；每源标注站方抓取时刻，可切"仅 AI 相关" |
 | 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB，**进页面即加载**（约 0.5s） |
 | OpenRouter 模型用量榜 | `openrouter` | `openrouter.ai/api/frontend/v1/rankings/models` + `/api/v1/models`（只为名字） | 按**当天 token 用量**排序，日更 7 天窗口；standard/batch/free **已合并**（见 `docs/trend-sources.md` §4） |
 | OpenRouter 模型库 | `orCatalog` | `openrouter.ai/api/v1/models`（0.76MB，CORS `*`） | 全部可路由模型的**目录**：价格（$/M tokens）/ 上下文 / 模态 / 上线时间，按上线时间降序；失败回退本地快照并标时刻 |
@@ -149,7 +152,7 @@ Papers）。真值只有一处：`web/public/assets/boards.js` 的 `BOARD_TAGS`�
 - **一个面板一页**：页面标题就是面板名（由 `trend.js` 渲染成 `<h1>`），
   没有另写一个 hero 标题 —— 一页一个 h1，且面板名只有字典一处来源。
 - **页头三样**：左边「首页」+「标签」，右边切换语言（构建期生成，
-  `src/site/nav.js` + `{{SITE_NAV}}`，不是抄 40 份）。十九个榜单**不进页头** ——
+  `src/site/nav.js` + `{{SITE_NAV}}`，不是抄 40 份）。二十一个榜单**不进页头** ——
   它们已经在首页的入口卡片里各占一张卡，页头再列一遍就是同一份目录的第二次出现；
   「标签」是一条**入口**（按来源/分类逛），不是榜单清单。
   语言切换**指向对应的那一页**（`repos.html` ↔ `en/repos.html`），
@@ -248,8 +251,8 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 
 ```
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
-  index.html                      中文入口：十九个面板的入口卡片
-  <board>.html                    ★ 十九个中文面板页（eval.html、repos.html…）
+  index.html                      中文入口：二十一个面板的入口卡片
+  <board>.html                    ★ 二十一个中文面板页（eval.html、repos.html…）
   tags.html  tag.html             标签总览 / 按标签筛选
   en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css

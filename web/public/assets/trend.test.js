@@ -19,7 +19,8 @@ import {
   openrouterBoard, openrouterNames, openrouterLabel, attachPanel,
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
   fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
-  parseGhTrending, isAiRepo, flattenGhTrending, flattenOrCatalog,
+  parseGhTrending, isAiRepo, isAiText, flattenGhTrending, flattenOrCatalog,
+  flattenAiNews, flattenMomoyu,
 } from './trend.js';
 
 let pass = 0;
@@ -1141,6 +1142,64 @@ t('flattenOrCatalog：免费是 0、缺价是 null、没上线日期排最后', 
   assert.ok(rows[0].release >= rows[1].release);
   assert.equal(flattenOrCatalog({}).length, 0, '空输入不炸');
   assert.equal(flattenOrCatalog(null).length, 0);
+});
+
+
+/* ---------------- AI 新闻 / 摸摸鱼（快照面板的纯逻辑） ---------------- */
+
+t('★ isAiText：中文子串 + 英文词边界一起管（momoyu 与 ghTrending 共用）', () => {
+  // 中文（CJK 无词边界，直接子串）
+  assert.equal(isAiText('如何评价 10 月 1 号发布的 Gemini 4 Argon'), true, 'Gemini');
+  assert.equal(isAiText(' OpenAI 发布新模型'), true);
+  assert.equal(isAiText('通用大模型刷屏'), true, '中文关键词"大模型"');
+  assert.equal(isAiText('买不到票被迫买长乘短'), false, '无关中文不命中');
+  assert.equal(isAiText('国庆出游计划'), false);
+  // 英文词边界守卫（沿用 isAiRepo 的标准）
+  assert.equal(isAiText('fast storage with drag-and-drop'), false);
+  assert.equal(isAiText('RAG pipeline with embeddings'), true);
+});
+
+t('flattenAiNews：快照 → 行（坏条目剔除、score 缺失为 null、来源名兜底 key）', () => {
+  const snap = {
+    fetchedAt: '2026-10-01T03:48:02.000Z',
+    sources: [
+      { key: 'hn', name: 'Hacker News · AI', fetchedAt: '2026-10-01T03:47:00.000Z', items: [
+        { title: 't1', url: 'https://a/1', time: '2026-10-01T00:00:00Z', score: 88, author: 'alice' },
+        { title: '', url: 'https://a/2' },            // 无标题 → 剔除
+        { title: 't3', url: '' },                     // 无链接 → 剔除
+      ] },
+      { key: 'arxiv', fetchedAt: '2026-10-01T03:47:30.000Z', items: [   // 无 name → 用 key
+        { title: 't4', url: 'http://arxiv.org/abs/1', time: '', score: 'x' },
+      ] },
+      'not-a-block',
+    ],
+  };
+  const rows = flattenAiNews(snap);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].source, 'Hacker News · AI');
+  assert.equal(rows[0].score, 88);
+  assert.equal(rows[1].source, 'arxiv', '来源名缺失时兜底用 key');
+  assert.equal(rows[1].score, null, '非数字分数是 null（排序时恒在最后）');
+  assert.equal(flattenAiNews(null).length, 0, '空输入不炸');
+});
+
+t('flattenMomoyu：快照 → 行（AI 标记在客户端算、extra 保留原文、空标题剔除）', () => {
+  const snap = {
+    fetchedAt: '2026-10-01T03:50:00.000Z',
+    sources: [
+      { key: 'zhihu', name: '知乎热榜', fetchedAt: '2026-10-01T02:00:15.000Z', items: [
+        { title: '如何评价 10 月 1 号发布的 Gemini 4 Argon', url: 'https://zhihu/q1', extra: '105 万' },
+        { title: '张本智和被文春爆出私下频繁搭讪女性', url: 'https://zhihu/q2', extra: '79 万' },
+        { title: ' ', url: 'https://zhihu/q3' },       // 空标题 → 剔除
+      ] },
+    ],
+  };
+  const rows = flattenMomoyu(snap);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].ai, true, '标题含 Gemini → AI');
+  assert.equal(rows[1].ai, false);
+  assert.equal(rows[0].extra, '105 万', '热度文字保留原文，不解析成数字');
+  assert.equal(flattenMomoyu(null).length, 0, '空输入不炸');
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

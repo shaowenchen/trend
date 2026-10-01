@@ -29,6 +29,8 @@
 | SWE-bench | `raw.githubusercontent.com/swe-bench/swe-bench.github.io/master/data/leaderboards.json` | 200 JSON | `*` | ✅ 可直连，**4MB → 进页面即加载** |
 | 🗂️ OpenRouter 模型库 | `openrouter.ai/api/v1/models` | 200 JSON（0.76MB，464 个模型） | `*` | ✅ 可直连（见 §7） |
 | 📈 GitHub Trending | `github.com/trending` | 200 **HTML**（650KB） | **无** | ❌ 无 CORS → **构建期快照**（见 §8） |
+| 📰 AI 新闻（8 源） | HN·Algolia / dev.to / TechCrunch / The Verge / Latent Space / Interconnects / arXiv / lobste.rs | 全 200 | 2 源 ✓ / 6 源 无 | 📸 全部**构建期快照**（见 §9） |
+| 🐟 摸摸鱼热榜 | `momoyu.cc/api/hot/list` | 200 JSON（76KB，13 榜） | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
@@ -275,3 +277,42 @@ npm run test:live
   抓取脚本按"少于 5 条"拒绝提交 —— 门禁在 CI 侧。
 
 ---
+
+---
+
+## 9. AI 新闻（8 源）与 摸摸鱼热榜（2026-10-01 新增，构建期快照）
+
+用户确认的方案：**全部快照**（含 CORS 可直连的 2 源）—— 对上游最友好
+（每天每源 1 个请求），"抓取于 …"标注统一，新闻时效损失 ≤24h 如实可见。
+
+### AI 新闻 8 源（`scripts/fetch-ai-news.mjs`，快照 `assets/data/ai-news.json`）
+
+| 源 | 端点 | 形状 | 备注 |
+|---|---|---|---|
+| Hacker News · AI | `hn.algolia.com/api/v1/search_by_date?query=AI OR LLM OR GPT&numericFilters=points>10` | JSON | ★ 不用"近 7 天+points>50"：实测会整周空窗；按时间序+10 分线永不空 |
+| dev.to · AI | `dev.to/api/articles?tag=ai&top=7` | JSON | 反应数当热度 |
+| TechCrunch · AI | `…/category/artificial-intelligence/feed/` | RSS | ⚠️ 会 429（当日实测），逐源回退兜住 |
+| The Verge · AI | `…/rss/ai-artificial-intelligence/index.xml` | **Atom** | ★ 根元素是 Atom；链接在 `<link href>`（`<id>` 是 tag: URI）；`<title type="html">` 带属性 |
+| Latent Space | `latent.space/feed` | RSS(substack) | 1.4MB 全量 feed，只取前 20 |
+| Interconnects | `interconnects.ai/feed` | RSS(substack) | 同上 |
+| arXiv · cs.AI | `export.arxiv.org/api/query?cat:cs.AI` | Atom | ⚠️ 限流狠（当日连打几次后冷却 10 分钟+）；链接回落 `<id>`（abs 页） |
+| lobste.rs · AI | `lobste.rs/t/ai.json` | JSON | ★ 最热榜里 ai 标签稀疏，用**标签订阅**才稳定 |
+
+实测落选：量子位 403、机器之心 /rss 返回 HTML 壳（RSS 已下线）、Reddit
+top.json 拦截、VentureBeat 稳定 429、smol.ai /rss 404。
+
+失败语义：**逐源回退** —— 某源当天抓不到，保留它上次的块与旧 `fetchedAt`；
+8 源全失败才非零退出不提交。页面标注"最老来源抓取于 …"（标最旧比标最新诚实）。
+解析器有真实 fixture 测试（`ainews.test.js`），含 XML 实体还原（`&amp;` → `&`，
+不还原页面上会显示字面量）。
+
+### 摸摸鱼热榜（`scripts/fetch-momoyu-hot.mjs`，快照 `assets/data/momoyu-hot.json`）
+
+- `GET momoyu.cc/api/hot/list?type=0`（**带浏览器 UA**，裸 UA 会被拒）→ 200 JSON：
+  13 个来源（知乎/微博/豆瓣/虎扑/IT之家/虎嗅/CSDN/掘金…）各带条目与
+  **站方 create_time**；`/api/hot/source` 需登录（401），`/api/hot/top` 是
+  20 条跨源聚合（备用）。响应无 CORS → 只能快照。
+- 口径：每源前 20 条；块内 `fetchedAt` 用**站方 create_time**（比"我们何时拉的"
+  更接近数据真相）；`extra` 是站方热度文字（'552 万'），保留原文不解析成数字。
+- AI 过滤在**页面端**做（`isAiText`：中文子串 + 英文词边界），"全部 / 仅 AI"
+  由读者切换 —— 快照存全量，过滤口径可迭代不用重抓。

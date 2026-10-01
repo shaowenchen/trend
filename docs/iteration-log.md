@@ -46,13 +46,42 @@
 ②③④无需重复接入；清单建议的"边缘函数"与站点"纯静态无服务端"前提冲突，
 且这三个端点 CORS 实测可直连（本来就在线上跑）。
 
-### 下一步（按序）
+### 完成情况（2026-10-01 09:55）
 
-1. [ ] 本地无头实测：eval / orCatalog / ghTrending 三页有数据。
-2. [ ] 提交推送 → 等 Actions 部署 → 线上实测：新增两页 + ②③④三页
-       （https://www.chenshaowen.com/trend/…）全部 200 且有数据。
-3. [ ] 微信 ≤8 行交付（含线上链接）。
+1. [x] 本地无头实测：ghTrending（14 条 AI、快照声明）、orCatalog（464 模型）、
+       eval 快照直用路径（预置 localStorage 验证"快照 · 抓取于 …"免网络直出）。
+       eval 取数层另用 Node 真实计时器按最终策略复测：46×200 零重试 25s；
+       第二轮撞 4×429 全被长退避救回（4576/4576 零缺页）。
+2. [x] 推送上线：b1955fe（主体）→ Actions 部署 → 线上实测全部通过：
+       ghTrending / orCatalog / trending / spaces / datasets 五页 200 且有数据，
+       eval.html 与 en/ 两页 200，线上 trend.js 已含新代码。
+3. [x] 微信交付已发。
 4. [ ] 首个 cron（次日 00:30 UTC+8）后确认快照自动刷新成功。
+5. [ ] **待推**：651f8c5（每日 cron 工作流）—— 需要带 workflow 权限的凭据
+       （本轮 PAT 无该 scope，被 GitHub 拒收）。用户给权限后 `git push` 即可。
+
+### 队列第二轮（2026-10-01 12:10 完成）
+
+- [x] 侦察 + 微信方案 + 用户确认（两个面板都加，新闻全部快照模式）。
+- [x] **aiNews 面板**（AI 新闻热点，8 源每日快照）：scripts/fetch-ai-news.mjs
+      （逐源回退、失败保旧块）+ parseRss/parseAtom/normalizeHn/DevTo/Lobsters
+      （真实 fixture 测试 ainews.test.js 13 条）。当天实测修正三处：
+      HN 查询改时间序+10 分（7 天+50 分会整周空窗）、The Verge 是 Atom 且
+      链接在 link href、XML 实体未还原（&amp; 会显示成字面量）。
+- [x] **momoyu 面板**（摸摸鱼热榜，13 榜聚合快照）：fetch-momoyu-hot.mjs，
+      块内 fetchedAt 用站方 create_time；AI 过滤在页面端（isAiText 中英词表），
+      "全部/仅 AI"切换。
+- [x] 本地全绿（i18n 9 / ui 7 / trend 95 / ainews 13 / site 36）+ 构建通过 +
+      无头实测两页有数据（aiNews 149 条 8 组、momoyu 246 条 13 组）。
+- [ ] 推送上线 + 线上实测 + 微信交付。
+- [ ] **待推**：refresh-snapshots.yml（三合一每日 cron，替代原 gh-trending
+      单独工作流）—— 仍需带 workflow 权限的凭据。
+
+### 每日快照工作流（待推送后生效）
+
+`.github/workflows/refresh-snapshots.yml`：每天 00:30（UTC+8）跑
+fetch-gh-trending / fetch-ai-news / fetch-momoyu-hot，三步各自
+continue-on-error（部分成功仍提交成功部分），diff 为空不提交。
 
 ### 环境注意（AGENTS.md 纪律）
 

@@ -11,13 +11,15 @@
     "build": "node scripts/build-site.mjs",
     "start": "node scripts/serve.mjs",
     "dev": "node scripts/serve.mjs",
-    "test": "node web/public/assets/i18n.test.js && node web/public/assets/ui.test.js && node web/public/assets/trend.test.js && node web/public/assets/site.test.js",
+    "test": "node web/public/assets/i18n.test.js && node web/public/assets/ui.test.js && node web/public/assets/trend.test.js && node web/public/assets/ainews.test.js && node web/public/assets/site.test.js",
     "test:site": "node web/public/assets/site.test.js",
     "test:trend": "node web/public/assets/trend.test.js",
     "test:ui": "node web/public/assets/ui.test.js",
     "test:i18n": "node web/public/assets/i18n.test.js",
     "test:live": "node scripts/live-check.mjs",
-    "snap:gh-trending": "node scripts/fetch-gh-trending.mjs"
+    "snap:gh-trending": "node scripts/fetch-gh-trending.mjs",
+    "snap:ai-news": "node scripts/fetch-ai-news.mjs",
+    "snap:momoyu": "node scripts/fetch-momoyu-hot.mjs"
   },
   "dependencies": {},
   "devDependencies": {}

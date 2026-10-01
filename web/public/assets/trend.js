@@ -1517,9 +1517,22 @@ const AI_KEYWORDS = [
 ];
 const AI_RE = new RegExp(`(?:^|[^a-z0-9])(?:${AI_KEYWORDS.join('|')})(?:[^a-z0-9]|$)`, 'i');
 
-/** 一个 trending 条目是否 AI 相关：仓库名 + 描述一起看（词边界，大小写不敏感） */
+/**
+ * 中文 AI 关键词 —— CJK 没有词边界，直接子串匹配即可（不存在"大模型"嵌在
+ * 别的词里"的问题）。选词仍是宁缺勿滥：'智能'/'模型'这种单看会误伤的词不进表。
+ */
+const AI_TEXT_ZH_RE =
+  /大模型|人工智能|智能体|深度学习|机器学习|神经网络|文生图|图生视频|语音识别|自动驾驶|多模态|生成式|AIGC|文心|通义|混元|豆包|智谱|开源模型|大语言模型/i;
+
+/** 一段文本是否 AI 相关（中英一起看：英语词边界 + 中文子串）。ghTrending 与 momoyu 共用 */
+export function isAiText(text) {
+  const s = String(text ?? '');
+  return AI_TEXT_ZH_RE.test(s) || AI_RE.test(s);
+}
+
+/** 一个 trending 条目是否 AI 相关：仓库名 + 描述一起看 */
 export function isAiRepo(entry) {
-  return AI_RE.test(`${entry?.repo ?? ''} ${entry?.desc ?? ''}`);
+  return isAiText(`${entry?.repo ?? ''} ${entry?.desc ?? ''}`);
 }
 
 /** 快照 JSON → 面板行（数字归一、AI 标记、空仓库名剔除） */
@@ -1596,6 +1609,167 @@ async function loadGhTrending(view = 'ai') {
     p.el.addEventListener('click', (e) => {
       const b = e.target.closest?.('[data-ghtrend]');
       if (b) loadGhTrending(b.getAttribute('data-ghtrend'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/* ================================================================== */
+/* 面板 9.6：AI 新闻热点（8 源构建期快照）与 摸摸鱼热榜（聚合快照）      */
+/* ================================================================== */
+
+/**
+ * 两份快照的地址：相对**本模块**解析（与 ghTrending 同一理由 —— 中英文页面
+ * 在不同目录，钉死在脚本自身上两种页面才取到同一个文件）。
+ * 由 scripts/fetch-ai-news.mjs / fetch-momoyu-hot.mjs 在构建期生成，
+ * `.github/workflows/refresh-snapshots.yml` 每日刷新；抓取失败不提交，
+ * 旧快照原样保留（页面照常显示旧快照与它的抓取时刻）。
+ */
+const AI_NEWS_SNAP_URL = new URL('./data/ai-news.json', import.meta.url).href;
+const MOMOYU_SNAP_URL = new URL('./data/momoyu-hot.json', import.meta.url).href;
+
+/** AI 新闻快照 → 面板行（坏条目剔除；score 缺失为 null，空值恒排最后） */
+export function flattenAiNews(snap) {
+  const out = [];
+  for (const s of snap?.sources || []) {
+    for (const it of s?.items || []) {
+      const title = String(it?.title || '').trim();
+      const url = String(it?.url || '').trim();
+      if (!title || !url) continue;
+      out.push({
+        title,
+        url,
+        source: String(s.name || s.key || ''),
+        time: String(it.time || ''),
+        score: Number.isFinite(Number(it.score)) ? Number(it.score) : null,
+        author: String(it.author || ''),
+      });
+    }
+  }
+  return out;
+}
+
+/** 面板：AI 新闻热点（8 源聚合，按来源分组，按时间倒序） */
+async function loadAiNews() {
+  const p = panel({
+    id: 'aiNews',
+    iconName: 'file',
+    title: L('p.aiNews.title'),
+    hint: L('p.aiNews.hint'),
+  });
+  try {
+    const snap = await cachedJson('ai-news', AI_NEWS_SNAP_URL);
+    const rows = flattenAiNews(snap);
+    if (!rows.length) throw new Error(L('err.noNews'));
+    // 标"最老来源"的抓取时刻：有源失联时读者能看到最旧的块有多旧 ——
+    // 比标"最新"诚实（快照的价值判断权在读的人，不在写的人）
+    const times = (snap.sources || []).map((x) => Date.parse(x.fetchedAt)).filter(Number.isFinite);
+    const oldest = times.length ? Math.min(...times) : Date.now();
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.title'),
+          field: 'title',
+          cell: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>`,
+        },
+        { label: L('col.source'), cls: 'col-2', field: 'source', cell: (r) => `<span class="tag">${esc(r.source)}</span>` },
+        { label: L('col.date'), cls: 'col-2', field: 'time', cell: (r) => (r.time ? fmtStamp(Date.parse(r.time)) : '—') },
+        { label: L('col.hot'), num: true, cls: 'col-2', field: 'score', cell: (r) => compact(r.score) ?? '—' },
+      ],
+      defaultSort: { index: 3, dir: 'desc' },
+      searchFields: ['title', 'source'],
+      groupField: 'source',
+      groupLabel: L('ui.allSources'),
+      placeholder: L('ui.searchNews'),
+      transform: withRank,
+      note: L('st.aiNewsSnap', { time: fmtStamp(oldest) }),
+      card: {
+        title: (r) => esc(r.title),
+        value: (r) => `<span class="v-num">${compact(r.score) ?? '—'}</span> <span class="v-unit">${L('col.hot')}</span>`,
+        meta: (r) =>
+          `<span class="tag">${esc(r.source)}</span>` +
+          (r.time ? `<span class="tag">${fmtStamp(Date.parse(r.time))}</span>` : ''),
+        link: (r) => r.url,
+      },
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/** 摸摸鱼快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换） */
+export function flattenMomoyu(snap) {
+  const out = [];
+  for (const s of snap?.sources || []) {
+    for (const it of s?.items || []) {
+      const title = String(it?.title || '').trim();
+      if (!title) continue;
+      out.push({
+        title,
+        url: String(it?.url || ''),
+        source: String(s.name || ''),
+        // 站方的热度文字（'552 万' / '59回复'）：保留原文，不解析成数字
+        extra: String(it?.extra || '').trim(),
+        ai: isAiText(title),
+      });
+    }
+  }
+  return out;
+}
+
+/** 面板：摸摸鱼热榜（13 个来源的聚合，按来源分组；默认全部，可切仅 AI） */
+async function loadMomoyu(view = 'all') {
+  const p = panel({
+    id: 'momoyu',
+    iconName: 'monitor',
+    title: L('p.momoyu.title'),
+    hint: L('p.momoyu.hint'),
+  });
+  try {
+    const snap = await cachedJson('momoyu-hot', MOMOYU_SNAP_URL);
+    const all = flattenMomoyu(snap);
+    if (!all.length) throw new Error(L('err.noNews'));
+    const rows = view === 'ai' ? all.filter((r) => r.ai) : all;
+    if (!rows.length) throw new Error(L('err.noNews'));
+    const fetchedAt = Date.parse(snap?.fetchedAt);
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.title'),
+          field: 'title',
+          cell: (r) => (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>` : esc(r.title)),
+        },
+        { label: L('col.source'), field: 'source', cell: (r) => `<span class="tag">${esc(r.source)}</span>` },
+        { label: L('col.hot'), field: 'extra', cell: (r) => (r.extra ? `<span class="tag">${esc(r.extra)}</span>` : '—') },
+      ],
+      defaultSort: null,
+      searchFields: ['title', 'source'],
+      groupField: 'source',
+      groupLabel: L('ui.allSources'),
+      placeholder: L('ui.searchNews'),
+      transform: withRank,
+      beforeControls: () => subBoardChips({ all: 'p.momoyu.all', ai: 'p.momoyu.ai' }, view, 'mmy'),
+      note: L('st.momoyuSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }),
+      card: {
+        title: (r) => esc(r.title),
+        value: (r) => `<span class="v-num">${esc(r.extra) || '—'}</span>`,
+        meta: (r) => `<span class="tag">${esc(r.source)}</span>`,
+        link: (r) => r.url || null,
+      },
+    });
+    // 子视图切换（事件委托：mountBoard 重画换 DOM，绑在面板元素上只绑一次）
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-mmy]');
+      if (b) loadMomoyu(b.getAttribute('data-mmy'));
     });
   } catch (e) {
     p.status(L('st.failed', { msg: e.message }), 'err');
@@ -2616,8 +2790,10 @@ const BOARD_LOADERS = {
   spaces: () => loadSpaces(),
   datasets: () => loadDatasets(),
   papers: () => loadPapers(),
+  aiNews: () => loadAiNews(),
   repos: () => loadRepos('week'),
   ghTrending: () => loadGhTrending('ai'),
+  momoyu: () => loadMomoyu('all'),
   newmodels: () => loadNewModels(),
   openrouter: () => loadOpenRouter(),
   orCatalog: () => loadOrCatalog(),
