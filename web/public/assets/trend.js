@@ -1524,7 +1524,7 @@ const AI_RE = new RegExp(`(?:^|[^a-z0-9])(?:${AI_KEYWORDS.join('|')})(?:[^a-z0-9
 const AI_TEXT_ZH_RE =
   /大模型|人工智能|智能体|深度学习|机器学习|神经网络|文生图|图生视频|语音识别|自动驾驶|多模态|生成式|AIGC|文心|通义|混元|豆包|智谱|开源模型|大语言模型/i;
 
-/** 一段文本是否 AI 相关（中英一起看：英语词边界 + 中文子串）。ghTrending 与 momoyu 共用 */
+/** 一段文本是否 AI 相关（中英一起看：英语词边界 + 中文子串）。GitHub Trending 与中文热榜共用 */
 export function isAiText(text) {
   const s = String(text ?? '');
   return AI_TEXT_ZH_RE.test(s) || AI_RE.test(s);
@@ -1617,19 +1617,19 @@ async function loadGhTrending(view = 'ai') {
 }
 
 /* ================================================================== */
-/* 面板 9.6：AI 新闻热点（8 源构建期快照）与 摸摸鱼热榜（聚合快照）      */
+/* 面板 9.6：AI 新闻热点（8 源构建期快照）与 13 个中文热榜（聚合快照）    */
 /* ================================================================== */
 
 /**
- * 两份快照的地址：相对**本模块**解析（与 ghTrending 同一理由 —— 中英文页面
+ * 三份快照的地址：相对**本模块**解析（与 ghTrending 同一理由 —— 中英文页面
  * 在不同目录，钉死在脚本自身上两种页面才取到同一个文件）。
- * 由 scripts/fetch-ai-news.mjs / fetch-momoyu-hot.mjs 在构建期生成，
+ * 由 scripts/ 下的抓取脚本在构建期生成（管道的工程记录见仓库 docs），
  * `.github/workflows/refresh-snapshots.yml` 每日刷新；抓取失败不提交，
  * 旧快照原样保留（页面照常显示旧快照与它的抓取时刻）。
  */
 const AI_NEWS_SNAP_URL = new URL('./data/ai-news.json', import.meta.url).href;
 const AI_PRESS_SNAP_URL = new URL('./data/ai-press.json', import.meta.url).href;
-const MOMOYU_SNAP_URL = new URL('./data/momoyu-hot.json', import.meta.url).href;
+const CN_HOT_SNAP_URL = new URL('./data/cn-hot.json', import.meta.url).href;
 
 /** AI 新闻快照 → 面板行（坏条目剔除；score 缺失为 null，空值恒排最后） */
 export function flattenAiNews(snap) {
@@ -1732,11 +1732,12 @@ function loadAiPress() {
 }
 
 /**
- * momoyu 快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换）。
- * `allowedKeys`：只保留这些 source_key 的块 —— 两块精选面板（科技 / 中文）
- * 共用同一份全量快照，各取各的子集，不为每个面板单独抓一份。
+ * 中文热榜快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换）。
+ * `allowedKeys`：只保留这些 source_key 的块 —— 13 块单榜面板共用同一份
+ * 全量快照，各取各的块，不为每个面板单独抓一份（抓取管道的工程记录
+ * 见仓库 scripts/ 与 docs/trend-sources.md §9）。
  */
-export function flattenMomoyu(snap, allowedKeys = null) {
+export function flattenHotList(snap, allowedKeys = null) {
   const allow = Array.isArray(allowedKeys) ? new Set(allowedKeys) : null;
   const out = [];
   for (const s of snap?.sources || []) {
@@ -1758,42 +1759,56 @@ export function flattenMomoyu(snap, allowedKeys = null) {
 }
 
 /**
- * momoyu 13 榜的精选分组（用户定的方向：科技向为主，全站热搜单独成面板）。
- *
- * ## 科技热榜（8 榜）
- *   开发者社区（CSDN / 掘金 / 知乎——科技话题浓度最高的问答）＋
- *   科技媒体（IT之家 / 虎嗅 / 爱范儿 / 中关村在线）＋ B站（按用户建议归
- *   科技向：科技区内容活跃，且条目里科技关键词命中率最高）。
- * ## 中文热榜（4 榜）
- *   微博热搜 / 今日头条 / 虎扑步行街（用户点名的全站热搜）＋ 豆瓣热话
- *   （文化生活热议——"中文热榜"要的就是广度，缺了它只剩娱乐体育）。
- * ## 落选：值得买（zhidemai）
- *   促销/比价信息（"3 小时热门"是 deals 榜），与"趋势"的定位最远。
- * 快照仍存全量 13 榜（fetch-momoyu-hot.mjs 不变）——分组的真值在这里，
- * 哪天要调整成员，改这两个数组即可，不用重抓。
+ * 13 个中文热榜的面板成员（用户返修定的形态：**每个榜一个独立面板/路由**）。
+ * 顺序 = 首页卡片顺序：先技术/科技社区，再全站热搜，最后促销榜。
+ * 真值只有这一处：BOARD_IDS / 页面 / 首页卡片 / BOARD_LOADERS 都从它推导，
+ * 漏一个会在 site.test.js 的对齐断言里炸出来。
  */
-export const MOMOYU_TECH_KEYS = ['csdn', 'juejin', 'zhihu', 'itzhijia', 'huxiu', 'aifaner', 'zhongguancun', 'bilibili'];
-export const MOMOYU_CN_KEYS = ['weibo', 'toutiao', 'hupu', 'douban'];
+export const HOT_LIST_KEYS = [
+  'zhihu', 'csdn', 'juejin', 'itzhijia', 'huxiu', 'aifaner', 'zhongguancun', 'bilibili',
+  'weibo', 'toutiao', 'hupu', 'douban', 'zhidemai',
+];
+
+/** 每个榜的面板图标（src/site/nav.js 的 BOARD_ICONS 用同一份对应） */
+export const HOT_LIST_ICONS = {
+  zhihu: 'file',
+  csdn: 'code',
+  juejin: 'code',
+  itzhijia: 'monitor',
+  huxiu: 'file',
+  aifaner: 'monitor',
+  zhongguancun: 'monitor',
+  bilibili: 'monitor',
+  weibo: 'trending',
+  toutiao: 'trending',
+  hupu: 'trending',
+  douban: 'star',
+  zhidemai: 'star',
+};
 
 /**
- * momoyu 系面板的公共骨架：同一份全量快照，按 keys 取子集。
- * 两块面板除成员外完全同形（列 / 分组 / AI 切换 / 快照声明），抽工厂
- * 避免两份复制的漂移 —— 与 mountNewsPanel 同一个理由。
+ * 单个热榜面板：同一份全量快照里取这一个 source_key 的块。
+ * 13 块面板同形（列 / 搜索 / AI 切换 / 快照声明），共用这一个加载器 ——
+ * 与 mountNewsPanel 同一个理由：同形面板抽一个实现，防复制漂移。
+ *
+ * 快照声明用**该榜块内的站方抓取时刻**（比整份快照的抓取时刻更贴近
+ * "这条榜是什么时候的"）。条目链接指向原平台，如实呈现。
  */
-async function mountMomoyuPanel(id, keys, view = 'all') {
+async function loadHotList(key, view = 'all') {
   const p = panel({
-    id,
-    iconName: 'monitor',
-    title: L(`p.${id}.title`),
-    hint: L(`p.${id}.hint`),
+    id: key,
+    iconName: HOT_LIST_ICONS[key] || 'monitor',
+    title: L(`p.${key}.title`),
+    hint: L(`p.${key}.hint`),
   });
   try {
-    const snap = await cachedJson('momoyu-hot', MOMOYU_SNAP_URL);
-    const all = flattenMomoyu(snap, keys);
+    const snap = await cachedJson(`cn-hot-${key}`, CN_HOT_SNAP_URL);
+    const block = (snap?.sources || []).find((x) => x.key === key);
+    const all = flattenHotList({ sources: block ? [block] : [] });
     if (!all.length) throw new Error(L('err.noNews'));
     const rows = view === 'ai' ? all.filter((r) => r.ai) : all;
     if (!rows.length) throw new Error(L('err.noNews'));
-    const fetchedAt = Date.parse(snap?.fetchedAt);
+    const blockTime = Date.parse(block?.fetchedAt || '');
     p.status('', 'ok');
     mountBoard(p, {
       rows,
@@ -1804,43 +1819,32 @@ async function mountMomoyuPanel(id, keys, view = 'all') {
           field: 'title',
           cell: (r) => (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>` : esc(r.title)),
         },
-        { label: L('col.source'), field: 'source', cell: (r) => `<span class="tag">${esc(r.source)}</span>` },
         { label: L('col.hot'), field: 'extra', cell: (r) => (r.extra ? `<span class="tag">${esc(r.extra)}</span>` : '—') },
       ],
       defaultSort: null,
-      searchFields: ['title', 'source'],
-      groupField: 'source',
-      groupLabel: L('ui.allSources'),
+      searchFields: ['title'],
       placeholder: L('ui.searchNews'),
       transform: withRank,
+      // "仅 AI" 过滤保留：全站一致的过滤能力，成本为零（标记在快照摊平时已算好）；
+      // 在娱乐向榜单上命中少，本身就是真实信号，不藏
       beforeControls: () => subBoardChips({ all: 'ui.showAll', ai: 'ui.aiOnly' }, view, 'mmy'),
-      note: L('st.momoyuSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }),
+      note: L('st.hotSnap', { time: fmtStamp(Number.isFinite(blockTime) ? blockTime : Date.now()) }),
       card: {
         title: (r) => esc(r.title),
         value: (r) => `<span class="v-num">${esc(r.extra) || '—'}</span>`,
-        meta: (r) => `<span class="tag">${esc(r.source)}</span>`,
+        meta: () => '',
         link: (r) => r.url || null,
       },
     });
     // 子视图切换（事件委托：mountBoard 重画换 DOM，绑在面板元素上只绑一次）
     p.el.addEventListener('click', (e) => {
       const b = e.target.closest?.('[data-mmy]');
-      if (b) mountMomoyuPanel(id, keys, b.getAttribute('data-mmy'));
+      if (b) loadHotList(key, b.getAttribute('data-mmy'));
     });
   } catch (e) {
     p.status(L('st.failed', { msg: e.message }), 'err');
     p.body('');
   }
-}
-
-/** 面板：科技热榜（momoyu 聚合的 8 个科技向榜单） */
-function loadTechHot() {
-  return mountMomoyuPanel('techHot', MOMOYU_TECH_KEYS);
-}
-
-/** 面板：中文热榜（momoyu 聚合的 4 个全站热搜） */
-function loadCnHot() {
-  return mountMomoyuPanel('cnHot', MOMOYU_CN_KEYS);
 }
 
 /* ================================================================== */
@@ -2860,8 +2864,19 @@ const BOARD_LOADERS = {
   aiPress: () => loadAiPress(),
   repos: () => loadRepos('week'),
   ghTrending: () => loadGhTrending('ai'),
-  techHot: () => loadTechHot(),
-  cnHot: () => loadCnHot(),
+  zhihu: () => loadHotList('zhihu'),
+  csdn: () => loadHotList('csdn'),
+  juejin: () => loadHotList('juejin'),
+  itzhijia: () => loadHotList('itzhijia'),
+  huxiu: () => loadHotList('huxiu'),
+  aifaner: () => loadHotList('aifaner'),
+  zhongguancun: () => loadHotList('zhongguancun'),
+  bilibili: () => loadHotList('bilibili'),
+  weibo: () => loadHotList('weibo'),
+  toutiao: () => loadHotList('toutiao'),
+  hupu: () => loadHotList('hupu'),
+  douban: () => loadHotList('douban'),
+  zhidemai: () => loadHotList('zhidemai'),
   newmodels: () => loadNewModels(),
   openrouter: () => loadOpenRouter(),
   orCatalog: () => loadOrCatalog(),

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 摸摸鱼热榜快照 —— momoyu.cc 聚合榜 → `web/public/assets/data/momoyu-hot.json`。
+ * 摸摸鱼热榜快照 —— momoyu.cc 聚合榜 → `web/public/assets/data/cn-hot.json`（★ 发布 URL 里不出现聚合站名，工程记录见本注释与 docs）。
  *
  * ## 来源（2026-10-01 实测）
  * `GET https://momoyu.cc/api/hot/list?type=0`（带浏览器 UA）→ 200 JSON：
@@ -31,7 +31,7 @@ const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv
 const API_URL = 'https://momoyu.cc/api/hot/list?type=0';
 const OUT_PATH = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../web/public/assets/data/momoyu-hot.json'
+  '../web/public/assets/data/cn-hot.json'
 );
 const UA =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 trend-snapshot/1.0';
@@ -90,7 +90,8 @@ if (sources.length < MIN_SOURCES) {
 }
 
 const snapshot = {
-  source: 'https://momoyu.cc/',
+  // ★ 不写聚合站的地址：这份 JSON 会原样发布到线上（devtools 可见），
+  // 页面上不应出现聚合站名；管道的真实出处记录在仓库 docs 里
   fetchedAt: new Date().toISOString(), // 本次构建期抓取时刻（各来源另有站方时刻）
   sources,
 };

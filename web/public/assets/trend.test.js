@@ -20,7 +20,7 @@ import {
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
   fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
   parseGhTrending, isAiRepo, isAiText, flattenGhTrending, flattenOrCatalog,
-  flattenAiNews, flattenMomoyu, MOMOYU_TECH_KEYS, MOMOYU_CN_KEYS,
+  flattenAiNews, flattenHotList, HOT_LIST_KEYS,
 } from './trend.js';
 
 let pass = 0;
@@ -1147,7 +1147,7 @@ t('flattenOrCatalog：免费是 0、缺价是 null、没上线日期排最后', 
 
 /* ---------------- AI 新闻 / 摸摸鱼（快照面板的纯逻辑） ---------------- */
 
-t('★ isAiText：中文子串 + 英文词边界一起管（momoyu 与 ghTrending 共用）', () => {
+t('★ isAiText：中文子串 + 英文词边界一起管（中文热榜与 ghTrending 共用）', () => {
   // 中文（CJK 无词边界，直接子串）
   assert.equal(isAiText('如何评价 10 月 1 号发布的 Gemini 4 Argon'), true, 'Gemini');
   assert.equal(isAiText(' OpenAI 发布新模型'), true);
@@ -1183,7 +1183,7 @@ t('flattenAiNews：快照 → 行（坏条目剔除、score 缺失为 null、来
   assert.equal(flattenAiNews(null).length, 0, '空输入不炸');
 });
 
-t('flattenMomoyu：快照 → 行（AI 标记在客户端算、extra 保留原文、空标题剔除）', () => {
+t('flattenHotList：快照 → 行（AI 标记在客户端算、extra 保留原文、空标题剔除）', () => {
   const snap = {
     fetchedAt: '2026-10-01T03:50:00.000Z',
     sources: [
@@ -1194,15 +1194,15 @@ t('flattenMomoyu：快照 → 行（AI 标记在客户端算、extra 保留原�
       ] },
     ],
   };
-  const rows = flattenMomoyu(snap);
+  const rows = flattenHotList(snap);
   assert.equal(rows.length, 2);
   assert.equal(rows[0].ai, true, '标题含 Gemini → AI');
   assert.equal(rows[1].ai, false);
   assert.equal(rows[0].extra, '105 万', '热度文字保留原文，不解析成数字');
-  assert.equal(flattenMomoyu(null).length, 0, '空输入不炸');
+  assert.equal(flattenHotList(null).length, 0, '空输入不炸');
 });
 
-t('★ flattenMomoyu 的 keys 过滤：两块精选面板各取各的子集，共用同一份全量快照', () => {
+t('★ flattenHotList 的 keys 过滤：13 块单榜面板各取各的块，共用同一份全量快照', () => {
   const snap = {
     sources: [
       { key: 'zhihu', name: '知乎热榜', items: [{ title: 't1', url: 'u1' }] },
@@ -1210,25 +1210,19 @@ t('★ flattenMomoyu 的 keys 过滤：两块精选面板各取各的子集，�
       { key: 'zhidemai', name: '值得买', items: [{ title: 't3', url: 'u3' }] },
     ],
   };
-  assert.equal(flattenMomoyu(snap, ['zhihu']).length, 1, '只留知乎块');
-  assert.equal(flattenMomoyu(snap, ['weibo'])[0].source, '微博热搜');
-  assert.equal(flattenMomoyu(snap, ['nonexistent']).length, 0, '键不存在 → 空（面板报"没有解析出新闻"）');
-  assert.equal(flattenMomoyu(snap).length, 3, '不传 keys = 全量');
+  assert.equal(flattenHotList(snap, ['zhihu']).length, 1, '只留知乎块');
+  assert.equal(flattenHotList(snap, ['weibo'])[0].source, '微博热搜');
+  assert.equal(flattenHotList(snap, ['nonexistent']).length, 0, '键不存在 → 空（面板报"没有解析出新闻"）');
+  assert.equal(flattenHotList(snap).length, 3, '不传 keys = 全量');
 });
 
-t('★ momoyu 精选分组：科技 8 榜 / 中文 4 榜，互不重叠，值得买两边都不在', () => {
-  assert.equal(MOMOYU_TECH_KEYS.length, 8);
-  assert.equal(MOMOYU_CN_KEYS.length, 4);
-  const both = [...MOMOYU_TECH_KEYS, ...MOMOYU_CN_KEYS];
-  assert.equal(new Set(both).size, both.length, '科技与中文两组不得重叠');
-  // 落选理由：值得买是促销/比价榜（"3 小时热门"），与趋势站定位最远
-  assert.ok(!both.includes('zhidemai'), '值得买按纪律落选，理由见 trend.js 注释与 docs');
-  // 用户点名的科技向成员都在
-  for (const k of ['zhihu', 'csdn', 'juejin', 'itzhijia', 'huxiu', 'bilibili']) {
-    assert.ok(MOMOYU_TECH_KEYS.includes(k), `${k} 应在科技热榜`);
-  }
-  for (const k of ['weibo', 'toutiao', 'hupu']) {
-    assert.ok(MOMOYU_CN_KEYS.includes(k), `${k} 应在中文热榜`);
+t('★ HOT_LIST_KEYS：13 个中文热榜面板成员（用户返修：每个榜一个独立面板）', () => {
+  assert.equal(HOT_LIST_KEYS.length, 13, '13 个都拆，一个不少（含值得买）');
+  assert.equal(new Set(HOT_LIST_KEYS).size, 13, '键不得重复');
+  // 与聚合快照里的 source_key 对齐（2026-10-01 实测的 13 个，管道见 scripts/fetch-momoyu-hot.mjs）
+  for (const k of ['zhihu', 'douban', 'weibo', 'toutiao', 'hupu', 'bilibili', 'itzhijia',
+                   'zhongguancun', 'aifaner', 'csdn', 'huxiu', 'zhidemai', 'juejin']) {
+    assert.ok(HOT_LIST_KEYS.includes(k), `${k} 应在 13 榜成员里`);
   }
 });
 

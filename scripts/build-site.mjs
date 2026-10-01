@@ -80,7 +80,7 @@ export const SITE_FILES = [
   'assets/data/gh-trending.json',
   'assets/data/ai-news.json',
   'assets/data/ai-press.json',
-  'assets/data/momoyu-hot.json',
+  'assets/data/cn-hot.json',
   ...BOARD_PAGES.map((id) => `${id}.html`),
   ...BOARD_PAGES.map((id) => `en/${id}.html`),
 ];

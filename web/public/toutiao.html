@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>今日头条热榜 · {{BRAND}}</title>
+<meta name="description" content="今日头条站内热榜，构建期快照。">
+<base href="./">
+<link rel="stylesheet" href="site.css">
+<!-- Google Tag Manager（容器 ID 见 src/site/gtm.js，构建期落成真值） -->
+{{GTM}}
+</head>
+<body>
+{{GTM_NOSCRIPT}}
+<header class="site-header">
+  <div class="wrap header-inner">
+    {{SITE_NAV}}
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 本页只跑一个面板：data-board 指名的那个。
+       面板标题由脚本渲染成 h1（文案来源仍是 i18n.js 一处），所以这里不另写 hero 标题。 -->
+  <div id="panels" data-board="toutiao"></div>
+
+</main>
+<script src="assets/trend.js" type="module"></script>
+<script src="assets/ui.js" type="module"></script>
+</body>
+</html>

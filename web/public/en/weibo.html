@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weibo trending · {{BRAND}}</title>
+<meta name="description" content="Trending topics on Weibo, build-time snapshot.">
+<base href="./">
+<link rel="stylesheet" href="../site.css">
+<!-- Google Tag Manager (container id lives in src/site/gtm.js, resolved at build time) -->
+{{GTM}}
+</head>
+<body>
+{{GTM_NOSCRIPT}}
+<header class="site-header">
+  <div class="wrap header-inner">
+    {{SITE_NAV}}
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- One board per page: the one named by data-board.
+       The board title is rendered as this page's h1 by the script, so there is
+       no separate hero heading here — and no second copy of the wording. -->
+  <div id="panels" data-board="weibo"></div>
+
+</main>
+<script src="../assets/trend.js" type="module"></script>
+<script src="../assets/ui.js" type="module"></script>
+</body>
+</html>

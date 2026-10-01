@@ -16,23 +16,24 @@
 ## 页面
 
 **一个面板一页**：每条趋势（榜单）是一个独立地址，首页每张卡片正好对应一个 ——
-不把二十三个面板堆在一页里。
+不把三十四个面板堆在一页里。
 
 | 地址 | 作用 |
 |---|---|
-| `index.html` | 中文入口页：二十三个面板的入口卡片 |
+| `index.html` | 中文入口页：三十四个面板的入口卡片 |
 | `trending.html` `liked.html` `downloaded.html` | 模型榜：正在流行 / 最受喜欢 / 下载最多 |
 | `eval.html` `aider.html` | 评测与编程能力榜 |
 | `spaces.html` `datasets.html` `papers.html` `repos.html` | 社区热度：应用 / 数据集 / 论文 / 开源项目 |
 | `newmodels.html` `swebench.html` | 大体积榜（4MB / 4.8MB，进页面即加载） |
 | `openrouter.html` `orCatalog.html` | OpenRouter 用量榜（1.1MB）与模型库（0.76MB，进页面就拉） |
 | `ghTrending.html` | GitHub Trending 每日榜（**构建期快照**，Actions 每日刷新） |
-| `aiNews.html` `aiPress.html` `techHot.html` `cnHot.html` | AI 新闻热点（聚合源）、AI 官方要闻（一手源）、科技热榜与中文热榜（momoyu 聚合）—— 全是构建期快照 |
+| `aiNews.html` `aiPress.html` | AI 新闻热点（聚合源）、AI 官方要闻（一手源）—— 构建期快照 |
+| `zhihu.html` … `zhidemai.html`（13 页） | 13 个中文热榜独立成页：知乎 · CSDN · 掘金 · IT之家 · 虎嗅 · 爱范儿 · 中关村在线 · B站 · 微博 · 今日头条 · 虎扑 · 豆瓣 · 值得买 —— 同一份聚合快照，条目链接指向原平台 |
 | `tags.html` | 全部标签（来源 + 分类），每个标签带条数 |
 | `tag.html?t=<标签>` | 含该标签的榜单，卡片式 |
 | `en/…` | 以上每一个的英文版（含标签页），文件名相同 |
 
-页头**三样**：左上角「首页」与「标签」，右上角切换语言。二十三个榜单不进页头 ——
+页头**三样**：左上角「首页」与「标签」，右上角切换语言。三十四个榜单不进页头 ——
 它们就是首页的入口卡片（下面一格一张卡），页头再列一遍等于同一份目录出现两次。
 页面**下方**另有一条由 `trend.js` 生成的 `.board-links`，列出全部面板并带
 「刷新数据」按钮 —— 那是"看完了换下一个"的那条路。
@@ -61,7 +62,7 @@
 > `site.test.js` 要求**每个被代码引用的键都存在**（见下面「曾经静默坏掉的一处」），
 > 以及两条"英文页里不许有中文 / 中文页里不许有整句英文"的断言。
 
-## 二十三个面板
+## 三十四个面板
 
 每个面板都有自己的页面（下表第一列即地址的文件名去掉 `.html`）：
 
@@ -79,8 +80,19 @@
 | AI 官方要闻 | `aiPress` | OpenAI · TechCrunch · Ars Technica · GitHub Blog · DeepMind · 微软研究院 · NVIDIA 官方博客 | **8 家一手信源快照聚合**（官方 RSS 均无 CORS）；官方 RSS 无统一热度口径，不硬造列；The Decoder 域名挂牌出售 → **观察项**如实显示 |
 | 高星 AI 开源项目 | `repos` | GitHub Search API | **可切**本周 / 本月新增星标与历史总星标 |
 | GitHub Trending | `ghTrending` | `github.com/trending`（HTML 解析） | **构建期快照**（页面无 CORS，浏览器直连做不了）；默认**仅 AI 相关**可切全部；每日 Actions 刷新，失败保留旧快照 |
-| 科技热榜 | `techHot` | `momoyu.cc` 聚合（8 榜子集） | 知乎 · CSDN · 掘金 · IT之家 · 虎嗅 · 爱范儿 · 中关村在线 · B站的**构建期快照**；来源标注 momoyu.cc 聚合、条目链接指向原平台、每源带站方抓取时刻 |
-| 中文热榜 | `cnHot` | `momoyu.cc` 聚合（4 榜子集） | 微博 · 今日头条 · 虎扑 · 豆瓣全站热搜的**构建期快照**；值得买（促销比价）按定位落选（理由见 `docs/trend-sources.md` §9） |
+| 知乎热榜 | `zhihu` | 中文热榜聚合管道（见 docs §9） | 知乎站内热度排序问题榜的**构建期快照**，条目链接指向知乎 |
+| CSDN 热榜 | `csdn` | 同上 | CSDN 技术社区热榜快照 |
+| 掘金热榜 | `juejin` | 同上 | 掘金技术社区热榜快照 |
+| IT之家热榜 | `itzhijia` | 同上 | IT之家科技资讯热榜快照 |
+| 虎嗅热榜 | `huxiu` | 同上 | 虎嗅科技商业热榜快照 |
+| 爱范儿热榜 | `aifaner` | 同上 | 爱范儿科技媒体热榜快照 |
+| 中关村在线热榜 | `zhongguancun` | 同上 | 中关村在线硬件资讯热榜快照 |
+| B站热榜 | `bilibili` | 同上 | B站热门视频榜快照 |
+| 微博热搜 | `weibo` | 同上 | 微博站内热搜榜快照 |
+| 今日头条热榜 | `toutiao` | 同上 | 今日头条站内热榜快照 |
+| 虎扑步行街热榜 | `hupu` | 同上 | 虎扑步行街热帖榜快照 |
+| 豆瓣热话 | `douban` | 同上 | 豆瓣热门话题快照 |
+| 值得买热榜 | `zhidemai` | 同上 | 值得买 3 小时热门促销榜快照 |
 | 最新发布的模型 | `newmodels` | models.dev | 按 `release_date` 降序；数据 4.8MB，**进页面即加载**（约 0.5s） |
 | OpenRouter 模型用量榜 | `openrouter` | `openrouter.ai/api/frontend/v1/rankings/models` + `/api/v1/models`（只为名字） | 按**当天 token 用量**排序，日更 7 天窗口；standard/batch/free **已合并**（见 `docs/trend-sources.md` §4） |
 | OpenRouter 模型库 | `orCatalog` | `openrouter.ai/api/v1/models`（0.76MB，CORS `*`） | 全部可路由模型的**目录**：价格（$/M tokens）/ 上下文 / 模态 / 上线时间，按上线时间降序；失败回退本地快照并标时刻 |
@@ -253,8 +265,8 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 
 ```
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
-  index.html                      中文入口：二十三个面板的入口卡片
-  <board>.html                    ★ 二十个中文面板页（eval.html、repos.html…）
+  index.html                      中文入口：三十四个面板的入口卡片
+  <board>.html                    ★ 三十四个中文面板页（eval.html、repos.html…）
   tags.html  tag.html             标签总览 / 按标签筛选
   en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css
