@@ -20,7 +20,7 @@ import {
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
   fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
   parseGhTrending, isAiRepo, isAiText, flattenGhTrending, flattenOrCatalog,
-  flattenAiNews, flattenMomoyu,
+  flattenAiNews, flattenMomoyu, MOMOYU_TECH_KEYS, MOMOYU_CN_KEYS,
 } from './trend.js';
 
 let pass = 0;
@@ -1200,6 +1200,36 @@ t('flattenMomoyu：快照 → 行（AI 标记在客户端算、extra 保留原�
   assert.equal(rows[1].ai, false);
   assert.equal(rows[0].extra, '105 万', '热度文字保留原文，不解析成数字');
   assert.equal(flattenMomoyu(null).length, 0, '空输入不炸');
+});
+
+t('★ flattenMomoyu 的 keys 过滤：两块精选面板各取各的子集，共用同一份全量快照', () => {
+  const snap = {
+    sources: [
+      { key: 'zhihu', name: '知乎热榜', items: [{ title: 't1', url: 'u1' }] },
+      { key: 'weibo', name: '微博热搜', items: [{ title: 't2', url: 'u2' }] },
+      { key: 'zhidemai', name: '值得买', items: [{ title: 't3', url: 'u3' }] },
+    ],
+  };
+  assert.equal(flattenMomoyu(snap, ['zhihu']).length, 1, '只留知乎块');
+  assert.equal(flattenMomoyu(snap, ['weibo'])[0].source, '微博热搜');
+  assert.equal(flattenMomoyu(snap, ['nonexistent']).length, 0, '键不存在 → 空（面板报"没有解析出新闻"）');
+  assert.equal(flattenMomoyu(snap).length, 3, '不传 keys = 全量');
+});
+
+t('★ momoyu 精选分组：科技 8 榜 / 中文 4 榜，互不重叠，值得买两边都不在', () => {
+  assert.equal(MOMOYU_TECH_KEYS.length, 8);
+  assert.equal(MOMOYU_CN_KEYS.length, 4);
+  const both = [...MOMOYU_TECH_KEYS, ...MOMOYU_CN_KEYS];
+  assert.equal(new Set(both).size, both.length, '科技与中文两组不得重叠');
+  // 落选理由：值得买是促销/比价榜（"3 小时热门"），与趋势站定位最远
+  assert.ok(!both.includes('zhidemai'), '值得买按纪律落选，理由见 trend.js 注释与 docs');
+  // 用户点名的科技向成员都在
+  for (const k of ['zhihu', 'csdn', 'juejin', 'itzhijia', 'huxiu', 'bilibili']) {
+    assert.ok(MOMOYU_TECH_KEYS.includes(k), `${k} 应在科技热榜`);
+  }
+  for (const k of ['weibo', 'toutiao', 'hupu']) {
+    assert.ok(MOMOYU_CN_KEYS.includes(k), `${k} 应在中文热榜`);
+  }
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

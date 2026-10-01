@@ -1731,10 +1731,16 @@ function loadAiPress() {
   return mountNewsPanel({ id: 'aiPress', iconName: 'file', snapUrl: AI_PRESS_SNAP_URL, cacheKey: 'ai-press', showScore: false });
 }
 
-/** 摸摸鱼快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换） */
-export function flattenMomoyu(snap) {
+/**
+ * momoyu 快照 → 面板行（AI 标记在客户端算，"全部 / 仅 AI"由读者切换）。
+ * `allowedKeys`：只保留这些 source_key 的块 —— 两块精选面板（科技 / 中文）
+ * 共用同一份全量快照，各取各的子集，不为每个面板单独抓一份。
+ */
+export function flattenMomoyu(snap, allowedKeys = null) {
+  const allow = Array.isArray(allowedKeys) ? new Set(allowedKeys) : null;
   const out = [];
   for (const s of snap?.sources || []) {
+    if (allow && !allow.has(s.key)) continue;
     for (const it of s?.items || []) {
       const title = String(it?.title || '').trim();
       if (!title) continue;
@@ -1751,17 +1757,39 @@ export function flattenMomoyu(snap) {
   return out;
 }
 
-/** 面板：摸摸鱼热榜（13 个来源的聚合，按来源分组；默认全部，可切仅 AI） */
-async function loadMomoyu(view = 'all') {
+/**
+ * momoyu 13 榜的精选分组（用户定的方向：科技向为主，全站热搜单独成面板）。
+ *
+ * ## 科技热榜（8 榜）
+ *   开发者社区（CSDN / 掘金 / 知乎——科技话题浓度最高的问答）＋
+ *   科技媒体（IT之家 / 虎嗅 / 爱范儿 / 中关村在线）＋ B站（按用户建议归
+ *   科技向：科技区内容活跃，且条目里科技关键词命中率最高）。
+ * ## 中文热榜（4 榜）
+ *   微博热搜 / 今日头条 / 虎扑步行街（用户点名的全站热搜）＋ 豆瓣热话
+ *   （文化生活热议——"中文热榜"要的就是广度，缺了它只剩娱乐体育）。
+ * ## 落选：值得买（zhidemai）
+ *   促销/比价信息（"3 小时热门"是 deals 榜），与"趋势"的定位最远。
+ * 快照仍存全量 13 榜（fetch-momoyu-hot.mjs 不变）——分组的真值在这里，
+ * 哪天要调整成员，改这两个数组即可，不用重抓。
+ */
+export const MOMOYU_TECH_KEYS = ['csdn', 'juejin', 'zhihu', 'itzhijia', 'huxiu', 'aifaner', 'zhongguancun', 'bilibili'];
+export const MOMOYU_CN_KEYS = ['weibo', 'toutiao', 'hupu', 'douban'];
+
+/**
+ * momoyu 系面板的公共骨架：同一份全量快照，按 keys 取子集。
+ * 两块面板除成员外完全同形（列 / 分组 / AI 切换 / 快照声明），抽工厂
+ * 避免两份复制的漂移 —— 与 mountNewsPanel 同一个理由。
+ */
+async function mountMomoyuPanel(id, keys, view = 'all') {
   const p = panel({
-    id: 'momoyu',
+    id,
     iconName: 'monitor',
-    title: L('p.momoyu.title'),
-    hint: L('p.momoyu.hint'),
+    title: L(`p.${id}.title`),
+    hint: L(`p.${id}.hint`),
   });
   try {
     const snap = await cachedJson('momoyu-hot', MOMOYU_SNAP_URL);
-    const all = flattenMomoyu(snap);
+    const all = flattenMomoyu(snap, keys);
     if (!all.length) throw new Error(L('err.noNews'));
     const rows = view === 'ai' ? all.filter((r) => r.ai) : all;
     if (!rows.length) throw new Error(L('err.noNews'));
@@ -1785,7 +1813,7 @@ async function loadMomoyu(view = 'all') {
       groupLabel: L('ui.allSources'),
       placeholder: L('ui.searchNews'),
       transform: withRank,
-      beforeControls: () => subBoardChips({ all: 'p.momoyu.all', ai: 'p.momoyu.ai' }, view, 'mmy'),
+      beforeControls: () => subBoardChips({ all: 'ui.showAll', ai: 'ui.aiOnly' }, view, 'mmy'),
       note: L('st.momoyuSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }),
       card: {
         title: (r) => esc(r.title),
@@ -1797,12 +1825,22 @@ async function loadMomoyu(view = 'all') {
     // 子视图切换（事件委托：mountBoard 重画换 DOM，绑在面板元素上只绑一次）
     p.el.addEventListener('click', (e) => {
       const b = e.target.closest?.('[data-mmy]');
-      if (b) loadMomoyu(b.getAttribute('data-mmy'));
+      if (b) mountMomoyuPanel(id, keys, b.getAttribute('data-mmy'));
     });
   } catch (e) {
     p.status(L('st.failed', { msg: e.message }), 'err');
     p.body('');
   }
+}
+
+/** 面板：科技热榜（momoyu 聚合的 8 个科技向榜单） */
+function loadTechHot() {
+  return mountMomoyuPanel('techHot', MOMOYU_TECH_KEYS);
+}
+
+/** 面板：中文热榜（momoyu 聚合的 4 个全站热搜） */
+function loadCnHot() {
+  return mountMomoyuPanel('cnHot', MOMOYU_CN_KEYS);
 }
 
 /* ================================================================== */
@@ -2822,7 +2860,8 @@ const BOARD_LOADERS = {
   aiPress: () => loadAiPress(),
   repos: () => loadRepos('week'),
   ghTrending: () => loadGhTrending('ai'),
-  momoyu: () => loadMomoyu('all'),
+  techHot: () => loadTechHot(),
+  cnHot: () => loadCnHot(),
   newmodels: () => loadNewModels(),
   openrouter: () => loadOpenRouter(),
   orCatalog: () => loadOrCatalog(),

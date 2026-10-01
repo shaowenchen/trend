@@ -31,7 +31,8 @@
 | 📈 GitHub Trending | `github.com/trending` | 200 **HTML**（650KB） | **无** | ❌ 无 CORS → **构建期快照**（见 §8） |
 | 📰 AI 新闻（8 源） | HN·Algolia / dev.to / TechCrunch / The Verge / Latent Space / Interconnects / arXiv / lobste.rs | 全 200 | 2 源 ✓ / 6 源 无 | 📸 全部**构建期快照**（见 §9） |
 | 📣 AI 官方要闻（8 家一手） | openai.com/news 等 7 家 RSS | 全 200 | 无（快照） | 📸 **构建期快照**（见 §10）；The Decoder ❌ 域名挂牌出售（观察项） |
-| 🐟 摸摸鱼热榜 | `momoyu.cc/api/hot/list` | 200 JSON（76KB，13 榜） | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
+| 🔥 科技热榜 | `momoyu.cc/api/hot/list`（8 榜子集） | 200 JSON | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
+| 🀄 中文热榜 | `momoyu.cc/api/hot/list`（4 榜子集） | 200 JSON | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
@@ -307,14 +308,24 @@ top.json 拦截、VentureBeat 稳定 429、smol.ai /rss 404。
 解析器有真实 fixture 测试（`ainews.test.js`），含 XML 实体还原（`&amp;` → `&`，
 不还原页面上会显示字面量）。
 
-### 摸摸鱼热榜（`scripts/fetch-momoyu-hot.mjs`，快照 `assets/data/momoyu-hot.json`）
+### 摸摸鱼热榜：科技热榜（techHot · 8 榜）+ 中文热榜（cnHot · 4 榜）
 
 - `GET momoyu.cc/api/hot/list?type=0`（**带浏览器 UA**，裸 UA 会被拒）→ 200 JSON：
-  13 个来源（知乎/微博/豆瓣/虎扑/IT之家/虎嗅/CSDN/掘金…）各带条目与
-  **站方 create_time**；`/api/hot/source` 需登录（401），`/api/hot/top` 是
-  20 条跨源聚合（备用）。响应无 CORS → 只能快照。
+  13 个来源各带条目与**站方 create_time**（2026-10-01 复测：知乎30 / 豆瓣40 /
+  微博51 / 头条50 / 虎扑60 / B站100 / IT之家12 / 中关村在线17 / 爱范儿19 /
+  CSDN30 / 虎嗅22 / 值得买10 / 掘金20 条）；`/api/hot/source` 需登录（401），
+  `/api/hot/top` 是 20 条跨源聚合（备用）。响应无 CORS → 只能快照。
+- **面板拆分与取舍**（用户定方向：科技向为主；快照仍存全量 13 榜，
+  分组真值在 `trend.js` 的 `MOMOYU_TECH_KEYS` / `MOMOYU_CN_KEYS`）：
+  - 科技热榜（8）：知乎 · CSDN · 掘金（开发者社区/高浓度科技问答）＋
+    IT之家 · 虎嗅 · 爱范儿 · 中关村在线（科技媒体）＋ B站（科技区活跃，
+    按用户建议归科技向）；
+  - 中文热榜（4）：微博热搜 · 今日头条 · 虎扑步行街（用户点名的全站热搜）＋
+    豆瓣热话（文化生活热议 —— "中文热榜"要广度，缺了它只剩娱乐体育）；
+  - **落选：值得买** —— 促销/比价的"3 小时热门"，与趋势站定位最远。
 - 口径：每源前 20 条；块内 `fetchedAt` 用**站方 create_time**（比"我们何时拉的"
-  更接近数据真相）；`extra` 是站方热度文字（'552 万'），保留原文不解析成数字。
+  更接近数据真相）；`extra` 是站方热度文字（'552 万'），保留原文不解析成数字；
+  来源标注 **momoyu.cc 聚合**，条目链接指向原平台。
 - AI 过滤在**页面端**做（`isAiText`：中文子串 + 英文词边界），"全部 / 仅 AI"
   由读者切换 —— 快照存全量，过滤口径可迭代不用重抓。
 

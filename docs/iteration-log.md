@@ -102,6 +102,23 @@ continue-on-error（部分成功仍提交成功部分），diff 为空不提交�
       不硬造列，卡片主数值是时间；观察项进 note）。
 - [x] 快照入库 7 源 117 条；本地全绿（trend 95 / ainews 16 / site 36 等）+
       无头实测（117 条 · 7 组 · 观察项声明可见）。
-- [ ] 推送上线 + 线上实测（DoD：≥6 源有条目、页面 200）+ 微信交付。
-- [ ] refresh-snapshots.yml 补第 4 步（fetch-ai-press）—— 与工作流一起待
-      workflow 权限凭据推送。
+- [x] 推送上线（8ec9e34）+ 线上实测通过：aiPress / en / 快照 JSON 全 200，
+      面板 ok、117 条、**7/7 源有条目**（DoD ≥6），note 显示
+      "最老来源抓取于 … · 观察项：The Decoder"；微信交付已发。
+- [ ] **待推**：16417cc（四合一每日快照工作流 refresh-snapshots.yml）——
+      仍需带 workflow 权限的凭据。注意：工作流提交不能混进面板提交的
+      祖先链（GitHub 按"推送包含的提交树"判 workflow 权限，推过一次
+      被拒：即便面板提交本身不含 .github，祖先链里的工作流提交也会挡）。
+
+## 2026-10-01 · 第四轮：momoyu 细化为「科技热榜 + 中文热榜」两个精选面板
+
+- [x] API 复测（200 · 13 榜 · 条数与用户给的一致；无 CORS → 快照维持）。
+- [x] 用户方向 + 自主取舍（方案/理由在 trend-sources.md §9 与 trend.js 注释）：
+      科技热榜 8 榜（知乎/CSDN/掘金 + IT之家/虎嗅/爱范儿/中关村在线 + B站）、
+      中文热榜 4 榜（微博/头条/虎扑 + 豆瓣）、值得买落选（促销比价）。
+      两个面板共用同一份全量快照（fetch 脚本不变），分组真值
+      MOMOYU_TECH_KEYS / MOMOYU_CN_KEYS 在 trend.js。
+- [x] 替换原 13 榜全量面板（momoyu.html 已删，页面 404）；本地全绿
+      （trend 97 / ainews 16 / site 36）+ 无头实测（techHot 148 条 8 组、
+      cnHot 80 条 4 组，note 标"momoyu.cc 聚合"）。
+- [ ] 推送上线 + 线上实测 + 微信交付。
