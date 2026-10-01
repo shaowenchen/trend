@@ -18,12 +18,26 @@ import {
   cardGrid, detailFromCols, detailRow,
   openrouterBoard, openrouterNames, openrouterLabel, attachPanel,
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
+  fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
+  parseGhTrending, isAiRepo, flattenGhTrending, flattenOrCatalog,
 } from './trend.js';
 
 let pass = 0;
 const t = (name, fn) => {
   try {
     fn();
+    pass += 1;
+    console.log(`  ✓ ${name}`);
+  } catch (e) {
+    console.error(`  ✗ ${name}\n    ${e.message}`);
+    process.exitCode = 1;
+  }
+};
+
+/** 异步版 t()：取数节奏（退避/重试）必须真实 await 才能验，计数与报告同一条路 */
+const ta = async (name, fn) => {
+  try {
+    await fn();
     pass += 1;
     console.log(`  ✓ ${name}`);
   } catch (e) {
@@ -850,6 +864,283 @@ t('★ panel() 只能经由 attachPanel 挂载（改回 appendChild 会让切子
     /panelsRoot\.(appendChild|insertAdjacent|innerHTML)/,
     'panel() 里出现了绕过 attachPanel 的直接挂载'
   );
+});
+
+/* ---------------- 评测榜取数节奏（退避 / 重试 / 限速，fetch 用桩） ---------------- */
+
+/*
+ * 2026-09-30 实测：datasets-server 对匿名请求限"每秒请求数"。旧实现 8 并发连发
+ * 46 页会撞 429（本机 46 连发 44×200 + 2×429；无头加载真实页面还见过 13/46 页
+ * 失败、以及连第一页都没拿到 → 整块面板报错）。
+ * 取数层因此改成"低并发 + 批间错峰 + 指数退避"。这一节盯三件事：
+ *   1. 退避序列本身（evalBackoffMs）；
+ *   2. 线上参数没被悄悄改回"高并发连发"（EVAL_FETCH）；
+ *   3. 重试行为：首页一次 429 能救回、救不回的页计入 failed 且不拖垮整榜。
+ * fetch 用桩、延迟注入为 0 —— 测试不联网也不真等退避（见 FAST 策略）。
+ */
+
+t('evalBackoffMs：指数放大且封顶 5s（800ms → 1.6s → 3.2s → 5s）', () => {
+  assert.equal(evalBackoffMs(1), 800);
+  assert.equal(evalBackoffMs(2), 1600);
+  assert.equal(evalBackoffMs(3), 3200);
+  assert.equal(evalBackoffMs(4), 5000, '封顶 5s：再失败的页不值得让访客等更久');
+  assert.equal(evalBackoffMs(5), 5000);
+  assert.equal(evalBackoffMs(9), 5000);
+  assert.equal(evalBackoffMs(2, 100), 200, '基数可注入（测试与 live-check 用）');
+});
+
+t('★ evalRetryWaitMs：429 走长退避（等桶回填），其它失败走短退避', () => {
+  // 429 是"桶被打空"，实测要 60–70s 才回填 —— 秒级重试只会连环再撞
+  assert.equal(evalRetryWaitMs(429, null, 1), 25000);
+  assert.equal(evalRetryWaitMs(429, null, 2), 50000);
+  assert.equal(evalRetryWaitMs(429, null, 3), 60000, '封顶 60s');
+  // 上游明说 Retry-After 就听上游的，无论什么状态码
+  assert.equal(evalRetryWaitMs(429, 8000, 1), 8000);
+  assert.equal(evalRetryWaitMs(503, 12000, 2), 12000);
+  // 普通失败（5xx/网络层 status=null）：短退避就够
+  assert.equal(evalRetryWaitMs(503, null, 1), 800);
+  assert.equal(evalRetryWaitMs(503, null, 2), 1600);
+  assert.equal(evalRetryWaitMs(null, null, 2), 1600, '网络层错误（Failed to fetch）同短退避');
+  // 基数可注入：测试与 live-check 用零等待跑得快
+  assert.equal(evalRetryWaitMs(429, null, 1, { rateLimitUnitMs: 0, backoffMs: 0 }), 0);
+});
+
+t('★ EVAL_FETCH：线上策略钉在"低并发 + 批间错峰 + 429 长退避"（改回连发就会再撞限流）', () => {
+  assert.ok(EVAL_FETCH.batch >= 1 && EVAL_FETCH.batch <= 3, `batch=${EVAL_FETCH.batch}，并发不得超过 3（datasets-server 实测限流）`);
+  assert.ok(EVAL_FETCH.batchGapMs >= 500, `batchGapMs=${EVAL_FETCH.batchGapMs}，批间错峰不得低于 500ms`);
+  assert.ok(EVAL_FETCH.attempts >= 2, '单页至少重试一次');
+  assert.ok(EVAL_FETCH.firstAttempts >= EVAL_FETCH.attempts, '首页尝试次数 ≥ 普通页（它决定总页数）');
+  assert.ok(EVAL_FETCH.rateLimitUnitMs >= 20000, `rateLimitUnitMs=${EVAL_FETCH.rateLimitUnitMs}，429 的退避单位不得低于 20s（实测桶回填要 60–70s）`);
+});
+
+/** datasets-server /rows 的响应桩：total 行、每页 rowsPerPage 行，模型名带页 offset */
+const evalPageStub = (offset, { total = 250, rowsPerPage = 2 } = {}) => ({
+  ok: true,
+  status: 200,
+  headers: { get: () => null },
+  json: async () => ({
+    num_rows_total: total,
+    rows: Array.from({ length: rowsPerPage }, (_, i) => ({
+      row: { fullname: `org/m${offset}-${i}`, 'Average ⬆️': String(50 + i) },
+    })),
+  }),
+});
+
+const http429 = { ok: false, status: 429, headers: { get: () => null }, json: async () => ({}) };
+
+/** 临时换掉全局 fetch，跑完即还原（测试不联网） */
+const withFetchStub = async (stub, fn) => {
+  const orig = globalThis.fetch;
+  globalThis.fetch = stub;
+  try {
+    return await fn();
+  } finally {
+    globalThis.fetch = orig;
+  }
+};
+
+const offsetOf = (url) => Number(new URL(url).searchParams.get('offset'));
+
+// 零延迟策略：真实节奏（350ms 批间隔 / 600ms 退避）不该让测试干等
+const FAST = { batch: 2, batchGapMs: 0, attempts: 3, firstAttempts: 3, backoffMs: 0, rateLimitUnitMs: 0 };
+
+await ta('fetchAllEvalPages：按页取全量（offset 0/100/200，行全到手、零失败）', async () => {
+  const calls = [];
+  await withFetchStub(async (url) => {
+    const off = offsetOf(url);
+    calls.push(off);
+    return evalPageStub(off);
+  }, async () => {
+    const { rows, failed, pageCount, total } = await fetchAllEvalPages(null, FAST);
+    assert.equal(total, 250);
+    assert.equal(pageCount, 3);
+    assert.equal(failed, 0);
+    assert.equal(rows.length, 6, '3 页 × 每页 2 行');
+    assert.deepEqual([...new Set(calls)].sort((a, b) => a - b), [0, 100, 200], '每页恰好取一次');
+  });
+});
+
+await ta('fetchAllEvalPages：第一页 429 一次 → 听 Retry-After 退避后救回（首页决定总页数）', async () => {
+  let firstCalls = 0;
+  await withFetchStub(async (url) => {
+    const off = offsetOf(url);
+    if (off === 0 && firstCalls++ === 0) {
+      // Retry-After 以秒计；给个极小值只为走"听上游"的分支，不真等 1 秒
+      return { ...http429, headers: { get: () => '0.05' } };
+    }
+    return evalPageStub(off);
+  }, async () => {
+    const { rows, failed } = await fetchAllEvalPages(null, FAST);
+    assert.equal(failed, 0);
+    assert.equal(rows.length, 6);
+    assert.equal(firstCalls, 2, '第一页恰好试了两次');
+  });
+});
+
+await ta('fetchAllEvalPages：一页始终 429 → 计入 failed，其余页照常到手', async () => {
+  await withFetchStub(async (url) => {
+    const off = offsetOf(url);
+    if (off === 100) return http429;
+    return evalPageStub(off);
+  }, async () => {
+    const { rows, failed } = await fetchAllEvalPages(null, FAST);
+    assert.equal(failed, 1);
+    assert.equal(rows.length, 4, '丢的那页算失败，另外两页的 4 行还在');
+  });
+});
+
+await ta('fetchAllEvalPages：第一页重试耗尽 → 抛"第一页就没取到"（没总数宁可明说）', async () => {
+  await withFetchStub(async () => http429, async () => {
+    await assert.rejects(() => fetchAllEvalPages(null, FAST), /第一页/);
+  });
+});
+
+await ta('fetchAllEvalPages：onProgress 逐批推进（done 单调不减、末批收口）', async () => {
+  const events = [];
+  await withFetchStub(async (url) => evalPageStub(offsetOf(url), { total: 450 }), async () => {
+    await fetchAllEvalPages((e) => events.push(e), FAST);
+    assert.deepEqual(events.map((e) => e.done), [1, 3, 5], '首页 1 页 + 每批 2 页，共 5 页');
+    assert.ok(events.every((e) => e.total === 5));
+  });
+});
+
+
+/* ---------------- GitHub Trending（构建期快照 + AI 过滤） ---------------- */
+
+/*
+ * fixture 取自 2026-10-01 的真实 github.com/trending 页面（两条 article 原文）。
+ * 为了不让测试文件塞满 10KB 的图标，只做了三处**不影响解析**的省略：
+ * octicon 的 <svg>…</svg> 整体、data-hydro-click 的 JSON 载荷、语言色块的 style。
+ * 解析器读的标记（h2 链接 / p.col-9 描述 / stargazers·forks 链接后的数字 /
+ * "N stars today" / programmingLanguage）全部逐字保留。
+ */
+const GH_ARTICLE_VOICESTUDIO = `<article class="Box-row"> <div class="float-right d-flex"> <div data-view-component="true" class="BtnGroup d-flex"> <a href="/login?return_to=%2Fdebpalash%2FVoiceStudio" rel="nofollow" data-hydro-click="{…}" data-hydro-click-hmac="…" aria-label="You must be signed in to star a repository" data-view-component="true" class="tooltipped tooltipped-sw btn-sm btn"> <svg>…</svg><svg>…</svg> <span data-view-component="true" class="d-none d-md-inline"> Star </span> </a></div> </div> <h2 class="h3 lh-condensed"> <a data-hydro-click="{…}" data-hydro-click-hmac="…" href="/debpalash/VoiceStudio" data-view-component="true" class="Link"><svg>…</svg> <span data-view-component="true" class="text-normal"> debpalash / </span> VoiceStudio</a> </h2> <p class="col-9 color-fg-muted my-1 tmp-pr-4"> VoiceStudio is the open-source, fully-local ElevenLabs alternative — voice cloning, voice design, video dubbing, dictation, transcription &amp; audiobook creation in 646 languages. </p> <div class="f6 color-fg-muted mt-2"> <span class="tmp-mr-3 d-inline-block ml-0 tmp-ml-0"> <span class="repo-language-color"></span> <span itemprop="programmingLanguage">Python</span> </span> <a href="/debpalash/VoiceStudio/stargazers" data-view-component="true" class="tmp-mr-3 Link Link--muted d-inline-block"><svg>…</svg> 50,428</a> <a href="/debpalash/VoiceStudio/forks" data-view-component="true" class="tmp-mr-3 Link Link--muted d-inline-block"><svg>…</svg> 5,597</a> <span data-view-component="true" class="tmp-mr-3 d-inline-block"> Built by <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/debpalash/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/debpalash"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/4178343?s=40&amp;v=4" width="20" height="20" alt="@debpalash" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/claude/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/claude"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/81847?s=40&amp;v=4" width="20" height="20" alt="@claude" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/kevin9327/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/kevin9327"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/5299031?s=40&amp;v=4" width="20" height="20" alt="@kevin9327" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/jaketame/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/jaketame"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/1787973?s=40&amp;v=4" width="20" height="20" alt="@jaketame" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/velixio/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/velixio"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/270455167?s=40&amp;v=4" width="20" height="20" alt="@velixio" /></a> </span> <span data-view-component="true" class="d-inline-block float-sm-right"> <svg>…</svg> 3,483 stars today </span> </div> </article>`;
+const GH_ARTICLE_CLAUDE_SKILLS = `<article class="Box-row"> <div class="float-right d-flex"> <div data-view-component="true" class="BtnGroup d-flex"> <a href="/login?return_to=%2FComposioHQ%2Fawesome-claude-skills" rel="nofollow" data-hydro-click="{…}" data-hydro-click-hmac="…" aria-label="You must be signed in to star a repository" data-view-component="true" class="tooltipped tooltipped-sw btn-sm btn"> <svg>…</svg><svg>…</svg> <span data-view-component="true" class="d-none d-md-inline"> Star </span> </a></div> </div> <h2 class="h3 lh-condensed"> <a data-hydro-click="{…}" data-hydro-click-hmac="…" href="/ComposioHQ/awesome-claude-skills" data-view-component="true" class="Link"><svg>…</svg> <span data-view-component="true" class="text-normal"> ComposioHQ / </span> awesome-claude-skills</a> </h2> <p class="col-9 color-fg-muted my-1 tmp-pr-4"> A curated list of awesome Claude Skills, resources, and tools for customizing Claude AI workflows </p> <div class="f6 color-fg-muted mt-2"> <span class="tmp-mr-3 d-inline-block ml-0 tmp-ml-0"> <span class="repo-language-color"></span> <span itemprop="programmingLanguage">Python</span> </span> <a href="/ComposioHQ/awesome-claude-skills/stargazers" data-view-component="true" class="tmp-mr-3 Link Link--muted d-inline-block"><svg>…</svg> 76,124</a> <a href="/ComposioHQ/awesome-claude-skills/forks" data-view-component="true" class="tmp-mr-3 Link Link--muted d-inline-block"><svg>…</svg> 8,880</a> <span data-view-component="true" class="tmp-mr-3 d-inline-block"> Built by <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/Prat011/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/Prat011"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/67639393?s=40&amp;v=4" width="20" height="20" alt="@Prat011" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/sohamganatra/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/sohamganatra"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/7982102?s=40&amp;v=4" width="20" height="20" alt="@sohamganatra" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/claude/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/claude"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/81847?s=40&amp;v=4" width="20" height="20" alt="@claude" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/sanjay3290/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/sanjay3290"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/24948667?s=40&amp;v=4" width="20" height="20" alt="@sanjay3290" /></a> <a class="d-inline-block" data-hydro-click="{…}" data-hydro-click-hmac="…" data-hovercard-type="user" data-hovercard-url="/users/mellson/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/mellson"><img class="avatar mb-1 avatar-user" src="https://avatars.githubusercontent.com/u/167574?s=40&amp;v=4" width="20" height="20" alt="@mellson" /></a> </span> <span data-view-component="true" class="d-inline-block float-sm-right"> <svg>…</svg> 123 stars today </span> </div> </article>`;
+
+t('★ parseGhTrending：从真实页面片段解析出仓库/描述/语言/星标（含 &amp; 还原）', () => {
+  const rows = parseGhTrending(GH_ARTICLE_VOICESTUDIO + GH_ARTICLE_CLAUDE_SKILLS);
+  assert.equal(rows.length, 2);
+  const v = rows[0];
+  assert.equal(v.repo, 'debpalash/VoiceStudio');
+  assert.equal(v.lang, 'Python');
+  assert.equal(v.stars, 50428);
+  assert.equal(v.forks, 5597);
+  assert.equal(v.starsToday, 3483);
+  assert.ok(v.desc.includes('voice cloning'), '描述应保留原文');
+  assert.ok(v.desc.includes('&') && !v.desc.includes('&amp;'), 'HTML 实体要还原');
+  assert.equal(rows[1].repo, 'ComposioHQ/awesome-claude-skills');
+  assert.equal(rows[1].starsToday, 123);
+});
+
+t('parseGhTrending：缺描述/缺语言/缺"今日星"的条目不炸，字段是空与 null', () => {
+  const minimal =
+    '<article class="Box-row">' +
+    '<h2 class="h3 lh-condensed"> <a data-hydro-click="{…}" href="/o/r" class="Link">o / r</a> </h2>' +
+    '<div class="f6 color-fg-muted mt-2">' +
+    '<a href="/o/r/stargazers" class="Link Link--muted"><svg>…</svg> 1,234</a>' +
+    '</div> </article>';
+  const rows = parseGhTrending(minimal);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].repo, 'o/r');
+  assert.equal(rows[0].desc, '');
+  assert.equal(rows[0].lang, '');
+  assert.equal(rows[0].stars, 1234);
+  assert.equal(rows[0].forks, null);
+  assert.equal(rows[0].starsToday, null, '没有"今日星"就是 null，不是 0');
+});
+
+t('parseGhTrending：h2 链接不是仓库形态（登录页/带查询串）的条目被丢弃', () => {
+  const bad =
+    '<article class="Box-row"><h2><a href="/login?return_to=x">Star</a></h2></article>' +
+    '<article class="Box-row"><h2><a href="/some/deep/path/file">Not a repo</a></h2></article>';
+  assert.equal(parseGhTrending(bad).length, 0);
+  assert.equal(parseGhTrending('').length, 0, '空输入不炸');
+});
+
+t('★ isAiRepo：词边界匹配 —— storage 里的 rag、html 里的 ml、array 里的 ai 都不命中', () => {
+  // 真实条目
+  assert.equal(isAiRepo({ repo: 'debpalash/VoiceStudio', desc: 'voice cloning, dictation, transcription' }), true);
+  assert.equal(isAiRepo({ repo: 'ComposioHQ/awesome-claude-skills', desc: 'A curated list of awesome Claude Skills' }), true);
+  assert.equal(isAiRepo({ repo: 'firebase/firebase-ios-sdk', desc: 'Firebase SDK for Apple App Development' }), false);
+  assert.equal(isAiRepo({ repo: 'NawfalMotii79/PLFM_RADAR', desc: 'low-cost 10.5 GHz PLFM phased array RADAR system' }), false);
+  // 误伤守卫（这些词都是真实 trending 里的高频非 AI 词）
+  assert.equal(isAiRepo({ repo: 'a/storage-engine', desc: 'fast storage with drag-and-drop' }), false, 'drag 里的 rag 不算 RAG');
+  assert.equal(isAiRepo({ repo: 'a/html-renderer', desc: 'streaming html to ml dataset? no' }), false);
+  assert.equal(isAiRepo({ repo: 'a/array-utils', desc: 'bit array helpers' }), false, 'array 里的 ai');
+  // 词边界正确命中
+  assert.equal(isAiRepo({ repo: 'a/rag', desc: '' }), true);
+  assert.equal(isAiRepo({ repo: 'a/app', desc: 'RAG pipeline with embeddings' }), true);
+  assert.equal(isAiRepo({ repo: 'openai/cool', desc: '' }), true);
+});
+
+t('flattenGhTrending：快照 JSON → 面板行（数字归一、AI 标记、空仓库名剔除）', () => {
+  const snap = {
+    source: 'https://github.com/trending',
+    fetchedAt: '2026-10-01T01:02:30.141Z',
+    entries: [
+      { repo: 'a/ai-tool', desc: 'llm stuff', lang: 'Rust', stars: '12,682', forks: 1547, starsToday: '1,281' },
+      { repo: '', desc: 'x' }, // 空 repo：剔除
+      { repo: 'b/plain', desc: 'a plain todo app', stars: 'abc' }, // stars 非数字 → null；描述不含 AI 词
+      'not-an-object',
+    ],
+  };
+  const rows = flattenGhTrending(snap);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].stars, 12682, '"12,682" → 12682');
+  assert.equal(rows[0].starsToday, 1281);
+  assert.equal(rows[0].ai, true);
+  assert.equal(rows[1].stars, null);
+  assert.equal(rows[1].ai, false);
+  assert.equal(flattenGhTrending(null).length, 0, '空输入不炸');
+});
+
+/* ---------------- OpenRouter 模型库 ---------------- */
+
+// 真实条目（2026-09-30 的 /api/v1/models，第一条 gpt-6.1-sol-pro），只保留面板读的字段
+const OR_CATALOG_ROW = {
+  id: 'openai/gpt-6.1-sol-pro',
+  name: 'OpenAI: GPT-6.1 Sol Pro',
+  canonical_slug: 'openai/gpt-6.1-sol-pro-20260929',
+  created: 1790702886,
+  context_length: 1050000,
+  architecture: { modality: 'text+image+file->text' },
+  pricing: { prompt: '0.000002', completion: '0.00001' },
+};
+
+t('★ flattenOrCatalog：真实条目 —— 每 token 美元 → 每百万 token 美元', () => {
+  const rows = flattenOrCatalog({ data: [OR_CATALOG_ROW] });
+  assert.equal(rows.length, 1);
+  const r = rows[0];
+  assert.equal(r.id, 'openai/gpt-6.1-sol-pro');
+  assert.equal(r.vendor, 'openai', '厂商取 id 的前半段');
+  assert.equal(r.context, 1050000);
+  assert.equal(r.costIn, 2, '"0.000002"/token → $2/M tokens');
+  assert.equal(r.costOut, 10, '"0.00001"/token → $10/M tokens');
+  assert.equal(r.modality, 'text+image+file->text');
+  assert.equal(r.slug, 'openai/gpt-6.1-sol-pro-20260929');
+  assert.match(r.release, /^\d{4}-\d{2}-\d{2}$/, 'created（unix 秒）→ YYYY-MM-DD');
+});
+
+t('flattenOrCatalog：免费是 0、缺价是 null、没上线日期排最后', () => {
+  const rows = flattenOrCatalog({
+    data: [
+      { id: 'inclusionai/ling-3.0-flash-sante:free', name: 'Ling 3.0 (free)', created: 1788545946, context_length: 128000, pricing: { prompt: '0', completion: '0' } },
+      { id: 'x/no-price', name: 'No Price' },
+      { id: 'x/old', name: 'Old', created: 1000000000 },
+    ],
+  });
+  const free = rows.find((r) => r.id.includes(':free'));
+  assert.equal(free.costIn, 0, '免费是 0（页面显示"免费"），不是 null');
+  assert.equal(free.costOut, 0);
+  const noprice = rows.find((r) => r.id === 'x/no-price');
+  assert.equal(noprice.costIn, null, '缺价是 null（排序时恒在最后，不冒充 0 价）');
+  assert.equal(noprice.release, '');
+  assert.equal(noprice.context, null);
+  // 排序：有日期的按降序，没日期的最后
+  assert.equal(rows[rows.length - 1].id, 'x/no-price');
+  assert.ok(rows[0].release >= rows[1].release);
+  assert.equal(flattenOrCatalog({}).length, 0, '空输入不炸');
+  assert.equal(flattenOrCatalog(null).length, 0);
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);

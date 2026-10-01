@@ -16,7 +16,8 @@
     "test:trend": "node web/public/assets/trend.test.js",
     "test:ui": "node web/public/assets/ui.test.js",
     "test:i18n": "node web/public/assets/i18n.test.js",
-    "test:live": "node scripts/live-check.mjs"
+    "test:live": "node scripts/live-check.mjs",
+    "snap:gh-trending": "node scripts/fetch-gh-trending.mjs"
   },
   "dependencies": {},
   "devDependencies": {}

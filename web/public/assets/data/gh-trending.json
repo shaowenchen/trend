@@ -1,0 +1,142 @@
+{
+ "source": "https://github.com/trending",
+ "fetchedAt": "2026-10-01T01:02:30.141Z",
+ "entries": [
+  {
+   "repo": "NVIDIA/OpenShell",
+   "desc": "OpenShell is the safe, private runtime for autonomous AI agents.",
+   "lang": "Rust",
+   "stars": 12682,
+   "forks": 1547,
+   "starsToday": 1281
+  },
+  {
+   "repo": "debpalash/VoiceStudio",
+   "desc": "VoiceStudio is the open-source, fully-local ElevenLabs alternative — voice cloning, voice design, video dubbing, dictation, transcription & audiobook creation in 646 languages.",
+   "lang": "Python",
+   "stars": 50446,
+   "forks": 5598,
+   "starsToday": 3483
+  },
+  {
+   "repo": "mvschwarz/openrig",
+   "desc": "Multi-agent harness that runs Claude Code and Codex together as one system",
+   "lang": "TypeScript",
+   "stars": 3031,
+   "forks": 212,
+   "starsToday": 624
+  },
+  {
+   "repo": "mksglu/context-mode",
+   "desc": "Context window optimization for AI coding agents. Sandboxes tool output (98% reduction), persists session memory, and enforces routing across 17 platforms via MCP + hooks.",
+   "lang": "TypeScript",
+   "stars": 24492,
+   "forks": 1769,
+   "starsToday": 90
+  },
+  {
+   "repo": "DietrichGebert/ponytail",
+   "desc": "Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+   "lang": "JavaScript",
+   "stars": 149191,
+   "forks": 8020,
+   "starsToday": 743
+  },
+  {
+   "repo": "harry0703/MoneyPrinterTurbo",
+   "desc": "利用 AI 大模型和自动化工作流，根据主题或关键词一键生成高清短视频。Generate HD short videos from a topic or keyword with an automated AI workflow.",
+   "lang": "Python",
+   "stars": 127566,
+   "forks": 19953,
+   "starsToday": 431
+  },
+  {
+   "repo": "openclaw/openclaw",
+   "desc": "The AI that really does things. Any OS. Any Platform. The lobster way. 🦞",
+   "lang": "TypeScript",
+   "stars": 390992,
+   "forks": 82220,
+   "starsToday": 136
+  },
+  {
+   "repo": "ComposioHQ/awesome-claude-skills",
+   "desc": "A curated list of awesome Claude Skills, resources, and tools for customizing Claude AI workflows",
+   "lang": "Python",
+   "stars": 76128,
+   "forks": 8880,
+   "starsToday": 123
+  },
+  {
+   "repo": "mattpocock/skills",
+   "desc": "Skills for Real Engineers. Straight from my .agents directory.",
+   "lang": "Shell",
+   "stars": 273008,
+   "forks": 22960,
+   "starsToday": 876
+  },
+  {
+   "repo": "heygen-com/hyperframes",
+   "desc": "Write HTML. Render video. Built for agents.",
+   "lang": "TypeScript",
+   "stars": 54737,
+   "forks": 4974,
+   "starsToday": 349
+  },
+  {
+   "repo": "firebase/firebase-ios-sdk",
+   "desc": "Firebase SDK for Apple App Development",
+   "lang": "C++",
+   "stars": 6767,
+   "forks": 1800,
+   "starsToday": 8
+  },
+  {
+   "repo": "modelcontextprotocol/servers",
+   "desc": "Model Context Protocol Servers",
+   "lang": "TypeScript",
+   "stars": 90816,
+   "forks": 11723,
+   "starsToday": 50
+  },
+  {
+   "repo": "byoungd/up",
+   "desc": "An advanced guide which might benefit you a lot 🎉 . 韩先凯的人生进阶指南 人生进阶指南 离谱的人生 人生进阶 AI学习 AI指南 韩先凯的AI学习指南 英语学习指南/英语学习教程/英语学习/学英语",
+   "lang": "JavaScript",
+   "stars": 66391,
+   "forks": 6638,
+   "starsToday": 743
+  },
+  {
+   "repo": "colbymchenry/codegraph",
+   "desc": "Pre-indexed code knowledge graph, auto syncs on code changes, for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, CoPilot, and Hermes Agent — fewer tokens, fewer tool calls, 100% local",
+   "lang": "C",
+   "stars": 72597,
+   "forks": 4664,
+   "starsToday": 118
+  },
+  {
+   "repo": "t8y2/dbx",
+   "desc": "25 MB lightweight cross-platform database client for 100+ databases, including MySQL, PostgreSQL, SQLite, Redis, MongoDB, DuckDB, SQL Server, and Dameng. Built-in AI, MCP Server, CLI, desktop and Docker. | 轻量级跨平台数据库管理工具，支持 MySQL、PostgreSQL、SQLite、Redis、MongoDB、达梦等 100+ 数据库，提供桌面端、Docker、CLI、内置 AI 助手和 MCP。",
+   "lang": "Rust",
+   "stars": 23191,
+   "forks": 2152,
+   "starsToday": 1138
+  },
+  {
+   "repo": "NawfalMotii79/PLFM_RADAR",
+   "desc": "Open-source, low-cost 10.5 GHz PLFM phased array RADAR system",
+   "lang": "PLSQL",
+   "stars": 26422,
+   "forks": 5971,
+   "starsToday": 263
+  },
+  {
+   "repo": "VectifyAI/PageIndex",
+   "desc": "📑 PageIndex: Document Index for Vectorless, Reasoning-based RAG",
+   "lang": "Python",
+   "stars": 38127,
+   "forks": 3306,
+   "starsToday": 1097
+  }
+ ]
+}

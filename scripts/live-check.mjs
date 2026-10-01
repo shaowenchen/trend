@@ -15,15 +15,19 @@
  * 末尾给出一个结论行：哪些源今天可用、哪些不可用。
  *
  * ## 关于评测榜
- * 它会真的把全部 46 页拉完（约 9 秒），因为"页数是否还等于 46""字段名有没有变"
+ * 它会真的把全部 46 页拉完，因为"页数是否还等于 46""字段名有没有变"
  * 恰恰是最需要被发现的漂移。字段解析用 web/public/assets/trend.js 里的**同一份**
  * 实现（normalizeEval），所以这里报"能解析出 N 行"就等于页面能出数。
+ * 取数节奏也用**同一份**（EVAL_FETCH：3 并发 + 批间 350ms 错峰）——
+ * 体检测的才是访客的真实路径，顺带验证这套节奏今天还不会撞上游限流
+ * （2026-09-30 实测 8 并发连发会 429，见 docs/trend-sources.md §2）。
  */
 import {
   normalizeEval, parseFlatYamlList, bestAiderRows,
   rankPapers, rankRepos, flattenModelsDev, rankSweBench, sweBoardNames,
   openrouterBoard, openrouterNames,
   rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
+  EVAL_FETCH,
 } from '../web/public/assets/trend.js';
 
 /**
@@ -93,7 +97,8 @@ const SWE_BENCH_URL =
 
 const EVAL_ENDPOINT = 'https://datasets-server.huggingface.co/rows';
 const EVAL_PAGE = 100;
-const EVAL_BATCH = 8;
+// 并发与批间错峰不在本地定义：用 trend.js 的 EVAL_FETCH（页面真实节奏），
+// 这里改了没用、那里改了这里自动跟上 —— 两个消费者一份真值
 const evalUrl = (offset) =>
   `${EVAL_ENDPOINT}?dataset=open-llm-leaderboard%2Fcontents&config=default&split=train&offset=${offset}&length=${EVAL_PAGE}`;
 
@@ -287,8 +292,10 @@ try {
     const offsets = [];
     for (let o = EVAL_PAGE; o < pageCount * EVAL_PAGE; o += EVAL_PAGE) offsets.push(o);
 
-    for (let i = 0; i < offsets.length; i += EVAL_BATCH) {
-      const batch = offsets.slice(i, i + EVAL_BATCH);
+    for (let i = 0; i < offsets.length; i += EVAL_FETCH.batch) {
+      // 批间错峰与页面同节奏（EVAL_FETCH.batchGapMs）—— 不停顿的"分批"等于没降并发
+      if (i > 0) await new Promise((r) => setTimeout(r, EVAL_FETCH.batchGapMs));
+      const batch = offsets.slice(i, i + EVAL_FETCH.batch);
       const got = await Promise.all(
         batch.map(async (o) => {
           try {

@@ -27,6 +27,8 @@
 | 高星 AI 开源项目 | `api.github.com/search/repositories?q=topic:llm…` | 200 JSON | `*` | ✅ 可直连，**但匿名限流 10 次/分钟** |
 | 最新发布的模型 | `models.dev/api.json` | 200 JSON | `*` | ✅ 可直连，**4.8MB / 8000+ 个模型 → 进页面即加载** |
 | SWE-bench | `raw.githubusercontent.com/swe-bench/swe-bench.github.io/master/data/leaderboards.json` | 200 JSON | `*` | ✅ 可直连，**4MB → 进页面即加载** |
+| 🗂️ OpenRouter 模型库 | `openrouter.ai/api/v1/models` | 200 JSON（0.76MB，464 个模型） | `*` | ✅ 可直连（见 §7） |
+| 📈 GitHub Trending | `github.com/trending` | 200 **HTML**（650KB） | **无** | ❌ 无 CORS → **构建期快照**（见 §8） |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
@@ -53,6 +55,14 @@ npm run test:live
 2. **分页按 `eval_name` 字母序，不是按分数**。实测首页五条是
    `0-hero_Matter-0.2-7B-DPO_bfloat16`、`01-ai_Yi-1.5-34B_bfloat16` … 一眼可见是名字排序。
    ⇒ **"榜"必须自己取全量再排序**，服务端不会按分数给你。
+3. **匿名请求限流是"突发容量 + 慢回填"的令牌桶（2026-09-30 校准）**：
+   - 桶满时 46 页 8 并发连发也能全 200（实测 11.9s）—— **坏掉的是半空的桶**；
+   - 本机 46 连发 8 并发（桶已被当天测试耗过）：44×200 + 2×429；
+   - 无头浏览器加载真实页面：一次 **13/46 页失败**（只剩 71% 覆盖），
+     另一次**连第一页都没拿到** → 整块面板报错；
+   - 桶被 46 连发耗尽后**每 10s 探测一次**：+10s…+60s 全 429，**+70s 才恢复 200**
+     （回填以分钟计，不是秒）；
+   - 旧实现失败后**立刻原样重发** —— 对 429 恰好是再撞一次限流。
 
 还试过但**不可用**的两条捷径：
 
@@ -60,9 +70,20 @@ npm run test:live
 - `/filter?where="Average ⬆️">60` → **500 `the dataset index is loading`**
   （这个数据集 2025-03 后已归档，索引起不来）。
 
-**因此实现是**：并发分批（每批 8 个）拉完 46 页，合并后按平均分降序（`web/public/assets/trend.js`
-的 `fetchAllEvalPages`）。实测耗时见 §5。结果缓存进 `sessionStorage`，TTL 10 分钟 ——
-否则每次进页面都要重新拉 46 次。
+**因此实现是**（2026-09-30 起按第 3 条约束重做取数节奏）：
+
+- **3 并发 + 批间 700ms 错峰**拉完 46 页（`web/public/assets/trend.js` 的 `EVAL_FETCH`），
+  持续 ~1.2 请求/秒：桶满时 ~35s 拉完全量，也不再触发限流；
+- **退避按失败类型分**（`evalRetryWaitMs`）：普通失败（网络/5xx）短退避
+  （800ms → 1.6s → 3.2s，封顶 5s，最多 3 次；第一页 5 次）；**429 走长退避**
+  （25s × 次数，封顶 60s —— 等的是桶回填，秒级重试只会连环再撞）；
+  上游 429 响应带的 `Retry-After` 优先于自家估算；
+- 合并后按平均分降序。**零缺页**的结果缓存进 `sessionStorage`（TTL 10 分钟）；
+  部分成功**不进**缓存（否则一次 71% 覆盖会在缓存期内被当成完整榜反复展示）；
+- **localStorage 快照**：数据源 2025-03 已归档、内容不再变，所以"每台浏览器
+  每 7 天拉一次全量"是常态（7 天内直接用快照并如实标注抓取时刻）；上游整个
+  读不动时回退快照（不限龄、标旧时刻），不给空面板。"刷新数据"会强制重拉。
+- `live-check.mjs` 与页面共用同一份 `EVAL_FETCH` —— 体检跑的就是访客的真实节奏。
 
 > **数据时效性提醒**：该数据集最后更新于 2025-03（榜单本身已归档），所以"评测榜"的分数
 > 反映的是那时的开源模型。这是**上游的事实**，本站不做二次加工，也不掩饰。
@@ -214,3 +235,43 @@ npm run test:live
   **绝不猜一个错值**（有测试盯着这条：`web/public/assets/trend.test.js`）。
 
 这是本项目的既有取向：**宁可不显示，也不静默出错值**。
+
+---
+
+## 7. OpenRouter 模型库（2026-10-01 新增）
+
+`openrouter.ai/api/v1/models` —— 全部可路由模型的目录（464 个，0.76MB JSON）。
+与用量榜（§4）互补：那边回答"谁在被用"，这边回答"有什么可用的、多少钱"。
+
+- **CORS `*`**（2026-09-30 实测，`access-control-allow-origin: *`），浏览器直连可行；
+  站点本来就在客户端拉它（用量榜取模型名），不是新通道。
+- 字段：`id` / `name` / `created`（unix 秒）/ `context_length` /
+  `architecture.modality` / `pricing.prompt|completion`（**每 token 美元的字符串**，
+  `"0.000002"` → 换算成 $2/M tokens 展示）/ `canonical_slug`。
+- 0.76MB 与 models.dev（4.8MB）/ SWE-bench（4MB）同属"进页面就拉"的量级，
+  且 `cache-control: max-age=120` 有边缘缓存。
+- 失败回退：localStorage 里留一份最后一次成功抓取的快照（标旧时刻），不给空面板。
+- 侦察清单（`~/.hermes/workspace/ai-trend-scout/候选-2026-09-30.md`）建议
+  "构建期快照取子集"；本站改为**浏览器直连**：CORS 通、体积可承受、
+  目录是近实时更新的 —— 构建期快照会把"近实时"变成"上次部署时"，反而更差。
+
+## 8. GitHub Trending 每日榜（2026-10-01 新增，唯一的构建期快照源）
+
+`github.com/trending` —— GitHub 官方每日趋势榜。
+
+- **为什么必须快照**：页面响应**不带 CORS**（2026-09-30 实测），浏览器直连做不了；
+  650KB 的 HTML 也不该让每个访客拖一遍。
+- **管道**：`scripts/fetch-gh-trending.mjs` 抓 HTML → `parseGhTrending()`（与页面
+  **同一份**实现，住在 `trend.js`）→ 落 `assets/data/gh-trending.json`
+  （含 `fetchedAt`）→ `.github/workflows/gh-trending-snapshot.yml` 每日 00:30（UTC+8）
+  跑一次，有变化才提交（提交触发 Pages 部署）。
+- **失败语义**：抓不到 / 解析 < 5 条 → 非零退出、**不提交** → 仓库里的旧快照
+  原样保留，页面继续显示旧快照与它的旧抓取时刻。宁可旧，不可错。
+- **AI 过滤**：默认只看 AI 相关（关键词表 + 词边界匹配，`isAiRepo`），
+  可切全部。词边界是硬要求：storage 里的 rag、html 里的 ml、array 里的 ai
+  都不该命中（有测试盯着）。
+- 解析依赖的标记（h2 链接 / `p.col-9` 描述 / stargazers·forks 链接 / "N stars today" /
+  `programmingLanguage`）均取自 2026-10-01 的真实页面；GitHub 改版时解析条目骤减，
+  抓取脚本按"少于 5 条"拒绝提交 —— 门禁在 CI 侧。
+
+---

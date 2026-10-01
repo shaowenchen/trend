@@ -57,6 +57,19 @@ export function num(v, digits = 2) {
   return n.toLocaleString('en-US', { maximumFractionDigits: digits });
 }
 
+/**
+ * 把时间戳格式化成"9月30日 14:30"这种带日期的时刻，用于标注快照的抓取时间。
+ * 只标到分钟：榜单是"这一批数据"而不是"这一秒的数据"，更细只会假精确。
+ */
+export function fmtStamp(ts) {
+  return new Date(ts).toLocaleString(LOCALE === 'en' ? 'en-US' : 'zh-CN', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 /** 大数缩写：12345 → 12.3k */
 export function compact(v) {
   const n = typeof v === 'number' ? v : parseFloat(v);
@@ -91,16 +104,20 @@ const CACHE_TTL_MS = 10 * 60 * 1000;
 const CACHE_PREFIX = 'trend-panel-cache:';
 const cacheKey = (k) => `${CACHE_PREFIX}${k}`;
 
-/** 取/存缓存，任何存储异常都当作"没有缓存"，绝不向外抛 */
-function readCache(key, ttl) {
+/** 取缓存条目（连写入时刻 t 一起返回，供"抓取于 HH:MM"这类标注用）；过期/异常返回 null */
+function readCacheEntry(key, ttl) {
   try {
     const raw = sessionStorage.getItem(cacheKey(key));
     if (!raw) return null;
     const { t, v } = JSON.parse(raw);
-    return Date.now() - t < ttl ? v : null;
+    return Date.now() - t < ttl ? { t, v } : null;
   } catch {
     return null;
   }
+}
+
+function readCache(key, ttl) {
+  return readCacheEntry(key, ttl)?.v ?? null;
 }
 
 function writeCache(key, value) {
@@ -111,7 +128,11 @@ function writeCache(key, value) {
   }
 }
 
-/** 清空本页缓存（"刷新数据"按钮用）。返回清掉的条数，便于测试与排错。 */
+/**
+ * 清空本页缓存（"刷新数据"按钮用）。返回清掉的条数，便于测试与排错。
+ * 只清 sessionStorage 的 10 分钟缓存；localStorage 里的**快照不清** ——
+ * 快照是"上游读不动时"的回退物，刷新求的是新数据，不是丢掉唯一的旧数据。
+ */
 export function clearCache() {
   let n = 0;
   try {
@@ -125,6 +146,58 @@ export function clearCache() {
     /* 存储不可用时没有缓存可清 —— 面板本来就每次都走网络 */
   }
   return n;
+}
+
+/* ── localStorage 快照层：给"上游读不动"时回退，比 sessionStorage 长命 ──
+ *
+ * 两层存储职责不同：
+ *   · sessionStorage 缓存（上面那组）= "这 10 分钟内不重复拉"的**新鲜缓存**，
+ *     标签页关了就没关系 —— 丢了就再拉一次；
+ *   · localStorage 快照 = "这台浏览器最后一次成功抓取"的**存底**，
+ *     跨标签页、关浏览器还在 —— 回退物的价值就在于"还在"。
+ *
+ * 快照永远带着写入时刻（t），展示时如实标注"抓取于几时"：旧数据标着旧时间，
+ * 不冒充新数据。隐私模式/配额满时存不下，就当没有回退物，不影响本次展示。
+ */
+const SNAP_PREFIX = 'trend-snap:';
+
+/** 读快照（连写入时刻一起返回）；超龄/不存在/存储不可用返回 null */
+function readSnapshot(key, maxAgeMs = Number.MAX_SAFE_INTEGER) {
+  try {
+    const raw = localStorage.getItem(SNAP_PREFIX + key);
+    if (!raw) return null;
+    const { t, v } = JSON.parse(raw);
+    return Date.now() - t < maxAgeMs ? { t, v } : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSnapshot(key, v) {
+  try {
+    localStorage.setItem(SNAP_PREFIX + key, JSON.stringify({ t: Date.now(), v }));
+  } catch {
+    /* 存不下就没有回退物，不影响本次展示 */
+  }
+}
+
+/**
+ * "刷新数据"的**强制重拉**标记（sessionStorage，但不在缓存前缀下、不会被清掉）。
+ * 为什么需要它：评测榜对 7 天内的快照直接复用（数据源已归档，快照即全量），
+ * 不设标记的话，点"刷新数据"会清掉缓存、然后又被快照挡住 —— 按钮看起来没反应。
+ */
+const FORCE_KEY = 'trend-force-refetch';
+
+function forceRefetch() {
+  try {
+    if (sessionStorage.getItem(FORCE_KEY)) {
+      sessionStorage.removeItem(FORCE_KEY);
+      return true;
+    }
+  } catch {
+    /* 读不了就当没有标记 —— 顶多这次不强制，不会出错 */
+  }
+  return false;
 }
 
 async function cachedJson(key, url, { ttl = CACHE_TTL_MS } = {}) {
@@ -691,11 +764,59 @@ async function loadModelBoard({ id, iconName, title, sort, metric, hint }) {
 const EVAL_DS = 'open-llm-leaderboard%2Fcontents';
 const EVAL_ENDPOINT = 'https://datasets-server.huggingface.co/rows';
 const EVAL_PAGE = 100;
-const EVAL_BATCH = 8; // 并发上限：46 个请求一次全发会被浏览器/上游按连接数排队甚至拒绝
 const EVAL_TOP = 50;
+
+/**
+ * 取数节奏 —— **降并发 + 错峰 + 分级退避**，参数全部来自 2026-09-30 的实测校准：
+ *
+ * datasets-server 对匿名 IP 是"突发容量 + 慢回填"的令牌桶：
+ *   · 桶满时 46 页 8 并发连发也能全 200（实测 11.9s）；
+ *   · 桶被前面的请求耗过后，429 `Too Many Requests` 会持续 **约 60–70 秒**才回填
+ *     （实测：46 连发后每 10s 探测一次，+10s…+60s 全 429，+70s 恢复 200）；
+ *   · 旧实现 8 并发 + 失败后**立刻原样重发**，在半空的桶上就是连环 429：
+ *     线上真实出现过 13/46 页失败（71% 覆盖）和"第一页都没拿到"两种残局。
+ *
+ * 所以策略是：3 并发 + 批间 700ms（持续 ~1.2 请求/秒，桶满时 ~35s 拉完全量）；
+ * 普通失败短退避（800ms 起指数放大）；**429 单独长退避**（25s×次数，封顶 60s ——
+ * 等的是桶回填，不是网络恢复，短退避只会再撞一次）。
+ * `live-check.mjs` 复用这一份策略，体检跑的就是访客的真实节奏。
+ */
+export const EVAL_FETCH = {
+  batch: 3, // 每批并发页数
+  batchGapMs: 700, // 批与批之间停一拍：限流按"每秒请求数"计，无缝连发等于没降并发
+  attempts: 3, // 单页尝试次数（含首次）
+  firstAttempts: 5, // 第一页决定总页数与整块面板的去留，多给两次机会
+  backoffMs: 800, // 普通失败（网络抖动/5xx）的退避基数：800ms → 1.6s → 3.2s…封顶 5s
+  rateLimitUnitMs: 25000, // 429 的退避单位：25s×次数，封顶 60s（等桶回填，见 evalRetryWaitMs）
+};
+
+/** 评测榜快照的"直用窗口"：数据源 2025-03 已归档，快照就是最新全量，
+ *  7 天内的快照直接用、不再打上游 46 个请求（见 loadEvalBoard）。 */
+const EVAL_SNAPSHOT_MS = 7 * 24 * 60 * 60 * 1000;
 
 const evalRowsUrl = (offset) =>
   `${EVAL_ENDPOINT}?dataset=${EVAL_DS}&config=default&split=train&offset=${offset}&length=${EVAL_PAGE}`;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** 第 n 次失败后等多久再试（普通失败）：基数按 2 的幂放大，封顶 5s。纯函数，测试盯着它 */
+export function evalBackoffMs(attempt, base = EVAL_FETCH.backoffMs) {
+  return Math.min(base * 2 ** (attempt - 1), 5000);
+}
+
+/**
+ * 第 n 次失败后等多久再试（**分失败类型**）：
+ *   · 上游 429 带 Retry-After → 听上游的（它说的比自家猜的准）；
+ *   · 429 没说 → `rateLimitUnitMs` × 尝试次数，封顶 60s。**不是网络问题，
+ *     是桶要回填**：实测耗尽的桶约 60–70s 才恢复，秒级重试只会连环再撞；
+ *   · 其它失败（网络抖动 / 5xx / 解析异常）→ 短退避（evalBackoffMs）就够。
+ * 纯函数；`pacing` 参数给测试注入零等待用，浏览器永远用 EVAL_FETCH 默认值。
+ */
+export function evalRetryWaitMs(status, retryAfterMs, attempt, pacing = EVAL_FETCH) {
+  if (Number.isFinite(retryAfterMs) && retryAfterMs > 0) return retryAfterMs;
+  if (status === 429) return Math.min((pacing.rateLimitUnitMs ?? 0) * attempt, 60000);
+  return evalBackoffMs(attempt, pacing.backoffMs);
+}
 
 /** 一个原始行 → 我们展示需要的字段；分数缺失的行返回 null（不让空值参与排序） */
 export function normalizeEval(row) {
@@ -719,30 +840,44 @@ export function normalizeEval(row) {
   };
 }
 
-/** 取一页原始成绩；失败返回 null（单页失败不该让整个榜消失） */
-async function fetchEvalPage(offset, attempt = 1) {
-  try {
-    const res = await fetch(evalRowsUrl(offset), { headers: { accept: 'application/json' } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const j = await res.json();
-    if (!Array.isArray(j?.rows)) throw new Error(L('err.noRows'));
-    return j;
-  } catch (e) {
-    // 上游偶发 5xx 很常见，一次重试就能救回一页；仍失败就记一笔，不抛出
-    if (attempt < 2) return fetchEvalPage(offset, attempt + 1);
-    return null;
+/** 取一页原始成绩；重试耗尽仍失败返回 null（单页失败不该让整个榜消失） */
+async function fetchEvalPage(offset, attempts = EVAL_FETCH.attempts, pacing = EVAL_FETCH) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    let status = null; // 本轮失败的 HTTP 状态（网络层错误时是 null）
+    let retryAfterMs = null; // 上游 429 时会明确说"多久再来"
+    try {
+      const res = await fetch(evalRowsUrl(offset), { headers: { accept: 'application/json' } });
+      status = res.status;
+      if (!res.ok) {
+        const ra = Number(res.headers?.get?.('retry-after'));
+        if (Number.isFinite(ra) && ra > 0) retryAfterMs = Math.min(ra * 1000, 60000);
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const j = await res.json();
+      if (!Array.isArray(j?.rows)) throw new Error(L('err.noRows'));
+      return j;
+    } catch (e) {
+      // 退避时长按失败类型分（见 evalRetryWaitMs）：429 等桶回填，其它等网络缓过来。
+      // 旧实现是失败后立刻原样重发 —— 对 429 恰好是再撞一次限流
+      if (attempt === attempts) return null;
+      await sleep(evalRetryWaitMs(status, retryAfterMs, attempt, pacing));
+    }
   }
+  return null; // 循环正常走不出这里；这行写给读代码的人
 }
 
 /**
- * 并发拉全量。
+ * 拉全量（第一页探总数 → 分批限速取余下页）。
  *
  * 为什么必须先拉第一页：**页数只能在拿到 `num_rows_total` 之后才知道**
  * （46 页这个数字不是写死的，上游加模型时会变）。第一页失败就直接报错 ——
  * 没有总数就无法判断"取了多少比例"，与其显示一个残榜不如明说拿不到。
+ *
+ * `policy` 参数是给测试与 `live-check.mjs` 用的（传零延迟跑得快）；
+ * 浏览器里永远用上面那份 EVAL_FETCH 默认值。
  */
-export async function fetchAllEvalPages(onProgress) {
-  const first = await fetchEvalPage(0);
+export async function fetchAllEvalPages(onProgress, policy = EVAL_FETCH) {
+  const first = await fetchEvalPage(0, policy.firstAttempts, policy);
   if (!first) throw new Error(L('err.evalFirst'));
 
   const total = Number.isFinite(first.num_rows_total) ? first.num_rows_total : null;
@@ -755,14 +890,16 @@ export async function fetchAllEvalPages(onProgress) {
 
   onProgress?.({ done: 1, total: pageCount, got: rows.length, failed });
 
-  for (let i = 0; i < rest.length; i += EVAL_BATCH) {
-    const batch = rest.slice(i, i + EVAL_BATCH);
-    const results = await Promise.all(batch.map((o) => fetchEvalPage(o)));
+  for (let i = 0; i < rest.length; i += policy.batch) {
+    // 批间错峰：限流按"每秒请求数"计，一批接一批无缝连发就等于没降并发
+    if (i > 0) await sleep(policy.batchGapMs);
+    const batch = rest.slice(i, i + policy.batch);
+    const results = await Promise.all(batch.map((o) => fetchEvalPage(o, policy.attempts, policy)));
     for (const r of results) {
       if (r) rows.push(...r.rows.map((x) => x.row));
       else failed += 1;
     }
-    onProgress?.({ done: 1 + Math.min(i + EVAL_BATCH, rest.length), total: pageCount, got: rows.length, failed });
+    onProgress?.({ done: 1 + Math.min(i + policy.batch, rest.length), total: pageCount, got: rows.length, failed });
   }
   return { rows, failed, total, pageCount };
 }
@@ -818,12 +955,23 @@ async function loadEvalBoard() {
     title: L('p.eval.title'),
     hint: L('p.eval.hint'),
   });
-  // 走 readCache() 而不是直接读 sessionStorage：存储被禁用时要降级成"没有缓存"，
-  // 而不是让整块面板崩掉（它只是缓存，不该有这种权力）
-  const cached = readCache('eval-board', CACHE_TTL_MS);
-  if (Array.isArray(cached) && cached.length) {
+  // 走 readCacheEntry()/readSnapshot() 而不是直接碰存储：存储被禁用时要降级成
+  // "没有缓存"，而不是让整块面板崩掉（它只是缓存，不该有这种权力）
+  const cached = readCacheEntry('eval-board', CACHE_TTL_MS);
+  if (cached && Array.isArray(cached.v) && cached.v.length) {
     p.status('', 'ok');
-    mountEvalBoard(p, cached, L('ui.cached', { n: cached.length }));
+    mountEvalBoard(p, cached.v, L('ui.cached', { n: cached.v.length, time: fmtStamp(cached.t) }));
+    return;
+  }
+
+  // 7 天内的快照直接用（除非"刷新数据"点了强制重拉）：数据源 2025-03 已归档，
+  // 快照就是最新全量 —— 与其每次进页面都打上游 46 个限流敏感的请求，
+  // 不如把"每台浏览器每 7 天拉一次全量"作为常态。时刻照实标注。
+  const forced = forceRefetch();
+  const snap = readSnapshot('eval-board', EVAL_SNAPSHOT_MS);
+  if (!forced && snap && Array.isArray(snap.v) && snap.v.length) {
+    p.status('', 'ok');
+    mountEvalBoard(p, snap.v, L('st.evalSnap', { time: fmtStamp(snap.t) }));
     return;
   }
 
@@ -850,16 +998,29 @@ async function loadEvalBoard() {
     const models = [...seen.values()];
     if (!models.length) throw new Error(L('err.noBoard'));
 
-    writeCache('eval-board', models);
+    // 只有**零缺页**的完整结果才进 10 分钟缓存；部分成功不进 ——
+    // 否则一次 71% 覆盖会在缓存期内被当成完整榜反复展示
+    if (!failed) writeCache('eval-board', models);
+    // 快照（localStorage）无论完整与否都写：它只当回退物与 7 天直用窗口的来源
+    writeSnapshot('eval-board', models);
+
     p.status('', failed ? 'warn' : 'ok');
     mountEvalBoard(
       p,
       models,
       failed
-        ? L('st.evalDonePartial', { n: models.length, pages: pageCount, failed })
-        : L('st.evalDone', { n: models.length, pages: pageCount })
+        ? L('st.evalDonePartial', { n: models.length, pages: pageCount, failed, time: fmtStamp(Date.now()) })
+        : L('st.evalDone', { n: models.length, pages: pageCount, time: fmtStamp(Date.now()) })
     );
   } catch (e) {
+    // 全量都没拿到：回退"最近一次成功抓取"的快照（可能早已过 7 天，仍如实标时刻），
+    // 而不是给一个空面板加一句干巴巴的报错 —— 不编数据，但也不让读者白来一趟
+    const last = readSnapshot('eval-board');
+    if (last && Array.isArray(last.v) && last.v.length) {
+      p.status('', 'warn');
+      mountEvalBoard(p, last.v, L('st.evalStale', { msg: e.message, time: fmtStamp(last.t), n: last.v.length }));
+      return;
+    }
     p.status(L('st.failed', { msg: e.message }), 'err');
     p.body('');
   }
@@ -1270,6 +1431,174 @@ async function loadRepos(range = 'week') {
     });
   } catch (e) {
     p.status(L('st.failed', { msg: e.message }) + L('st.ghLimit'), 'err');
+    p.body('');
+  }
+}
+
+/* ================================================================== */
+/* 面板 9.5：GitHub Trending 每日榜（构建期快照，AI 关键词过滤）         */
+/* ================================================================== */
+
+/**
+ * 快照地址：相对**本模块**（import.meta.url）而不是页面解析 —— 中文页在 `/`、
+ * 英文页在 `/en/`，同一个相对路径在两边会解析到不同目录；钉在脚本自身上，
+ * 两种页面取到的都是 `assets/data/gh-trending.json`。
+ *
+ * 为什么是快照而不是浏览器直连：github.com 的页面响应**不带 CORS**
+ * （2026-09-30 实测），浏览器直连必被拦；页面是 650KB 的 HTML 也不适合每次
+ * 进页面都拖一遍。快照由 `scripts/fetch-gh-trending.mjs` 在**构建期**生成
+ * （GitHub Actions 每日跑），抓取失败就不提交、旧快照原样保留 ——
+ * 页面上继续显示旧快照与它的抓取时刻，绝不拿残缺数据顶上。
+ */
+const GH_TRENDING_SNAP_URL = new URL('./data/gh-trending.json', import.meta.url).href;
+
+/** 极小的 HTML 实体还原（解析描述里的 &amp; 这类用，五样够覆盖 GitHub 的输出） */
+function unescapeHtml(s) {
+  return String(s)
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'");
+}
+
+/** "1,281" → 1281；"abc"/缺失 → null（空值恒排最后，不冒充 0 星） */
+const intOrNull = (s) => {
+  const n = parseInt(String(s ?? '').replace(/,/g, ''), 10);
+  return Number.isFinite(n) ? n : null;
+};
+
+/**
+ * 解析 github.com/trending 的 HTML → 结构化条目。
+ * 页面与 CI 抓取脚本用的是**同一份**实现（脚本 import 这里的导出），
+ * 字段对不上只会在一处修。依赖的标记都取自 2026-09-30 的真实页面；
+ * GitHub 改版时这里解析出的条目会骤减，抓取脚本按"少于 5 条"拒绝提交 ——
+ * 坏快照进不了仓库，门禁在 CI 侧而不是靠人眼。
+ */
+export function parseGhTrending(html) {
+  const out = [];
+  const articles = String(html || '').match(/<article class="Box-row">[\s\S]*?<\/article>/g) || [];
+  for (const a of articles) {
+    // 仓库：h2 里的链接（article 里第一个 <a> 是"登录加星"按钮，指到 /login，不能要）
+    const repo = /<h2[^>]*>\s*<a[^>]*href="\/([^"]+)"/.exec(a)?.[1];
+    if (!repo || !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) continue;
+    out.push({
+      repo,
+      desc: unescapeHtml(/<p class="col-9[^"]*">([\s\S]*?)<\/p>/.exec(a)?.[1] ?? '').trim(),
+      lang: /itemprop="programmingLanguage">([^<]+)</.exec(a)?.[1]?.trim() || '',
+      stars: intOrNull(/\/stargazers"[^>]*>[\s\S]*?<\/svg>\s*([\d,]+)/.exec(a)?.[1]),
+      forks: intOrNull(/\/forks"[^>]*>[\s\S]*?<\/svg>\s*([\d,]+)/.exec(a)?.[1]),
+      starsToday: intOrNull(/([\d,]+)\s+stars today/.exec(a)?.[1]),
+    });
+  }
+  return out;
+}
+
+/**
+ * AI 关键词 —— 判断一个 trending 仓库是否与 AI 相关。**词边界**匹配：
+ * "storage" 里的 rag、"detail" 里的 ai、"html" 里的 ml 都不该命中。
+ * 取舍是**宁缺勿滥**：模糊的词（smart / data / app）不进清单 ——
+ * 把无关仓库拉进"仅 AI"视图，比漏掉一个边缘仓库更伤这个榜的可信度。
+ */
+const AI_KEYWORDS = [
+  'ai', 'agi', 'llm', 'llms', 'gpt', 'chatgpt', 'claude', 'gemini', 'deepseek',
+  'qwen', 'mistral', 'llama', 'kimi', 'doubao', 'openai', 'anthropic', 'copilot',
+  'genai', 'generative ai', 'agent', 'agents', 'agentic', 'mcp', 'autogen',
+  'crewai', 'langchain', 'langgraph', 'llamaindex', 'rag', 'embedding', 'embeddings',
+  'vector database', 'transformer', 'transformers', 'diffusion', 'stable diffusion',
+  'comfyui', 'midjourney', 'sdxl', 'vllm', 'ollama', 'llama.cpp', 'gguf',
+  'lora', 'fine-tuning', 'finetuning', 'fine-tune', 'whisper', 'tts', 'asr',
+  'speech recognition', 'voice cloning', 'text-to-speech', 'text to speech',
+  'speech to text', 'ocr', 'nlp', 'machine learning', 'deep learning',
+  'neural network', 'neural networks', 'yolo', 'multimodal', 'text-to-image',
+  'text to image', 'image generation', 'video generation', 'chatbot', 'chatbots',
+  'inference', 'tokenizer', 'quantization', 'mlops', 'semantic search',
+  'knowledge graph', 'large language model',
+];
+const AI_RE = new RegExp(`(?:^|[^a-z0-9])(?:${AI_KEYWORDS.join('|')})(?:[^a-z0-9]|$)`, 'i');
+
+/** 一个 trending 条目是否 AI 相关：仓库名 + 描述一起看（词边界，大小写不敏感） */
+export function isAiRepo(entry) {
+  return AI_RE.test(`${entry?.repo ?? ''} ${entry?.desc ?? ''}`);
+}
+
+/** 快照 JSON → 面板行（数字归一、AI 标记、空仓库名剔除） */
+export function flattenGhTrending(snap) {
+  const entries = Array.isArray(snap?.entries) ? snap.entries : [];
+  const rows = [];
+  for (const e of entries) {
+    const repo = String(e?.repo || '').trim();
+    if (!repo) continue;
+    rows.push({
+      repo,
+      desc: String(e?.desc || '').trim(),
+      lang: String(e?.lang || '').trim(),
+      // 快照是 CI 用 parseGhTrending 生成的（数字），这里仍走 intOrNull：
+      // 手工修过/旧版快照里的 "12,682" 字符串也能归一，坏值一律 null 不冒充 0
+      stars: intOrNull(e?.stars),
+      forks: intOrNull(e?.forks),
+      starsToday: intOrNull(e?.starsToday),
+      ai: isAiRepo(e),
+    });
+  }
+  return rows;
+}
+
+/** 面板：GitHub Trending 每日榜（默认只看 AI 相关，可切全部仓库） */
+async function loadGhTrending(view = 'ai') {
+  const p = panel({
+    id: 'ghTrending',
+    iconName: 'trending',
+    title: L('p.ghTrending.title'),
+    hint: L('p.ghTrending.hint'),
+  });
+  try {
+    // 快照很小（几十 KB），10 分钟内的会话缓存足够 —— 数据本来就是每日一更
+    const snap = await cachedJson('gh-trending', GH_TRENDING_SNAP_URL);
+    const fetchedAt = Date.parse(snap?.fetchedAt);
+    const all = flattenGhTrending(snap);
+    if (!all.length) throw new Error(L('err.noRepos'));
+    const rows = view === 'ai' ? all.filter((r) => r.ai) : all;
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.repo'),
+          field: 'repo',
+          cell: (r) => `<a href="https://github.com/${encodeURI(r.repo)}" target="_blank" rel="noopener noreferrer">${esc(r.repo)}</a>`,
+        },
+        { label: L('col.starsToday'), num: true, field: 'starsToday', cell: (r) => compact(r.starsToday) ?? '—' },
+        { label: L('col.stars'), num: true, cls: 'col-2', field: 'stars', cell: (r) => compact(r.stars) ?? '—' },
+        { label: L('col.lang'), cls: 'col-2', field: 'lang', cell: (r) => (r.lang ? `<span class="tag">${esc(r.lang)}</span>` : '—') },
+        { label: L('col.desc'), field: 'desc', cell: (r) => esc(r.desc) || '—' },
+      ],
+      defaultSort: { index: 2, dir: 'desc' },
+      searchFields: ['repo', 'desc', 'lang'],
+      groupField: 'lang',
+      groupLabel: L('ui.allLangs'),
+      placeholder: L('ui.searchRepos'),
+      transform: withRank,
+      beforeControls: () => subBoardChips({ ai: 'p.ghTrending.ai', all: 'p.ghTrending.all' }, view, 'ghtrend'),
+      // 快照声明：这是构建期抓的、什么时候抓的 —— 每榜都要能回答这两句
+      note: L('st.ghSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }),
+      card: {
+        title: (r) => esc(r.repo),
+        value: (r) => `<span class="v-num">+${compact(r.starsToday) ?? '—'}</span> <span class="v-unit">${L('col.starsToday')}</span>`,
+        meta: (r) =>
+          (r.lang ? `<span class="tag">${esc(r.lang)}</span>` : '') +
+          `<span class="tag">${icon('star')}${compact(r.stars) ?? '—'}</span>`,
+        link: (r) => `https://github.com/${r.repo}`,
+      },
+    });
+    // 子视图切换（事件委托：mountBoard 每次重画都换 DOM，绑在面板元素上只绑一次）
+    p.el.addEventListener('click', (e) => {
+      const b = e.target.closest?.('[data-ghtrend]');
+      if (b) loadGhTrending(b.getAttribute('data-ghtrend'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
     p.body('');
   }
 }
@@ -2056,6 +2385,121 @@ async function loadOrBenchmarks(view = 'intelligence') {
   }
 }
 
+/* ================================================================== */
+/* 面板：OpenRouter 模型库（全量目录：价格 / 上下文 / 模态 / 上线时间）  */
+/* ================================================================== */
+
+/**
+ * `/api/v1/models`（~762KB、约 460 个模型）→ 面板行。
+ * 价格从"每 token 美元"（字符串）换算成"每百万 token 美元"（数字）：
+ * `"0.000002"` → 2（fmtCost 显示成 `$2`，0 显示成"免费"）。
+ * 缺失字段一律 null —— 空值恒排最后，不冒充 0 分 / 0 价 / 0 上下文。
+ */
+export function flattenOrCatalog(json) {
+  const perM = (v) => {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n * 1e6 : null;
+  };
+  const out = [];
+  for (const m of json?.data || []) {
+    if (!m?.id) continue;
+    out.push({
+      id: String(m.id),
+      name: String(m.name || m.id),
+      vendor: String(m.id).split('/')[0] || '',
+      release: Number.isFinite(Number(m.created)) ? new Date(m.created * 1000).toISOString().slice(0, 10) : '',
+      context: Number(m.context_length) || null,
+      costIn: perM(m.pricing?.prompt),
+      costOut: perM(m.pricing?.completion),
+      modality: String(m.architecture?.modality || ''),
+      slug: String(m.canonical_slug || m.id),
+    });
+  }
+  // 上线日期降序，没日期的排最后（与 flattenModelsDev 同一约定：不把缺日期当 1970）
+  return out.sort((a, b) => {
+    if (!a.release && !b.release) return a.name.localeCompare(b.name);
+    if (!a.release) return 1;
+    if (!b.release) return -1;
+    return b.release.localeCompare(a.release);
+  });
+}
+
+/** 模型库的挂载：新鲜数据与回退快照共用一份配置，只差那行"快照声明" */
+function mountOrCatalog(p, rows, note) {
+  mountBoard(p, {
+    rows,
+    cols: [
+      { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+      {
+        label: L('col.model'),
+        field: 'name',
+        cell: (r) => `<a href="https://openrouter.ai/${encodeURI(r.slug)}" target="_blank" rel="noopener noreferrer">${esc(r.name)}</a>`,
+      },
+      { label: L('col.provider'), cls: 'col-2', field: 'vendor', cell: (r) => `<span class="tag">${esc(r.vendor)}</span>` },
+      { label: L('col.release'), field: 'release', cell: (r) => esc(r.release) || '—' },
+      { label: L('col.context'), num: true, cls: 'col-2', field: 'context', cell: (r) => compact(r.context) ?? '—' },
+      { label: L('col.priceIn'), num: true, cls: 'col-2', field: 'costIn', cell: (r) => fmtCost(r.costIn) },
+      { label: L('col.priceOut'), num: true, cls: 'col-2', field: 'costOut', cell: (r) => fmtCost(r.costOut) },
+      { label: L('col.modality'), cls: 'col-2', field: 'modality', cell: (r) => esc(r.modality) || '—' },
+    ],
+    defaultSort: { index: 3, dir: 'desc' },
+    limit: 60,
+    searchFields: ['name', 'id', 'vendor'],
+    groupField: 'vendor',
+    groupLabel: L('ui.allProviders'),
+    placeholder: L('ui.searchModelsProviders'),
+    transform: withRank,
+    note,
+    card: {
+      title: (r) => esc(r.name),
+      value: (r) => `<span class="v-num">${esc(r.release) || '—'}</span> <span class="v-unit">${L('col.release')}</span>`,
+      meta: (r) =>
+        `<span class="tag">${esc(r.vendor)}</span>` +
+        `<span class="tag">${compact(r.context) ?? '—'} ${L('col.context')}</span>` +
+        `<span class="tag">${L('col.priceIn')} ${fmtCost(r.costIn)}</span>`,
+      link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
+    },
+  });
+}
+
+/**
+ * 面板：OpenRouter 模型库。与"用量榜"互补 —— 那边回答"谁在被用"，
+ * 这边回答"有什么可用的、多少钱"。浏览器直连（CORS `*`，实测 2026-09-30），
+ * 762KB 与 models.dev（4.8MB）/ SWE-bench（4MB）同属"进页面就拉"的量级。
+ */
+async function loadOrCatalog() {
+  const p = panel({
+    id: 'orCatalog',
+    iconName: 'database',
+    title: L('p.orCatalog.title'),
+    hint: L('p.orCatalog.hint'),
+  });
+  p.status(L('st.loadingBig', { size: '0.76MB' }), 'loading');
+  p.body(skeleton(6));
+  try {
+    // 与其它 OpenRouter 面板共用同一个缓存键：同一标签页里逛完整组只拉一次
+    const json = await cachedJson('openrouter-models', OPENROUTER_MODELS_URL);
+    const rows = flattenOrCatalog(json);
+    if (!rows.length) throw new Error(L('err.noModels'));
+    writeSnapshot('or-catalog', rows);
+    // 抓取时刻：缓存条目自带写入时间 t —— 命中缓存时是当初拉取的时刻，
+    // 未命中则是刚才（cachedJson 刚写进去），两种情况下它都是真话
+    const entry = readCacheEntry('openrouter-models', CACHE_TTL_MS);
+    p.status('', 'ok');
+    mountOrCatalog(p, rows, L('st.orCatDone', { time: fmtStamp(entry?.t ?? Date.now()) }));
+  } catch (e) {
+    // 上游读不动：回退本浏览器最后一次成功抓取的快照（照实标时刻，不装新数据）
+    const snap = readSnapshot('or-catalog');
+    if (snap && Array.isArray(snap.v) && snap.v.length) {
+      p.status('', 'warn');
+      mountOrCatalog(p, snap.v, L('st.staleSnap', { msg: e.message, time: fmtStamp(snap.t) }));
+      return;
+    }
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
 /** 面板：OpenRouter 应用榜 + 多模态用量（三个子榜） */
 async function loadOrApps(view = 'day') {
   const p = panel({ id: 'orApps', iconName: 'cube', title: L('p.orApps.title'), hint: L('p.orApps.hint') });
@@ -2173,8 +2617,10 @@ const BOARD_LOADERS = {
   datasets: () => loadDatasets(),
   papers: () => loadPapers(),
   repos: () => loadRepos('week'),
+  ghTrending: () => loadGhTrending('ai'),
   newmodels: () => loadNewModels(),
   openrouter: () => loadOpenRouter(),
+  orCatalog: () => loadOrCatalog(),
   orTrends: () => loadOrTrends(),
   orAuthors: () => loadOrAuthors(),
   orPerf: () => loadOrPerformance(),
@@ -2190,9 +2636,17 @@ const BOARD_LOADERS = {
  * 缓存是 sessionStorage 里的，刷新页面并不会丢掉它 —— 用户点"刷新数据"
  * 却看到一模一样的内容（因为读的还是 10 分钟内的缓存），
  * 会以为按钮坏了。所以必须显式清掉再拉。
+ *
+ * localStorage 的快照**不清**（它是上游挂掉时的回退物），但要立一个
+ * **强制重拉**标记：评测榜对 7 天内快照直接复用，不设标记的话按钮对它无效。
  */
 function reloadAll() {
   clearCache();
+  try {
+    sessionStorage.setItem(FORCE_KEY, '1');
+  } catch {
+    /* 存不进就算了：顶多评测榜这次仍用快照，不是错误 */
+  }
   panelsRoot.innerHTML = '';
   startAll();
 }
