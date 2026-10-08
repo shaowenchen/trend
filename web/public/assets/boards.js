@@ -59,112 +59,120 @@ export const BOARD_IDS = [
 ];
 
 /**
- * 每个榜单的标签 —— 两类，顺序有意义（**来源在前，分类在后**）。
+ * 每个榜单的两个标签 —— **主题**（它是什么榜）与**来源**（数据从哪来）。
  *
  * ## 为什么标签住在**这个**文件里
  * 标签要出现在三个地方，而且三者必须一致：
- *   · 首页与榜单页的卡片上（`trend.js` 渲染，客户端）；
+ *   · 榜单页的面板头与页脚（`trend.js` 渲染，客户端）；
  *   · `tags.html` / `tag.html` 两个页面（**构建期**生成，`src/site/nav.js` 同一路数）；
  *   · 测试（Node）。
  * 与 `BOARD_IDS` 完全同一个理由：真值只能有一个地方，否则"网页上少了某个标签"
  * 这种错会静默发生 —— 页面上只是少一行，不报错。
  *
- * ## 两类标签
- *   · **来源**：数据从哪来（HuggingFace / GitHub / models.dev / Aider /
- *     OpenRouter / SWE-bench）。它们同时是**可信度**信息 —— 榜的口径以来源方为准。
- *   · **分类**：这是什么榜（模型 / 评测 / 编程 / 社区 / 论文）。
+ * ## 两个字段，缺一不可
+ *   · **topic**：这是**分类**。每个榜**恰好一个**，六类互不重叠 ——
+ *     于是"点主题标签"就等于"看这一类"，过滤本身即分类。
+ *     （旧的标签不是这样：`Models` 落在一半以上的榜上，点它几乎等于看全部。）
+ *     `site.test.js` 有一条断言盯着"恰好一个、且是已知主题"。
+ *   · **source**：数据从哪来。它同时是**可信度**信息 —— 榜的口径以来源方为准。
  *
- * ## 为什么标签文字**不进 i18n 字典**
- * 它们是专有名词与简短的英文分类词，**两种语言用同一份**。走字典会得到一个
- * 更糟的状态：中文页显示"模型"、英文页显示"Models"、而 `tag.html?t=模型`
- * 这种地址在英文站上无解（URL 里的标签值也得跟着分语言）。
- * 保持一份，地址与文字都稳定。站点其余文案照旧走字典，这里是有意的例外。
+ * ## 为什么值用 slug、不直接写显示文字
+ * 标签值会进 URL（`tag.html?t=models`）。slug 两种语言共用，地址因此稳定、
+ * 可收藏、可分享；**显示文字**则按页面语言从 `i18n.js` 的 `tag.<slug>` 取
+ * （中文站「模型榜」，英文站 `Models`）。若把显示文字当值，地址就得跟着语言变，
+ * `tag.html?t=模型榜` 这种地址在英文站上无解。判种类（主题 / 来源）见 `TAG_KINDS`。
  */
 export const BOARD_TAGS = {
-  trending: ['HuggingFace', 'Models'],
-  liked: ['HuggingFace', 'Models'],
-  downloaded: ['HuggingFace', 'Models'],
-  eval: ['HuggingFace', 'Evaluation', 'Models'],
-  aider: ['Aider', 'Coding', 'Evaluation'],
-  spaces: ['HuggingFace', 'Community'],
-  datasets: ['HuggingFace', 'Community'],
-  papers: ['HuggingFace', 'Papers', 'Community'],
-  aiNews: ['News', 'Community'],
-  aiPress: ['News', 'Community'],
-  repos: ['GitHub', 'Community'],
-  ghTrending: ['GitHub', 'Trends', 'Community'],
-  zhihu: ['Zhihu', 'Trends', 'Community'],
-  csdn: ['CSDN', 'Trends', 'Community'],
-  juejin: ['Juejin', 'Trends', 'Community'],
-  itzhijia: ['ITHome', 'Trends', 'Community'],
-  huxiu: ['Huxiu', 'Trends', 'Community'],
-  aifaner: ['Ifanr', 'Trends', 'Community'],
-  zhongguancun: ['ZOL', 'Trends', 'Community'],
-  bilibili: ['Bilibili', 'Trends', 'Community'],
-  weibo: ['Weibo', 'Trends', 'Community'],
-  toutiao: ['Toutiao', 'Trends', 'Community'],
-  hupu: ['Hupu', 'Trends', 'Community'],
-  douban: ['Douban', 'Trends', 'Community'],
-  zhidemai: ['Smzdm', 'Trends', 'Community'],
-  newmodels: ['models.dev', 'Models'],
-  openrouter: ['OpenRouter', 'Models'],
-  orCatalog: ['OpenRouter', 'Models'],
-  orTrends: ['OpenRouter', 'Trends', 'Models'],
-  orAuthors: ['OpenRouter', 'Trends', 'Community'],
-  orPerf: ['OpenRouter', 'Performance', 'Models'],
-  aaBench: ['Artificial Analysis', 'Evaluation', 'Models'],
-  orApps: ['OpenRouter', 'Community', 'Apps'],
-  swebench: ['SWE-bench', 'Coding', 'Evaluation'],
+  // 模型榜 —— 模型本身的热度、人气、下载量、新发布、用量、目录
+  trending: { topic: 'models', source: 'huggingface' },
+  liked: { topic: 'models', source: 'huggingface' },
+  downloaded: { topic: 'models', source: 'huggingface' },
+  newmodels: { topic: 'models', source: 'models-dev' },
+  openrouter: { topic: 'models', source: 'openrouter' },
+  orCatalog: { topic: 'models', source: 'openrouter' },
+  // 评测榜 —— 拿分数说话的榜（人工评测 / 真实代码任务）
+  eval: { topic: 'benchmarks', source: 'huggingface' },
+  aider: { topic: 'benchmarks', source: 'aider' },
+  aaBench: { topic: 'benchmarks', source: 'artificial-analysis' },
+  swebench: { topic: 'benchmarks', source: 'swe-bench' },
+  // 社区生态 —— 模型之外，围绕它长出来的东西
+  spaces: { topic: 'ecosystem', source: 'huggingface' },
+  datasets: { topic: 'ecosystem', source: 'huggingface' },
+  papers: { topic: 'ecosystem', source: 'huggingface' },
+  repos: { topic: 'ecosystem', source: 'github' },
+  ghTrending: { topic: 'ecosystem', source: 'github' },
+  // 平台洞察 —— 在某一个平台上观察到的动向（用量、份额、性能、应用）
+  orTrends: { topic: 'platform', source: 'openrouter' },
+  orAuthors: { topic: 'platform', source: 'openrouter' },
+  orPerf: { topic: 'platform', source: 'openrouter' },
+  orApps: { topic: 'platform', source: 'openrouter' },
+  // 资讯 —— 新闻快照。两张榜都是**多源聚合**（8 个聚合源 / 8 家一手信源），
+  // 所以来源是"聚合源"，而不是某一家媒体。
+  aiNews: { topic: 'news', source: 'aggregator' },
+  aiPress: { topic: 'news', source: 'aggregator' },
+  // 中文热榜 —— 13 个平台的热榜，来自同一份聚合快照，但**各算一个来源**
+  // （这样"点微博"筛出的就是微博那一个榜，而不是 13 个一起出）
+  zhihu: { topic: 'cn-hot', source: 'zhihu' },
+  csdn: { topic: 'cn-hot', source: 'csdn' },
+  juejin: { topic: 'cn-hot', source: 'juejin' },
+  itzhijia: { topic: 'cn-hot', source: 'itzhijia' },
+  huxiu: { topic: 'cn-hot', source: 'huxiu' },
+  aifaner: { topic: 'cn-hot', source: 'aifaner' },
+  zhongguancun: { topic: 'cn-hot', source: 'zhongguancun' },
+  bilibili: { topic: 'cn-hot', source: 'bilibili' },
+  weibo: { topic: 'cn-hot', source: 'weibo' },
+  toutiao: { topic: 'cn-hot', source: 'toutiao' },
+  hupu: { topic: 'cn-hot', source: 'hupu' },
+  douban: { topic: 'cn-hot', source: 'douban' },
+  zhidemai: { topic: 'cn-hot', source: 'zhidemai' },
 };
 
 /**
- * 全部标签，按**首次出现的顺序**去重 —— 顺序稳定（来源先出现、分类随后），
- * `tags.html` 直接按它铺，不需要每次再排一遍，也不会因为 Map 迭代顺序的
- * 细枝末节而在两次构建间换位置。
+ * 主题分类 —— **顺序即显示顺序**（`tags.html` 的分组、`tag.html` 的排列都按它）。
+ * 六类互不重叠，每个榜恰好落进一类：前四类是 AI 相关，后两类是资讯与中文热榜。
  */
-export const ALL_TAGS = [...new Set(Object.values(BOARD_TAGS).flat())];
+export const TOPIC_SLUGS = ['models', 'benchmarks', 'ecosystem', 'platform', 'news', 'cn-hot'];
 
 /**
- * 每个标签属于哪一类 —— 决定 `tags.html` 怎么分组（来源一组、类别一组）。
- *
- * 为什么值得单独一份：不分组的话 tags 页就是一坨平铺的标签片，
- * 读者看不出"HuggingFace 是来源、Models 是类别"这两件事不是一回事 ——
- * 而这正是标签存在的理由。分组让"按来源逛"与"按主题逛"变成两条看得见的路。
- *
- * 与 `BOARD_TAGS` 一样，**两语言共用**（见那里的说明）。
- * 未知标签默认归到 `topic`，所以新增标签时忘了登记也只是分组不够准，不会丢。
+ * 数据来源 —— 顺序即显示顺序：先是 AI 榜单的来源，再是 13 个中文热榜各自的平台
+ * （它们来自同一份聚合快照，但各算一个来源 —— 这样"点微博"筛出的就是微博那一个榜）。
+ * 与主题分开列，是为了让"按来源逛"与"按主题逛"是两条看得见的路。
  */
-export const TAG_KINDS = {
-  News: 'source',
-  Zhihu: 'source',
-  CSDN: 'source',
-  Juejin: 'source',
-  ITHome: 'source',
-  Huxiu: 'source',
-  Ifanr: 'source',
-  ZOL: 'source',
-  Bilibili: 'source',
-  Weibo: 'source',
-  Toutiao: 'source',
-  Hupu: 'source',
-  Douban: 'source',
-  Smzdm: 'source',
-  HuggingFace: 'source',
-  Aider: 'source',
-  GitHub: 'source',
-  'models.dev': 'source',
-  OpenRouter: 'source',
-  'SWE-bench': 'source',
-  'Artificial Analysis': 'source',
-  Models: 'topic',
-  Trends: 'topic',
-  Performance: 'topic',
-  Apps: 'topic',
-  Evaluation: 'topic',
-  Coding: 'topic',
-  Community: 'topic',
-  Papers: 'topic',
-};
+export const SOURCE_SLUGS = [
+  'huggingface',
+  'aider',
+  'github',
+  'models-dev',
+  'openrouter',
+  'artificial-analysis',
+  'swe-bench',
+  'aggregator',
+  'zhihu',
+  'csdn',
+  'juejin',
+  'itzhijia',
+  'huxiu',
+  'aifaner',
+  'zhongguancun',
+  'bilibili',
+  'weibo',
+  'toutiao',
+  'hupu',
+  'douban',
+  'zhidemai',
+];
+
+/**
+ * 全部标签 —— 主题在前、来源在后。顺序稳定，页面直接按它铺，
+ * 不需要每次再排一遍，也不会因为 Map 迭代顺序的细枝末节而在两次构建间换位置。
+ */
+export const ALL_TAGS = [...TOPIC_SLUGS, ...SOURCE_SLUGS];
+
+/** 每个标签属于哪一类 —— 由上面两个清单**推导**，不再手写第二份会漂移的真值。 */
+export const TAG_KINDS = Object.fromEntries([
+  ...TOPIC_SLUGS.map((slug) => [slug, 'topic']),
+  ...SOURCE_SLUGS.map((slug) => [slug, 'source']),
+]);
 
 /** 某一类下的标签，顺序沿用 `ALL_TAGS`（保证页面上的排列稳定） */
 export function tagsOfKind(kind) {
@@ -173,5 +181,17 @@ export function tagsOfKind(kind) {
 
 /** 某个标签下的榜单 id（按 `BOARD_IDS` 的顺序，保证页面上的排列稳定） */
 export function boardsWithTag(tag) {
-  return BOARD_IDS.filter((id) => (BOARD_TAGS[id] || []).includes(tag));
+  return BOARD_IDS.filter((id) => {
+    const t = BOARD_TAGS[id];
+    return !!t && (t.topic === tag || t.source === tag);
+  });
+}
+
+/**
+ * 某个榜单自己的标签 —— **主题在前、来源在后**（卡片上就按这个顺序显示）。
+ * 是 `boardsWithTag` 的逆运算，供 `trend.js` 在面板头/页脚渲染标签片。
+ */
+export function tagsOfBoard(id) {
+  const t = BOARD_TAGS[id];
+  return t ? [t.topic, t.source] : [];
 }

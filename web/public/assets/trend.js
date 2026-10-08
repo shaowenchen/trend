@@ -238,7 +238,7 @@ const panelsRoot = typeof document === 'undefined' ? null : document.querySelect
  * 既有引用者改 import）。
  */
 export { BOARD_IDS, BOARD_TAGS } from './boards.js';
-import { BOARD_IDS, BOARD_TAGS } from './boards.js';
+import { BOARD_IDS, tagsOfBoard } from './boards.js';
 
 /**
  * 本页到站点根的相对前缀 —— 标签链接要用（中文页 `tag.html`，英文页 `../tag.html`）。
@@ -301,8 +301,8 @@ function panel({ id, iconName, title, hint }) {
   // 整页只有这一个面板时，它的标题就是页面的标题 —— 用 h1 承担
   // （一页一个 h1；读屏器也能靠它一眼报出"这是什么页"）
   const heading = SINGLE_BOARD ? 'h1' : 'h2';
-  // 这个榜的标签（来源 + 分类），点进去按类看别的榜。标签真值见 boards.js。
-  const tags = tagChips(BOARD_TAGS[id], TAG_PREFIX);
+  // 这个榜的标签（主题 + 来源），点进去按类看别的榜。标签真值见 boards.js。
+  const tags = tagChips(tagsOfBoard(id), TAG_PREFIX, LOCALE);
   el.innerHTML = `
     <header class="panel-head">
       <${heading}><span class="panel-icon">${icon(iconName)}</span>${esc(title)}</${heading}>
@@ -2963,7 +2963,7 @@ function buildBoardNav() {
   nav.innerHTML = `${links}
     <div class="board-tags">
       <span class="muted">${esc(L('ui.boardTags'))}</span>
-      ${tagChips(BOARD_TAGS[requestedBoard], TAG_PREFIX)}
+      ${tagChips(tagsOfBoard(requestedBoard), TAG_PREFIX, LOCALE)}
     </div>
     <div class="board-actions">
       <button class="btn-sm" type="button" id="refresh">

@@ -42,7 +42,7 @@ import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/bran
 import { injectGtm } from '../src/site/gtm.js';
 // 面板 id 与标签的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的
 // 文件，所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
-import { BOARD_IDS, ALL_TAGS, boardsWithTag } from '../web/public/assets/boards.js';
+import { BOARD_IDS } from '../web/public/assets/boards.js';
 import { injectNav, injectTagsPage, injectTagPage } from '../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

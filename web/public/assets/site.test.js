@@ -24,8 +24,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { t, LOCALES } from './i18n.js';
-import { BOARD_IDS, BOARD_TAGS } from './trend.js';
-import { ALL_TAGS, boardsWithTag } from './boards.js';
+import { BOARD_IDS } from './trend.js';
+import { ALL_TAGS, boardsWithTag, tagsOfBoard, TAG_KINDS, TOPIC_SLUGS, SOURCE_SLUGS } from './boards.js';
 import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';
 import { buildSite, SITE_FILES, findMissingAssets, findMissingImports, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
 import { resolveRequest } from '../../../scripts/serve.mjs';
@@ -378,17 +378,46 @@ await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了�
 
 /* ---------------- 标签 ---------------- */
 
-await test('★ 每个面板 id 都有至少一个标签（少了它的卡片就孤立无援）', () => {
+await test('★ 每个面板恰好一个主题 + 一个来源（主题重叠会让"过滤即分类"失效）', () => {
   const bad = [];
   for (const id of BOARD_IDS) {
-    const tags = BOARD_TAGS[id];
-    if (!Array.isArray(tags) || !tags.length) bad.push(`${id} 没有标签`);
-    else if (tags.some((x) => !String(x).trim())) bad.push(`${id} 有空标签`);
+    const tags = tagsOfBoard(id);
+    if (tags.length !== 2) bad.push(`${id} 的标签不是两个：${JSON.stringify(tags)}`);
+    const [topic, source] = tags;
+    if (!TOPIC_SLUGS.includes(topic)) bad.push(`${id} 的主题 '${topic}' 不是已知主题`);
+    if (!SOURCE_SLUGS.includes(source)) bad.push(`${id} 的来源 '${source}' 不是已知来源`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ 每个出现过的标签都能筛出至少一个面板（不然 tags 页会有一个空链接）', () => {
+await test('★ 每个主题都有榜单，且每个榜单正好落进一个主题（不留空分组、也不重叠）', () => {
+  const bad = [];
+  for (const topic of TOPIC_SLUGS) {
+    if (!boardsWithTag(topic).length) bad.push(`主题 ${topic} 筛不出任何面板`);
+  }
+  // 一个榜单出现在两个主题下 = 重叠，那正是这一版要修掉的东西
+  for (const id of BOARD_IDS) {
+    const inTopics = TOPIC_SLUGS.filter((t) => boardsWithTag(t).includes(id));
+    if (inTopics.length !== 1) bad.push(`${id} 落在 ${inTopics.length} 个主题里：${inTopics.join(', ')}`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 每个标签在两种语言下都有名字（主题是中文词，来源是专有名词）', () => {
+  // 标签文字按语言取（`tag.<slug>`），而键是**拼**出来的 —— `site.test.js` 那条
+  // "引用的键存在于字典"的扫描只认字面量 `t(LOCALE,'x')`，扫不到 `'tag.'+slug`。
+  // 所以这一条是标签文案唯一的门禁，不能省。
+  const bad = [];
+  for (const tag of ALL_TAGS) {
+    for (const locale of LOCALES) {
+      const v = t(locale, `tag.${tag}`);
+      if (v === `tag.${tag}` || !v.trim()) bad.push(`${locale} 缺标签名 tag.${tag}`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 每个标签都能筛出至少一个面板（不然 tags 页会有一个空链接）', () => {
   const bad = [];
   for (const tag of ALL_TAGS) {
     const ids = boardsWithTag(tag);
@@ -399,12 +428,39 @@ await test('★ 每个出现过的标签都能筛出至少一个面板（不然 
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ tags 页列出全部标签，且每个链接都带 ?t=<标签>', async () => {
+await test('★ 标签的种类自洽：主题就是主题、来源就是来源（推导错了会静默错组）', () => {
+  const bad = [];
+  for (const topic of TOPIC_SLUGS) {
+    if (TAG_KINDS[topic] !== 'topic') bad.push(`${topic} 的种类不是 topic`);
+  }
+  for (const source of SOURCE_SLUGS) {
+    if (TAG_KINDS[source] !== 'source') bad.push(`${source} 的种类不是 source`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ tags 页列出全部标签，且每个链接都带 ?t=<slug>', async () => {
   const bad = [];
   for (const rel of ['tags.html', 'en/tags.html']) {
     const html = await distRead(rel);
     for (const tag of ALL_TAGS) {
       if (!html.includes(`tag.html?t=${encodeURIComponent(tag)}`)) bad.push(`${rel} 缺标签 ${tag} 的链接`);
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ tag 页的分组用 slug 匹配地址、但显示本地化文字（否则标题会显示成 slug）', async () => {
+  // data-tag 必须是 slug（tags.js 拿它跟地址里的 ?t= 比），
+  // data-tag-label 必须是本页语言的文字（脚本拿它回填标题）。
+  const bad = [];
+  for (const [rel, locale] of [['tag.html', 'zh'], ['en/tag.html', 'en']]) {
+    const html = await distRead(rel);
+    for (const tag of ALL_TAGS) {
+      const label = t(locale, `tag.${tag}`);
+      if (!html.includes(`data-tag="${tag}" data-tag-label="${label}"`)) {
+        bad.push(`${rel} 的 ${tag} 分组缺 data-tag/data-tag-label`);
+      }
     }
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
@@ -435,6 +491,20 @@ await test('★ tag 页的分组默认**不隐藏**（没有 JS 时应当看到�
   }
 });
 
+await test('★ 生成的标签页不串语言（正文是构建期落的，源页扫描扫不到它）', async () => {
+  // 标签页正文在源文件里只是一个 {{TAG_PAGE}} 占位符，所以上面那两条"语言不串页"
+  // 的门禁（它们读 web/public 源文件）**扫不到真正渲染出来的内容** ——
+  // 中文标签名"模型榜"若落到英文页上，之前一路绿灯。这里补一道，扫发布物。
+  const bad = [];
+  for (const rel of ['en/tags.html', 'en/tag.html']) {
+    // 与源页那条同样的例外：语言切换链接是有意的「中文」，先摘掉再查
+    const text = visibleText(await distRead(rel)).split('中文').join('');
+    const hit = text.match(/[一-鿿]+/g);
+    if (hit) bad.push(`${rel}: ${[...new Set(hit)].slice(0, 8).join(' ')}`);
+  }
+  assert.deepEqual(bad, [], `英文标签页里混进了中文：\n      ${bad.join('\n      ')}`);
+});
+
 await test('★ 榜单页的页脚标出了本页标签（可点进标签页）', async () => {
   const bad = [];
   for (const id of BOARD_IDS) {
@@ -442,7 +512,7 @@ await test('★ 榜单页的页脚标出了本页标签（可点进标签页）'
       const src = await read(rel);
       // 标签由 trend.js 运行期渲染，所以源页里看不到 —— 这里查的是
       // "这个面板在 boards.js 里有标签"，以及脚本确实被引到了
-      if (!BOARD_TAGS[id]?.length) bad.push(`${id} 没有标签`);
+      if (tagsOfBoard(id).length !== 2) bad.push(`${id} 没有标签`);
       if (!/assets\/trend\.js/.test(src)) bad.push(`${rel} 没有引入 trend.js（标签渲染不出来）`);
     }
   }

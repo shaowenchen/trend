@@ -29,8 +29,8 @@
 | `ghTrending.html` | GitHub Trending 每日榜（**构建期快照**，Actions 每日刷新） |
 | `aiNews.html` `aiPress.html` | AI 新闻热点（聚合源）、AI 官方要闻（一手源）—— 构建期快照 |
 | `zhihu.html` … `zhidemai.html`（13 页） | 13 个中文热榜独立成页：知乎 · CSDN · 掘金 · IT之家 · 虎嗅 · 爱范儿 · 中关村在线 · B站 · 微博 · 今日头条 · 虎扑 · 豆瓣 · 值得买 —— 同一份聚合快照，条目链接指向原平台 |
-| `tags.html` | 全部标签（来源 + 分类），每个标签带条数 |
-| `tag.html?t=<标签>` | 含该标签的榜单，卡片式 |
+| `tags.html` | 全部标签（主题 + 来源），每个标签带条数 |
+| `tag.html?t=<slug>` | 含该标签的榜单，卡片式（`?t=` 用英文 slug，如 `models`） |
 | `en/…` | 以上每一个的英文版（含标签页），文件名相同 |
 
 页头**三样**：左上角「首页」与「标签」，右上角切换语言。三十四个榜单不进页头 ——
@@ -111,29 +111,51 @@
 > 在"浏览器直连"的前提下做不了（GitHub Pages 更不可能代理）。
 > 全部取舍与实测取证见 `docs/trend-sources.md`。
 
-## 标签（来源 + 分类）
+## 标签（主题 + 来源）
 
-每个榜单带两个标签：**来源**（HuggingFace / GitHub / models.dev / Aider /
-OpenRouter / SWE-bench）与**分类**（Models / Evaluation / Coding / Community /
-Papers）。真值只有一处：`web/public/assets/boards.js` 的 `BOARD_TAGS`。
+每个榜单带两个标签：**主题**（它是什么榜）与**来源**（数据从哪来）。
+真值只有一处：`web/public/assets/boards.js` 的 `BOARD_TAGS`。
+
+**主题六类互不重叠，每个榜恰好一个** —— 所以「点主题标签」就等于「看这一类」，
+过滤本身即是分类：
+
+| 主题 | 榜单 |
+|---|---|
+| 模型榜 `models` | trending · liked · downloaded · newmodels · openrouter · orCatalog |
+| 评测榜 `benchmarks` | eval · aider · aaBench · swebench |
+| 社区生态 `ecosystem` | spaces · datasets · papers · repos · ghTrending |
+| 平台洞察 `platform` | orTrends · orAuthors · orPerf · orApps |
+| 资讯 `news` | aiNews · aiPress |
+| 中文热榜 `cn-hot` | zhihu · csdn · juejin · itzhijia · huxiu · aifaner · zhongguancun · bilibili · weibo · toutiao · hupu · douban · zhidemai |
+
+来源则按主题各有各的：AI 榜单是 HuggingFace / Aider / GitHub / models.dev /
+OpenRouter / Artificial Analysis / SWE-bench（它同时是**可信度**信息 ——
+榜的口径以来源方为准）；资讯两张榜多源聚合，来源记作「多源聚合」；
+13 个中文热榜虽来自同一份聚合快照，但**各记一个平台**来源 ——
+这样点「微博」筛出的就是微博那一个榜，而不是 13 个一起出。
+
+> 标签值在地址里是**英文 slug**（`tag.html?t=models`），两种语言共用，地址因此稳定、
+> 可收藏；**显示文字**按页面语言从字典取（`i18n.js` 的 `tag.<slug>`）——
+> 中文站显示「模型榜」，英文站显示 `Models`。若把显示文字当值，`tag.html?t=模型榜`
+> 这种地址在英文站上就无解了。
 
 标签出现在三处，都是同一份数据：
 
 | 位置 | 形态 | 为什么 |
 |---|---|---|
-| 首页入口卡片 | **静态**标签片 | 卡片本身是 `<a>`，HTML 不允许 `<a>` 套 `<a>`（解析器会提前闭合外层，整片栅格散架）。要按标签逛走页头入口 |
-| 榜单页的面板头与页脚 | **链接**（进 `tag.html?t=`） | 读者看完一个榜，顺手就能看到"同类还有哪些" |
-| `tags.html` / `tag.html` | 链接 + 卡片分组 | 按来源/分类逛的两个页面 |
+| 榜单页的面板头与页脚 | **链接**（进 `tag.html?t=<slug>`） | 读者看完一个榜，顺手就能看到"同类还有哪些" |
+| `tags.html` | 标签卡片（名字 + 数量 + 包含哪些榜） | 分「主题分类」「数据来源」两段，按主题或来源逛 |
+| `tag.html` | 静态分组 + 顶部标签条 | 点标签把页面收窄到那一组（脚本只读 `?t=`） |
 
-> 标签文字**不进 i18n 字典**，中英共用一份（专有名词 + 简短的英文分类词）。
-> 走字典会得到一个更糟的状态：`tag.html?t=模型` 这种地址在英文站上无解 ——
-> URL 里的标签值也得跟着分语言。站点其余文案照旧走字典，这里是有意的例外。
+（首页入口卡片只有标题与半句说明，**不带**标签片 —— 要按标签逛走页头「标签」入口。）
 
-**两个页面都是构建期生成的**（`src/site/nav.js` 的 `renderTagsPage` /
+**两个标签页都是构建期生成的**（`src/site/nav.js` 的 `renderTagsPage` /
 `renderTagPage`），理由与页头导航相同，而且这里更重：分类页的价值在于让搜索引擎
 发现"这些榜是一类"，客户端渲染在爬虫眼里是空页。`tag.html` 把**全部**标签与
 全部卡片都落成静态 HTML，`assets/tags.js`（十几行）再按地址里的 `?t=` 收窄
 —— 分组**默认不隐藏**，所以禁用 JS 时看到的是"全部榜单"而不是空白。
+分组带 `data-tag`（slug，给脚本匹配地址）与 `data-tag-label`（本页语言的显示文字，
+脚本拿它回填标题 —— 否则标题会显示成 slug）。
 
 静态托管没有 rewrite，做不到"一个标签一个文件"（那会让每加一个标签就多发布
 两个页面），所以用查询参数。代价是这些地址不进索引 —— 可接受，它们主要服务于
@@ -168,7 +190,7 @@ Papers）。真值只有一处：`web/public/assets/boards.js` 的 `BOARD_TAGS`�
 - **页头三样**：左边「首页」+「标签」，右边切换语言（构建期生成，
   `src/site/nav.js` + `{{SITE_NAV}}`，不是抄 40 份）。二十三个榜单**不进页头** ——
   它们已经在首页的入口卡片里各占一张卡，页头再列一遍就是同一份目录的第二次出现；
-  「标签」是一条**入口**（按来源/分类逛），不是榜单清单。
+  「标签」是一条**入口**（按主题/来源逛），不是榜单清单。
   语言切换**指向对应的那一页**（`repos.html` ↔ `en/repos.html`），
   换语言时读者留在原来的榜单上，而不是被丢回首页。
   页头的两个元素都是 `header-inner` 的直接子元素，靠它的 `space-between`
@@ -259,7 +281,7 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 | `i18n.test.js` | 两种语言的键一致、无空值、英文侧不含中文 |
 | `ui.test.js` | 图标表与 `[data-icon]` 回填 |
 | `trend.test.js` | YAML 子集解析、评测行字段提取、"同模型取最高分"的合并规则 |
-| `site.test.js` | 站点门禁：文案键存在、HTML 引用与**脚本 import** 都能解析到发布集合、无绝对路径、无占位符残留、语言不串页、**首页卡片与面板一一对应**、面板页与发布白名单对齐、标签非空且每个都筛得出面板、**卡片里不许套链接** |
+| `site.test.js` | 站点门禁：文案键存在、HTML 引用与**脚本 import** 都能解析到发布集合、无绝对路径、无占位符残留、语言不串页、**首页卡片与面板一一对应**、面板页与发布白名单对齐、**每个榜恰好一个主题且每个主题都有榜**、每个标签两种语言都有名字、**卡片里不许套链接** |
 
 ## 代码结构
 
@@ -267,19 +289,19 @@ npm run test:live  # 对真实上游体检：状态码 · CORS · 耗时 · 分�
 web/public/                       手写静态页（页面 + 样式 + 客户端脚本）
   index.html                      中文入口：三十四个面板的入口卡片
   <board>.html                    ★ 三十四个中文面板页（eval.html、repos.html…）
-  tags.html  tag.html             标签总览 / 按标签筛选
+  tags.html  tag.html             标签总览 / 按标签筛选（`?t=<slug>`）
   en/index.html  en/<board>.html  对应的英文版（文件名相同）
   site.css
   assets/
     trend.js                      面板注册表 + 数据层与渲染（1600 行，主体在这里）
-    boards.js                     面板 id 唯一来源（★ 必须在 assets/ 下，见下）
+    boards.js                     面板 id 与标签（主题/来源）的唯一来源（★ 必须在 assets/ 下，见下）
     tags.js                      标签页的收窄脚本（只读 ?t=，页面静态生成）
     i18n.js                       双语字典 —— 面板文案的唯一来源
     ui.js                         内联 SVG 图标
     *.test.js                     测试（★ 不发布，构建的白名单挡在外面）
 src/site/brand.js                 品牌名唯一来源 + 占位符替换/校验
 src/site/gtm.js                   GTM 容器 ID 唯一来源 + 两段代码片段
-src/site/nav.js                   页头导航的构建期生成器（{{SITE_NAV}}：首页 + 语言切换）
+src/site/nav.js                   页头导航 + 标签页正文的构建期生成器（{{SITE_NAV}} / {{TAGS_PAGE}} / {{TAG_PAGE}}）
 scripts/build-site.mjs            构建：白名单复制 + 落占位符 + 校验
 scripts/serve.mjs                 本地预览服务器（零依赖）
 scripts/live-check.mjs            上游数据源体检（联网）
@@ -289,10 +311,13 @@ docs/trend-sources.md             每个数据源的实测可用性
 ```
 
 面板页是"一个面板一页"，所以加一个面板要动五处：`assets/boards.js` 的
-`BOARD_IDS` **与 `BOARD_TAGS`**（后者不填的话那一页就没有标签、也不出现在任何
-标签组里）、`trend.js` 的加载器、中英两个页面文件、首页的入口卡。
-少任何一处都会在 `npm test` 里暴露，不会静默上线 —— 构建白名单从 `BOARD_IDS`
-推导，页脚的面板跳转由 `trend.js` 从同一份清单生成，都不用手改。
+`BOARD_IDS` **与 `BOARD_TAGS`**（后者要给它一个主题与一个来源；不填的话那一页
+就没有标签、也不出现在任何标签组里）、`trend.js` 的加载器、中英两个页面文件、
+首页的入口卡。少任何一处都会在 `npm test` 里暴露，不会静默上线 ——
+构建白名单从 `BOARD_IDS` 推导，页脚的面板跳转由 `trend.js` 从同一份清单生成，
+都不用手改。新加一个**主题**（不是榜单）才需要动标签文案：在 `boards.js` 的
+`TOPIC_SLUGS` 加 slug，并在 `i18n.js` 的两种语言各加一条 `tag.<slug>`，
+门禁会盯着"每个 slug 两种语言都有名字"。
 
 > ★ `boards.js` 放在 `assets/` 下是**必须的**，不是随手：浏览器只能拿到发布集合里的
 > 文件，而 `trend.js` 要在浏览器里 `import` 它。它曾经住在 `src/site/` 下，

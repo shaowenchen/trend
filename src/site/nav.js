@@ -2,9 +2,9 @@
  * 页头导航 —— **构建期**生成，页面里写 `{{SITE_NAV}}`。
  *
  * ## 三样：左边「首页」+「标签」，右边切换语言
- * 十二个榜单**不进页头**：它们已经在首页的入口卡片里各占一张卡，页头再列一遍
- * 就是同一份目录的第二次出现 —— 而窄屏上 12 条要挤成下拉才放得下。
- * 「标签」是一条**入口**（进 tags 页按来源/分类逛），不是榜单清单。
+ * 十七个榜单**不进页头**：它们已经在首页的入口卡片里各占一张卡，页头再列一遍
+ * 就是同一份目录的第二次出现 —— 而窄屏上这些条目要挤成下拉才放得下。
+ * 「标签」是一条**入口**（进 tags 页按主题/来源逛），不是榜单清单。
  * 榜单页之间怎么互相走，见页面下部的 `.board-links`（`trend.js` 生成）。
  *
  * ## 为什么不写进每个页面文件（现在是 30 个）
@@ -121,8 +121,13 @@ export function injectNav(html, lang, prefix, boardId, opts) {
  * 见该文件顶部说明为什么它必须在发布目录里）。这里只是隔着目录引它。
  * 不再 `export` 转出去：那会让这个构建期模块多一层对外表面，而调用方
  * （构建脚本、测试）都能直接引 `boards.js`。
+ *
+ * 标签的**显示文字**从 `assets/i18n.js` 取（`tagLabel`）—— 那份字典里没有任何
+ * DOM 依赖，Node 下能直接 import（构建脚本本来就在 Node 里跑）。这与 `BOARD_TITLES`
+ * 需要另抄一份不同：标签文字进了字典（因为它要按语言变），就不该再有第二份。
  */
-import { ALL_TAGS, boardsWithTag, BOARD_TAGS, tagsOfKind } from '../../web/public/assets/boards.js';
+import { ALL_TAGS, boardsWithTag, tagsOfKind, tagsOfBoard } from '../../web/public/assets/boards.js';
+import { tagLabel } from '../../web/public/assets/i18n.js';
 
 /* ================================================================== */
 /* 标签页                                                              */
@@ -268,13 +273,13 @@ const TAG_TEXT = {
   zh: {
     tagsTitle: '标签',
     // ★ 这一页**没有**说明句：标签卡自带数量与"包含哪些榜"的预览，
-    //   "按来源或类别浏览"这种事由分组标题直接说明，再补一句就是废话。
+    //   "按主题或来源浏览"这种事由分组标题直接说明，再补一句就是废话。
     // tag.html 的标题分前后缀，脚本只往中间插标签值
     tagPrefix: '标签：',
     allTitle: '按标签浏览',
-    // 分组标题（两类标签）
+    // 分组标题（两类标签）—— 主题在前（分类是这一页的目的），来源在后
+    topicKind: '主题分类',
     sourceKind: '数据来源',
-    topicKind: '榜单类别',
     // 卡片里的两行小字
     boardCount: '{n} 个榜单',
     noBoard: '暂无',
@@ -285,8 +290,8 @@ const TAG_TEXT = {
     tagsTitle: 'Tags',
     tagPrefix: 'Tag: ',
     allTitle: 'Browse by tag',
+    topicKind: 'Topics',
     sourceKind: 'Data sources',
-    topicKind: 'Board topics',
     boardCount: '{n} boards',
     noBoard: 'none yet',
     allTags: 'All tags',
@@ -300,11 +305,14 @@ const fill = (s, vars) =>
 /** 一张榜单卡片（与首页 `.entry` 同一套样式，所以长相一致） */
 function boardCard(lang, prefix, id) {
   const title = BOARD_TITLES[lang][id] || id;
+  // 卡片说明 = 这个榜的标签（主题在前、来源在后），按当前语言显示。
+  // 与面板头/页脚用同一份 slug 列表（`tagsOfBoard`），只是这里是构建期静态落值。
+  const tags = tagsOfBoard(id).map((slug) => tagLabel(slug, lang)).join(' · ');
   return `<a class="entry" href="${prefix}${id}.html">
       <span class="ic" data-icon="${BOARD_ICONS[id] || 'box'}"></span>
       <span class="entry-body">
         <span class="entry-title">${escHtml(title)}</span>
-        <span class="entry-desc">${escHtml((BOARD_TAGS[id] || []).join(' · '))}</span>
+        <span class="entry-desc">${escHtml(tags)}</span>
       </span>
       <span class="entry-go" aria-hidden="true">→</span>
     </a>`;
@@ -327,7 +335,7 @@ function tagCard(lang, prefix, tag) {
   const names = ids.map((id) => BOARD_TITLES[lang][id] || id);
   return `<a class="tag-card" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">
       <span class="tag-card-top">
-        <span class="tag-card-name">${escHtml(tag)}</span>
+        <span class="tag-card-name">${escHtml(tagLabel(tag, lang))}</span>
         <span class="tag-card-count">${escHtml(fill(text.boardCount, { n: ids.length }))}</span>
       </span>
       <span class="tag-card-boards">${escHtml(names.join(' · '))}</span>
@@ -350,8 +358,8 @@ function tagKindSection(lang, prefix, kind) {
 export function renderTagsPage(lang, prefix) {
   const text = TAG_TEXT[lang];
   return `<h1>${escHtml(text.tagsTitle)}</h1>
-    ${tagKindSection(lang, prefix, 'source')}
-    ${tagKindSection(lang, prefix, 'topic')}`;
+    ${tagKindSection(lang, prefix, 'topic')}
+    ${tagKindSection(lang, prefix, 'source')}`;
 }
 
 /**
@@ -366,29 +374,33 @@ export function renderTagsPage(lang, prefix) {
  */
 export function renderTagPage(lang, prefix) {
   const text = TAG_TEXT[lang];
+  // `ALL_TAGS` 本身就是"主题在前、来源在后"（见 boards.js），所以直接按它铺 ——
+  // 主题是分类（这一页的重点），来源随后。
   const groups = ALL_TAGS.map((tag) => {
     const ids = boardsWithTag(tag);
-    return `<section class="tag-group" data-tag="${escHtml(tag)}">
-      <h2 class="tag-group-head">${escHtml(tag)}<span class="tag-group-count">${escHtml(fill(text.boardCount, { n: ids.length }))}</span></h2>
+    const label = tagLabel(tag, lang);
+    // `data-tag` 是 slug（脚本按地址里的 ?t= 匹配），`data-tag-label` 是显示文字 ——
+    // 脚本收窄后要用它回填标题，否则标题会显示 slug（"标签：models"）。
+    return `<section class="tag-group" data-tag="${escHtml(tag)}" data-tag-label="${escHtml(label)}">
+      <h2 class="tag-group-head">${escHtml(label)}<span class="tag-group-count">${escHtml(fill(text.boardCount, { n: ids.length }))}</span></h2>
       <div class="entry-grid">
     ${ids.map((id) => boardCard(lang, prefix, id)).join('\n    ')}
       </div>
     </section>`;
   }).join('\n    ');
 
-  // 顶部的标签选择条：每个标签带条数，点它把页面收窄到那一组。
-  // 顺序**按类**（来源在前、类别在后）而不是 ALL_TAGS 的"首次出现"顺序 ——
-  // 后者会把 Aider 夹在 Models 与 Coding 之间，读起来像随手排的。
-  const ordered = [...tagsOfKind('source'), ...tagsOfKind('topic')];
-  const chips = ordered.map(
+  // 顶部的标签选择条：每个标签带条数，点它把页面收窄到那一组。顺序同 `ALL_TAGS`。
+  const chips = ALL_TAGS.map(
     (tag) =>
       `<a class="tag-chip" data-tag-link="${escHtml(tag)}" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">` +
-      `${escHtml(tag)}<span class="tag-chip-n">${boardsWithTag(tag).length}</span></a>`
+      `${escHtml(tagLabel(tag, lang))}<span class="tag-chip-n">${boardsWithTag(tag).length}</span></a>`
   ).join('\n      ');
 
   return `<p><a class="muted" href="${prefix}tags.html">${escHtml(text.back)}</a></p>
   <!-- 没有 ?t= 时显示"按标签浏览"（下面默认全部展开）；脚本选中某个标签后
-       会把它换成"标签：<那个标签>"。data-prefix 就是给脚本用的前缀，见 assets/tags.js。 -->
+       会把它换成"标签：<那个标签>"。data-prefix 是给脚本用的前缀，标签值本身
+       从各分组的 data-tag-label 取（见 assets/tags.js）—— 因为地址里是 slug，
+       不能直接拿它当标题。 -->
   <h1 id="tag-title" data-prefix="${escHtml(text.tagPrefix)}">${escHtml(text.allTitle)}</h1>
   <nav class="tag-grid" aria-label="${escHtml(text.allTags)}">
       ${chips}

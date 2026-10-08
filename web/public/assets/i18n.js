@@ -132,6 +132,40 @@ const zh = {
   'p.swebench.title': 'SWE-bench（真实代码修复）',
   'p.swebench.hint': '数据较大（约 4MB），进页面即加载',
 
+  // ── 标签（`boards.js` 的 slug → 面向访客的文字）──
+  // slug 进地址（`tag.html?t=models`，两种语言共用）；这里只放**显示文字**，
+  // 所以中文站显示"模型榜"、英文站显示"Models"，而地址始终是同一个。
+  // 主题四类互不重叠，每个榜恰好一个 —— 见 `boards.js` 的 BOARD_TAGS。
+  'tag.models': '模型榜',
+  'tag.benchmarks': '评测榜',
+  'tag.ecosystem': '社区生态',
+  'tag.platform': '平台洞察',
+  'tag.news': '资讯',
+  'tag.cn-hot': '中文热榜',
+  'tag.huggingface': 'HuggingFace',
+  'tag.aider': 'Aider',
+  'tag.github': 'GitHub',
+  'tag.models-dev': 'models.dev',
+  'tag.openrouter': 'OpenRouter',
+  'tag.artificial-analysis': 'Artificial Analysis',
+  'tag.swe-bench': 'SWE-bench',
+  // 资讯两张榜都是多源聚合，没有单一来源方 —— 单独一个来源标签
+  'tag.aggregator': '多源聚合',
+  // 13 个中文热榜各自的平台（点它筛出该平台那一个榜）
+  'tag.zhihu': '知乎',
+  'tag.csdn': 'CSDN',
+  'tag.juejin': '掘金',
+  'tag.itzhijia': 'IT之家',
+  'tag.huxiu': '虎嗅',
+  'tag.aifaner': '爱范儿',
+  'tag.zhongguancun': '中关村在线',
+  'tag.bilibili': 'B站',
+  'tag.weibo': '微博',
+  'tag.toutiao': '今日头条',
+  'tag.hupu': '虎扑',
+  'tag.douban': '豆瓣',
+  'tag.zhidemai': '值得买',
+
   // ── 列名 / 字段名 ──
   'col.rank': '#',
   'col.model': '模型',
@@ -383,6 +417,35 @@ const en = {
   'p.swebench.title': 'SWE-bench (real code fixes)',
   'p.swebench.hint': 'large payload (~4MB), loads on page open',
 
+  // ── Tag labels (slug → what the visitor reads; see the zh block above) ──
+  'tag.models': 'Models',
+  'tag.benchmarks': 'Benchmarks',
+  'tag.ecosystem': 'Ecosystem',
+  'tag.platform': 'Platform',
+  'tag.news': 'News',
+  'tag.cn-hot': 'Chinese hot lists',
+  'tag.huggingface': 'HuggingFace',
+  'tag.aider': 'Aider',
+  'tag.github': 'GitHub',
+  'tag.models-dev': 'models.dev',
+  'tag.openrouter': 'OpenRouter',
+  'tag.artificial-analysis': 'Artificial Analysis',
+  'tag.swe-bench': 'SWE-bench',
+  'tag.aggregator': 'Multi-source',
+  'tag.zhihu': 'Zhihu',
+  'tag.csdn': 'CSDN',
+  'tag.juejin': 'Juejin',
+  'tag.itzhijia': 'ITHome',
+  'tag.huxiu': 'Huxiu',
+  'tag.aifaner': 'Ifanr',
+  'tag.zhongguancun': 'ZOL',
+  'tag.bilibili': 'Bilibili',
+  'tag.weibo': 'Weibo',
+  'tag.toutiao': 'Toutiao',
+  'tag.hupu': 'Hupu',
+  'tag.douban': 'Douban',
+  'tag.zhidemai': 'Smzdm',
+
   'col.rank': '#',
   'col.model': 'Model',
   'col.app': 'App',
@@ -547,22 +610,37 @@ export function keysOf(locale) {
 }
 
 /**
- * 一组标签的 HTML —— 首页卡片与榜单页共用，所以放在这里而不是各写一遍。
+ * 一组标签的 HTML —— 榜单页的面板头与页脚共用，所以放在这里而不是各写一遍。
  *
- * 标签文字**不走字典**（见 `boards.js` 的说明：它们是专有名词与英文分类词，
- * 中英共用一份）；只有链接的目标前缀随语言变（中文页 `tag.html`、
- * 英文页 `../tag.html`），所以 `prefix` 由调用方按页面层级传。
+ * ## 参数是 **slug**，不是显示文字
+ * `tags` 里放的是 `boards.js` 的标签 slug（`['models','huggingface']`）。地址用 slug、
+ * 显示用当前语言的 `tag.<slug>` —— 这样"同一个标签在任何语言下都是同一个地址"，
+ * 中文站与英文站互相引用时不会各指一半。
  *
  * 为什么是链接而不是死文字：标签页的存在意义就是"点进去按类看"。
  * 少了这层链接，标签就只是装饰。
+ *
+ * @param {string[]} tags 标签 slug（顺序即显示顺序，见 `boards.js` 的 `tagsOfBoard`）
+ * @param {string} prefix 本页到站点根的相对前缀（中文页 `''`，英文页 `'../'`）
+ * @param {string} [locale] 显示语言，默认取 `DEFAULT_LOCALE`
  */
-export function tagChips(tags, prefix = '') {
+export function tagChips(tags, prefix = '', locale = DEFAULT_LOCALE) {
   return (tags || [])
-    .map(
-      (tag) =>
-        `<a class="tag-chip" href="${prefix}tag.html?t=${encodeURIComponent(tag)}">${escTag(tag)}</a>`
-    )
+    .map((slug) => {
+      const label = tagLabel(slug, locale);
+      return `<a class="tag-chip" href="${prefix}tag.html?t=${encodeURIComponent(slug)}">${escTag(label)}</a>`;
+    })
     .join('');
+}
+
+/**
+ * 标签 slug 在当前语言下的显示文字。
+ *
+ * 缺键时 `t()` 会返回 `tag.<slug>` 本身（一眼能看出漏配，而不是空白）——
+ * `site.test.js` 另有一条断言要求每个 slug 在两种语言下都有名字。
+ */
+export function tagLabel(slug, locale = DEFAULT_LOCALE) {
+  return t(locale, `tag.${slug}`);
 }
 
 /** 标签文本的转义（与 `trend.js` 的 `esc` 同样规则，独立一份免得循环依赖） */

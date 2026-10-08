@@ -15,25 +15,34 @@
  * ## 标签不认识时怎么办
  * 显示全部并把标题写回"按标签浏览"。不猜、也不写一句"没有结果"就完事 ——
  * 手输错的标签是最可能的原因，而"全部"正好让人自己找。
+ *
+ * ## 标题里的**标签值**从哪来
+ * 不取地址里的那个值 —— 地址里是 slug（`?t=models`），显示文字按语言不同
+ * （中文「模型榜」、英文 `Models`）。所以从命中分组的 `data-tag-label` 取，
+ * 那正是构建期按本页语言落好的文字。直接拿 slug 当标题会显示成"标签：models"。
  */
 const params = new URLSearchParams(location.search);
 const wanted = (params.get('t') || '').trim();
 
 const groups = [...document.querySelectorAll('.tag-group')];
 const links = [...document.querySelectorAll('[data-tag-link]')];
-const known = groups.map((g) => g.getAttribute('data-tag') || '');
+// 命中的那一组（`data-tag` 是 slug，跟地址里的 `?t=` 比）。没命中就是"未知标签"，
+// 走下面的兜底：显示全部、标题回到"按标签浏览"。
+const hit = wanted ? groups.find((g) => (g.getAttribute('data-tag') || '') === wanted) : null;
 
-if (wanted && known.includes(wanted)) {
+if (hit) {
   for (const g of groups) {
     g.hidden = (g.getAttribute('data-tag') || '') !== wanted;
   }
-  // 标题与说明：把静态的"按标签浏览"换成这一组自己的。
+  // 标题与说明：把静态的"按标签浏览"换成这一组自己的。显示文字取自分组上的
+  // `data-tag-label`（构建期按本页语言落好），**不是**地址里的 slug。
   // 前缀/后缀由构建期写在 data-* 上（它们要跟着语言走），脚本只插标签值 ——
   // 这样拼接规则只有一处（生成器），不会出现"中英文粘反了"这种错。
+  const label = hit.getAttribute('data-tag-label') || wanted;
   const title = document.getElementById('tag-title');
   const intro = document.getElementById('tag-intro');
-  if (title) title.textContent = `${title.dataset.prefix || ''}${wanted}`;
-  if (intro) intro.textContent = `${intro.dataset.prefix || ''}${wanted}${intro.dataset.suffix || ''}`;
+  if (title) title.textContent = `${title.dataset.prefix || ''}${label}`;
+  if (intro) intro.textContent = `${intro.dataset.prefix || ''}${label}${intro.dataset.suffix || ''}`;
   // 当前标签标出来（与页头、页脚导航同样用 aria-current，不只靠颜色）
   for (const a of links) {
     if (a.getAttribute('data-tag-link') === wanted) a.setAttribute('aria-current', 'page');
@@ -41,13 +50,13 @@ if (wanted && known.includes(wanted)) {
   // 浏览器标签页标题：把"按标签浏览"换成这个标签（站点名是最后一段，保持不动）
   const parts = document.title.split(' · ');
   if (parts.length > 1) {
-    parts[0] = wanted;
+    parts[0] = label;
     document.title = parts.join(' · ');
   }
 
   // 页头的语言切换链接：构建期还不知道当前标签（它在地址里），所以那时落的
   // 是 `?t=`（空值）。这里补上 —— 否则换语言会把筛选丢掉，读者被扔回"全部"。
-  // 这一处是"服务端渲染 + 运行期参数"必然留下的缝，写在这里比让每页硬编码好。
+  // 补的是 **slug**（两种语言同一个值），不是显示文字。
   for (const a of document.querySelectorAll('a.lang[href*="tag.html"]')) {
     a.setAttribute('href', a.getAttribute('href').replace(/\?t=.*$/, `?t=${encodeURIComponent(wanted)}`));
   }
