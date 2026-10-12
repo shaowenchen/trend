@@ -2,6 +2,92 @@
 
 > 约定：每个会话/回合把进度落到这里，重启后按文件接上，不依赖会话上下文。
 
+## 2026-10-12 · 第七轮：改成单页站（首页装下全部 34 个面板，没有二级页面）
+
+用户要求（原话）："页面扁平设计，不用点击二级页面。" 三个范围问题当场确认：
+
+| 问题 | 用户选择 |
+|---|---|
+| 扁平到哪一步 | **首页装下全部，首页带标签过滤，标签小一点**（删 34 个榜单页 + 两个标签页） |
+| 取数时机 | **滚动到才加载** |
+| 怎么找榜/逛 | **粘性索引条 + 主题六类分组** |
+
+第六轮"保留一张卡一个面板入口"的结构这一轮被推翻；第六轮的**视觉**（暗色默认、
+momoyu 取色、13 个来源色）保留不动。
+
+### 做了什么
+
+1. **`trend.js` 扁平化**（主体）：
+   - 主题分段：新增 `rootFor(id)` —— 面板挂进 `#topic-<主题> [data-panels]`，
+     `attachPanel` 的"同 id 原地替换"因此是在**段内**生效（切子榜不跳段）。
+   - 骨架复用：新增 `ensurePanel(meta)`（幂等）+ `shellMeta(id)`。启动时先同步建
+     34 个骨架（零网络），loader 复用同一元素 —— 于是 34 处 `panel({…})` 改成
+     `ensurePanel(...)`（字面替换）。
+   - 懒加载：`observePending`（IntersectionObserver，`rootMargin: 600px`），
+     命中即 observe→startLoader；不支持 IO 时退化成全部加载。
+   - 标题层级：`SINGLE_BOARD ? 'h1' : 'h3'`（页面 h1 = 站点名、主题段 h2）。
+   - 筛选总线：`boardVisible(id, filter)`（纯函数，已导出）+ `applyFilter` +
+     `wireFilters`（绑 **document**，见下"踩到的坑"）。
+   - 大表格延后：`mountBoard` 的完整表放进 `.table-slot[data-deferred]`，
+     `details` 首次展开才建（`eval` 是 4576 行 × 9 列）；搜索加 120ms 防抖。
+   - 深链接 `#panel-<id>`：`startAll` 读到就立刻 `startLoader`，不等滚动。
+2. **`boards.js`**：新增 `BOARD_ICONS`（头像真值，从 `src/site/nav.js` 搬来 ——
+   浏览器要它建骨架）与 `BOARD_ORDER`（按主题分段的排列，推导而非手写）。
+3. **`src/site/nav.js`**：删 `renderTagsPage`/`renderTagPage`/`tagCard`/
+   `tagKindSection`（标签页没了）；`renderNav` 去掉「标签」项（页头两样）；
+   新增 `renderIndex`（吸顶索引条）+ `renderTopics`（六个主题段骨架）。
+   删掉 34×2 的 `BOARD_TITLES` 手抄表 —— 面板名改从 `i18n.js` 的 `p.<id>.title` 取，
+   整个仓库只剩一份。`BOARD_ICONS` 也改为引 `boards.js`。
+4. **`i18n.js`**：`tagChips()` 由 `<a href="tag.html?t=…">` 改成
+   `<button data-tag-filter="…">`（就地筛选，不跳页；也天然躲开 `<a>` 套 `<a>`）。
+5. **构建/删除**：`SITE_FILES` 从 ~86 项缩到 11 项；删 34×2 个榜单页、四个标签页、
+   `assets/tags.js`、两个孤儿 `momoyu.html`。
+6. **`site.css`**：面板容器改 `#panels > .topic > .topic-grid`；新增索引条
+   （吸顶 `top: 52px`）与主题段样式；删 `.entry-grid`/`.board-links`/整套标签页样式；
+   `.panel-head :is(h1, h2, h3)`；13 个来源色选择器改指 `.idx-jump[data-jump]`。
+7. **测试**：`site.test.js` 从"逐页扫描"改成"单页门禁"（发布集合恰两页、
+   六个主题段都在、索引条 6+34 片、恰一个 h1、头像都有图标、旧页面删净）；
+   `trend.test.js` 新增 BOARD_ORDER 完备性/分段连续/头像可渲染/懒加载源码级/
+   `boardVisible` 真值表/`wireOnce` 只绑一次。`trend.test.js:855` 那条源码门禁
+   同步成 `attachPanel(rootFor(id), el, id)`。
+
+### 踩到的坑（两个，都是"页面上看不出来"的那类）
+
+1. **索引条是 `#panels` 的兄弟**，不是子节点。筛选委托一开始绑在 `panelsRoot` 上，
+   于是点索引条的主题/来源片**毫无反应**（面板头里的标签片倒是能）。
+   由一段临时 DOM 探针（点一下再把 `visible/hidden` 写进 `title`）照出来的 ——
+   改成绑 `document`。
+2. **`{{SITE_NAV}}` 也出现在 `site.css` 的注释里**，而构建对**每个**发布文件都跑
+   `injectNav` —— 于是那段导航 HTML 被塞进 CSS 的一条注释里（产物看着像损坏的 CSS）。
+   这个隐患在第六轮就存在（那时 CSS 里也写着这个 token），只是没看产物。
+   本轮把占位符替换**收口到 HTML**，并把注释里的字面量改掉。另：`index.html` 注释里
+   写出的 `{{BOARD_INDEX}}` 同样被撑开（索引条出现两次）—— 一并改掉。
+
+### 验证
+
+`npm test` 全绿（i18n 9 / ui 7 / trend 103 / ainews 16 / site 40 = 175 条），
+`npm run build` 通过（dist 11 个文件）。无头实测（本机 3.5G，一次一条 chrome）：
+
+- **懒加载**（1200×900 视口）：34 个骨架都在，只有 `models` 段前 4 个拉了数据
+  （10 张卡/个），其余 30 个仍是 `加载中…` 骨架 —— 证实"没滚到就不拉"。
+- **深链接** `#panel-zhihu`：zhihu/csdn 立刻有数据（各 10 卡），仍未全量加载。
+- **大表延后**：`#panel-swebench` 渲染出 10 张卡但 `<tr>` 为 0（表在收起的折叠区里）。
+- **筛选**（DOM 探针）：点「中文热榜」→ 可见 13、隐藏 5 个主题段、`aria-pressed=true`；
+  点「全部」→ 回到 34；点来源 `huggingface` → 可见 7，再点一次 → 34；
+  先筛选再点跳转 → 清筛选并跳 `#panel-swebench`。
+- **暗/亮 + 移动端**（390px）：截图确认索引条四行、主题分段、卡片栅格都正常，
+  页面无横向溢出（只有刻意横向滚动的那两条索引行超宽）。
+- **旧地址 404**：本地服务下 `trending.html` 返回 404（站点已无二级页）。
+
+### 待办
+
+- [ ] **推送 + 线上实测**：本轮尚未推送。推送后需复核 `index.html` / `en/index.html`
+      200 且有数据、旧地址（`trending.html`）404。
+- [ ] 快照每日刷新工作流仍未推送（第五/六轮就欠着，需带 workflow 权限的凭据）。
+- [ ] 想更激进的话：把 `models`（含 4.8MB 的 newmodels）与 `benchmarks`（含 4MB 的
+      swebench）排到主题顺序后面，让首屏更轻 —— 本轮没做，`rootMargin 600px`
+      已经让"一屏内"只加载 `models` 段的 4 个。
+
 ## 2026-10-12 · 第六轮：照 momoyu.cc 那一版换观感 + 中文热榜不再截断
 
 用户要求（原话）："https://momoyu.cc/ 参考以下这个风格，重新更新以下设计。

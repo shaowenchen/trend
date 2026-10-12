@@ -24,7 +24,7 @@
  * 若上游改用超出该子集的写法，本面板会**明确报错并只影响自己**，不会静默出错值。
  */
 
-import { icon, injectIcons } from './ui.js';
+import { icon } from './ui.js';
 import { t, tagChips } from './i18n.js';
 
 /**
@@ -237,32 +237,113 @@ const panelsRoot = typeof document === 'undefined' ? null : document.querySelect
  * 这里再导出一次，是为了让测试继续从同一个地方取（也免得 `./trend.js` 的
  * 既有引用者改 import）。
  */
-export { BOARD_IDS, BOARD_TAGS } from './boards.js';
-import { BOARD_IDS, tagsOfBoard } from './boards.js';
-
-/**
- * 本页到站点根的相对前缀 —— 标签链接要用（中文页 `tag.html`，英文页 `../tag.html`）。
- * 与 `ui.js` 的回填同一套判断：语言已经是 `LOCALE` 定好的，这里只需要知道层级。
- */
-const TAG_PREFIX = LOCALE === 'en' ? '../' : '';
+export { BOARD_IDS, BOARD_TAGS, BOARD_ICONS, BOARD_ORDER } from './boards.js';
+import { BOARD_IDS, BOARD_TAGS, BOARD_ICONS, BOARD_ORDER, TOPIC_SLUGS, tagsOfBoard } from './boards.js';
 
 /**
  * 本页要跑哪个面板：`data-board` 指名的那一个；**没写就是全部**。
  *
- * "没写就跑全部"是可贵的兜底：它是本文件在 Node 测试与旧页面下的行为，
- * 也让"忘了写 data-board"退化成"跑得慢一点"而不是"空白页"。
- * 但写了**且名字不认识**就是硬错误 —— 那种情况只会是页面写错或 id 改过，
- * 静默渲染空白页是本站最不想要的那种失败（见 startAll 里的报错）。
+ * 扁平站之后**首页正是"没写 `data-board`"** —— 一页装下全部 34 个面板。
+ * 这条兜底因此从"忘了写属性的退路"变成了主路径：没写 → 跑全部（慢一点但正确），
+ * 写了名字不认识 → 硬错误（见 startAll 里的报错，静默空白是本站最不想要的失败）。
+ * 页面要跑的顺序取 `BOARD_ORDER`（按主题分段），不是 `BOARD_IDS`（那是稳定清单）。
  */
 const requestedBoard = String(panelsRoot?.dataset?.board || '').trim();
-const wantedIds = requestedBoard ? BOARD_IDS.filter((id) => id === requestedBoard) : BOARD_IDS;
+const wantedIds = requestedBoard ? BOARD_IDS.filter((id) => id === requestedBoard) : BOARD_ORDER;
 
 /**
  * 单面板页：本页只有一个面板，于是这个面板就是页面的主体 ——
  * 它的标题升级成 `<h1>`（一页一个 h1，且不另写一遍 hero 标题）。
- * 这样"面板叫什么"仍然只有 `i18n.js` 一处来源，22 个页面文件里一个字都不重复。
+ * 这样"面板叫什么"仍然只有 `i18n.js` 一处来源，页面文件里一个字都不重复。
+ *
+ * 扁平站之后"单面板页"只剩一个来源：页面自己写了 `data-board`。
+ * 其余情况（首页）是**一页装下全部** —— 那时页面标题 `<h1>` 由构建期落在骨架里，
+ * 面板标题降到 `<h3>`（中间的主题段标题是 `<h2>`），层级才不会两头抢。
  */
 const SINGLE_BOARD = Boolean(requestedBoard);
+
+/**
+ * 某个面板该挂进哪个容器。
+ *
+ * 扁平页把 `#panels` 分成 6 个**主题段**（`<section class="topic" id="topic-<slug>">`
+ * 里的 `<div class="topic-grid" data-panels>`）。一个面板挂到自己主题那一段里，
+ * 于是"同一类的榜挨在一起"。`attachPanel` 的"同 id 原地替换"因此是在**段内**
+ * 生效的 —— 切子榜时面板留在原地，不会跳到别的段里。
+ *
+ * 找不到主题容器时回落到 `panelsRoot`：那是单面板页与 Node 测试的情形
+ * （没有主题分段，只有一个容器）。
+ */
+function rootFor(id) {
+  const topic = BOARD_TAGS[id]?.topic;
+  const grid = topic ? $(`#topic-${topic} [data-panels]`) : null;
+  return grid || panelsRoot;
+}
+
+/**
+ * 取一个已存在的面板句柄（`#panel-<id>` 的操作柄），没有就返回 null。
+ * 句柄的形状与 `panel()` 的返回值一致，所以 loader 不关心面板是
+ * "刚建的"还是"骨架阶段就建好的"。
+ */
+function panelHandle(el) {
+  return {
+    el,
+    status: (text, kind = '') => {
+      const p = $('.panel-status', el);
+      if (!p) return;
+      p.textContent = text;
+      // 转圈只在"还在动"的时候出现；拿到结果或报错就停下
+      p.className = `panel-status ${kind}${kind ? '' : ' loading'}`;
+      p.hidden = !text;
+    },
+    body: (html) => {
+      const b = $('.panel-body', el);
+      if (b) b.innerHTML = html;
+    },
+  };
+}
+
+/**
+ * 确保某个面板的骨架存在，并返回它的句柄。
+ *
+ * ## 为什么需要它（扁平站的核心一环）
+ * 懒加载要"先有骨架、再观察、滚到了才拉数据"。而今天面板外壳是在 loader
+ * **内部**才建的 —— 那就没有东西可观察。于是启动时先给每个面板 `ensurePanel`
+ * 出一块骨架（同步、零网络），观察器盯着这些骨架；滚到时调 loader，loader 复用
+ * 同一块骨架填数据（`ensurePanel` 幂等：`#panel-<id>` 已在就原样返回）。
+ *
+ * ## 为什么 loader 也调它
+ * 子榜切换走的是"重新调用 loader"（chip 点击 → `loadRepos('month')`）。那条路径上
+ * 骨架已经在了，`ensurePanel` 直接返回它，于是**不重建、不重排** —— 这正是
+ * `attachPanel` 那条"同 id 原地替换"修复想保住的行为（见那些测试）。
+ */
+function ensurePanel(meta) {
+  const existing = panelsRoot?.querySelector?.(`#panel-${meta.id}`);
+  if (existing) return panelHandle(existing);
+  return panel(meta);
+}
+
+/**
+ * 只绑一次的事件委托。
+ *
+ * ## 为什么需要它（扁平站引入的一个真缺陷）
+ * 面板里的子榜/子视图切换（repos 周期、ghTrending 的 AI 过滤、hotList 的"仅 AI"、
+ * swebench 子榜、orPerf 视图…）走的是"事件委托绑在面板元素上"，注释写的是
+ * "挂面板上只绑一次即可"。**在"一个面板一页"的世界里那是对的**：`panel()` 每次
+ * 都建一个**新元素**，旧的随页面走了，监听器不会累积。
+ *
+ * 扁平站改了这件事：`ensurePanel` 让"重新调用 loader"（点刷新、或加载器重跑）
+ * 复用**同一个**元素，于是同一个监听器被重复挂上 —— 点一次 chip 会触发 N 次，
+ * 而页面上看不出任何异常。`key` 把"这个元素上装过哪些委托"记在 dataset 上，
+ * 重复调用直接返回。
+ *
+ * 导出是为了能测：这条缺陷只有"点两次刷新再点一次 chip"才显形，靠人眼测不出来。
+ */
+export function wireOnce(el, key, fn) {
+  const flag = `wired${key}`;
+  if (el.dataset[flag]) return;
+  el.dataset[flag] = '1';
+  el.addEventListener('click', fn);
+}
 
 
 /** 加载中的骨架：铺几行灰条，让人知道"这里会有内容"以及大致是表格的形状 */
@@ -271,9 +352,27 @@ function skeleton(lines = 5) {
 }
 
 /**
- * 建一个面板并返回它的操作柄。
- * 面板先以"加载中"出现，填好后替换 —— 避免整页空白等最慢的那个源。
+ * 面板骨架的**头像是唯一必需的信息** —— 建骨架时得先把头像摆上去，
+ * 否则懒加载的观察器没有东西可盯、面板会一直只有一排灰条。
+ *
+ * 以前头像名是各 loader 里的字面量（`panel({ iconName: 'trophy' })`）。
+ * 扁平站之后骨架要**在 loader 之前**建，头像就成了"渲染会不会炸"的真值
+ * （`ui.js` 的 `icon()` 遇到未登记的名字**直接抛错**），所以它搬进了
+ * `boards.js`（`BOARD_ICONS`）—— 那里是面板 id 与标签的真值所在，
+ * 也是浏览器够得着的地方。标题与说明仍由 loader 在填充阶段落值。
+ *
+ * 漏登记一个 id 时回落 `'box'`：`icon('box')` 是有效图标，骨架不炸；
+ * 真正的头像对不对由 loader 那一次 `ensurePanel` 覆盖过来。
  */
+function shellMeta(id) {
+  return {
+    id,
+    iconName: BOARD_ICONS[id] || 'box',
+    title: L(`p.${id}.title`),
+    hint: L(`p.${id}.hint`),
+  };
+}
+
 /**
  * 把一个新建的面板挂进容器 —— **同 id 已存在就原地替换**。
  *
@@ -294,15 +393,24 @@ export function attachPanel(root, el, id) {
   return el;
 }
 
+/**
+ * 建一个面板并返回它的操作柄。
+ * 面板先以"加载中"出现，填好后替换 —— 避免整页空白等最慢的那个源。
+ *
+ * ★ 挂载**只能经由 `attachPanel`**（`trend.test.js` 有一条源码级断言盯着）：
+ * 直接 `panelsRoot.appendChild` 会让"切换子榜"退化成"又追加一个同 id 的面板"。
+ */
 function panel({ id, iconName, title, hint }) {
   const el = document.createElement('section');
   el.className = 'panel';
   el.id = `panel-${id}`;
-  // 整页只有这一个面板时，它的标题就是页面的标题 —— 用 h1 承担
-  // （一页一个 h1；读屏器也能靠它一眼报出"这是什么页"）
-  const heading = SINGLE_BOARD ? 'h1' : 'h2';
-  // 这个榜的标签（主题 + 来源），点进去按类看别的榜。标签真值见 boards.js。
-  const tags = tagChips(tagsOfBoard(id), TAG_PREFIX, LOCALE);
+  // 整页只有这一个面板时（`data-board` 页），它的标题就是页面的标题 —— 用 h1 承担
+  // （一页一个 h1；读屏器也能靠它一眼报出"这是什么页"）。
+  // 扁平页上不是：页面 h1 是站点标题、主题段是 h2，所以面板落到 h3，
+  // 层级才一以贯之（`site.css` 的 `.panel-head :is(h1, h3)` 是另一半）。
+  const heading = SINGLE_BOARD ? 'h1' : 'h3';
+  // 这个榜的标签（主题 + 来源），点一下就地按类收窄（不再是独立标签页）
+  const tags = tagChips(tagsOfBoard(id), LOCALE);
   el.innerHTML = `
     <header class="panel-head">
       <${heading}><span class="panel-icon">${icon(iconName)}</span>${esc(title)}</${heading}>
@@ -311,7 +419,7 @@ function panel({ id, iconName, title, hint }) {
     </header>
     <p class="panel-status loading" aria-live="polite">${L('ui.loading')}</p>
     <div class="panel-body">${skeleton()}</div>`;
-  attachPanel(panelsRoot, el, id);
+  attachPanel(rootFor(id), el, id);
   return {
     el,
     status: (text, kind = '') => {
@@ -574,6 +682,12 @@ function mountBoard(p, cfg) {
     // ── 完整列表：放在折叠区里 ──
     // 为什么表格不删：卡片回答"最靠前的是谁"，表格回答"第 47 名是谁 / 按成本排一下"。
     // 两者不是同一个问题，所以保留，但收起来不占首屏。
+    //
+    // ★ 表格**延后到展开时才建**：扁平页把 34 个面板放进一页，而 `eval` 的完整表
+    //   是 4576 行 × 9 列（约 4 万个单元格）、`orCatalog` 也有整份目录 —— 每个
+    //   `<details>` 默认都是收起的，先把它们全建出来等于拿几万个看不见的节点
+    //   撑爆 DOM。展开过（`state.open` 为真）之后按老样子每次重画都重建，
+    //   所以搜索/排序的手感不变；差别只在于"从没打开过的面板不再花这份钱"。
     const listHtml = cfg.table === false
       ? ''
       : `<details class="more"${state.open ? ' open' : ''}>` +
@@ -586,7 +700,7 @@ function mountBoard(p, cfg) {
           groupLabel: cfg.groupLabel || L('ui.allGroups'),
         }) +
         `<p class="board-count">${esc(note)}</p>` +
-        table(cfg.cols, shown, state.sort) +
+        `<div class="table-slot"${state.open ? '' : ` data-deferred`}>${state.open ? table(cfg.cols, shown, state.sort) : ''}</div>` +
         '</details>';
 
     p.body((cfg.beforeControls ? cfg.beforeControls() : '') + cardsHtml + listHtml);
@@ -607,22 +721,36 @@ function mountBoard(p, cfg) {
       });
     }
 
-    // 折叠区的开合状态记住，重画（比如搜索）时不要把用户的展开动作弹回去
+    // 折叠区：记住开合状态，并在**首次展开时**把延后的大表建出来。
     const det = p.el.querySelector('details.more');
-    if (det) det.addEventListener('toggle', () => { state.open = det.open; });
-    // 重新绑定（DOM 已换）
+    if (det) {
+      det.addEventListener('toggle', () => {
+        state.open = det.open;
+        const slot = det.querySelector('.table-slot[data-deferred]');
+        if (det.open && slot) {
+          slot.innerHTML = table(cfg.cols, shown, state.sort);
+          slot.removeAttribute('data-deferred');
+        }
+      });
+    }
+    // 重新绑定（DOM 已换）。搜索做 ~120ms 防抖：扁平页上"边打字边重画"
+    // 可能意味着每次按键重排几万行（`eval`），键盘手感会顿。
     const q = p.el.querySelector('[data-q]');
     if (q) {
+      let timer = null;
       q.addEventListener('input', () => {
         state.q = q.value;
         const pos = q.selectionStart;
-        draw();
-        // 保持焦点与光标位置，否则每敲一个字都会掉焦点
-        const nq = p.el.querySelector('[data-q]');
-        if (nq) {
-          nq.focus();
-          try { nq.setSelectionRange(pos, pos); } catch { /* 该类型不支持就算了 */ }
-        }
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          draw();
+          // 保持焦点与光标位置，否则每敲一个字都会掉焦点
+          const nq = p.el.querySelector('[data-q]');
+          if (nq) {
+            nq.focus();
+            try { nq.setSelectionRange(pos, pos); } catch { /* 该类型不支持就算了 */ }
+          }
+        }, 120);
       });
     }
     const g = p.el.querySelector('[data-group]');
@@ -719,12 +847,7 @@ function withRank(rows) {
 }
 
 async function loadModelBoard({ id, iconName, title, sort, metric, hint }) {
-  const p = panel({
-    id,
-    iconName,
-    title,
-    hint,
-  });
+  const p = ensurePanel({ id, iconName, title, hint });
   try {
     const url = `${HF_MODELS}?sort=${sort}&direction=-1&limit=50`;
     const data = await cachedJson(`hf-${sort}`, url);
@@ -949,12 +1072,7 @@ function mountEvalBoard(p, models, note) {
 }
 
 async function loadEvalBoard() {
-  const p = panel({
-    id: 'eval',
-    iconName: 'trophy',
-    title: L('p.eval.title'),
-    hint: L('p.eval.hint'),
-  });
+  const p = ensurePanel(shellMeta('eval'));
   // 走 readCacheEntry()/readSnapshot() 而不是直接碰存储：存储被禁用时要降级成
   // "没有缓存"，而不是让整块面板崩掉（它只是缓存，不该有这种权力）
   const cached = readCacheEntry('eval-board', CACHE_TTL_MS);
@@ -1124,12 +1242,7 @@ export function bestAiderRows(entries) {
 }
 
 async function loadAiderBoard() {
-  const p = panel({
-    id: 'aider',
-    iconName: 'code',
-    title: L('p.aider.title'),
-    hint: L('p.aider.hint'),
-  });
+  const p = ensurePanel(shellMeta('aider'));
   try {
     const res = await fetch(AIDER_URL, { headers: { accept: 'text/plain' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1168,12 +1281,7 @@ async function loadAiderBoard() {
 /* ================================================================== */
 
 async function loadSpaces() {
-  const p = panel({
-    id: 'spaces',
-    iconName: 'cube',
-    title: L('p.spaces.title'),
-    hint: L('p.spaces.hint'),
-  });
+  const p = ensurePanel(shellMeta('spaces'));
   try {
     const data = await cachedJson('hf-spaces', `${HF_MODELS.replace('/models', '/spaces')}?sort=trendingScore&direction=-1&limit=50`);
     if (!Array.isArray(data)) throw new Error(L('err.notArray'));
@@ -1219,12 +1327,7 @@ async function loadSpaces() {
 /* ================================================================== */
 
 async function loadDatasets() {
-  const p = panel({
-    id: 'datasets',
-    iconName: 'layers',
-    title: L('p.datasets.title'),
-    hint: L('p.spaces.hint'),
-  });
+  const p = ensurePanel(shellMeta('datasets'));
   try {
     const data = await cachedJson('hf-datasets', `${HF_MODELS.replace('/models', '/datasets')}?sort=trendingScore&direction=-1&limit=50`);
     if (!Array.isArray(data)) throw new Error(L('err.notArray'));
@@ -1293,12 +1396,7 @@ export function rankPapers(entries) {
 }
 
 async function loadPapers() {
-  const p = panel({
-    id: 'papers',
-    iconName: 'file',
-    title: L('p.papers.title'),
-    hint: L('p.papers.hint'),
-  });
+  const p = ensurePanel(shellMeta('papers'));
   try {
     const data = await cachedJson('hf-papers', 'https://huggingface.co/api/daily_papers?limit=50');
     if (!Array.isArray(data)) throw new Error(L('err.notArray'));
@@ -1378,12 +1476,7 @@ export function rankRepos(items, metricKey) {
 }
 
 async function loadRepos(range = 'week') {
-  const p = panel({
-    id: 'repos',
-    iconName: 'star',
-    title: L('p.repos.title'),
-    hint: L('p.repos.hint'),
-  });
+  const p = ensurePanel(shellMeta('repos'));
   try {
     const q = GH_QUERIES[range].q.replace('@WEEK@', isoDaysAgo(7)).replace('@MONTH@', isoDaysAgo(30));
     const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=30`;
@@ -1425,7 +1518,7 @@ async function loadRepos(range = 'week') {
 
     // 绑定时间段切换（mountBoard 每次重画都会换 DOM，所以在这里绑会随重画失效，
     // 因此挂到面板元素上用事件委托 —— 只绑一次即可）
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'range', (e) => {
       const btn = e.target.closest?.('[data-range]');
       if (btn) loadRepos(btn.getAttribute('data-range'));
     });
@@ -1559,12 +1652,7 @@ export function flattenGhTrending(snap) {
 
 /** 面板：GitHub Trending 每日榜（默认只看 AI 相关，可切全部仓库） */
 async function loadGhTrending(view = 'ai') {
-  const p = panel({
-    id: 'ghTrending',
-    iconName: 'trending',
-    title: L('p.ghTrending.title'),
-    hint: L('p.ghTrending.hint'),
-  });
+  const p = ensurePanel(shellMeta('ghTrending'));
   try {
     // 快照很小（几十 KB），10 分钟内的会话缓存足够 —— 数据本来就是每日一更
     const snap = await cachedJson('gh-trending', GH_TRENDING_SNAP_URL);
@@ -1606,7 +1694,7 @@ async function loadGhTrending(view = 'ai') {
       },
     });
     // 子视图切换（事件委托：mountBoard 每次重画都换 DOM，绑在面板元素上只绑一次）
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'ghtrend', (e) => {
       const b = e.target.closest?.('[data-ghtrend]');
       if (b) loadGhTrending(b.getAttribute('data-ghtrend'));
     });
@@ -1659,12 +1747,7 @@ export function flattenAiNews(snap) {
  * 改了这边忘了那边）。
  */
 async function mountNewsPanel({ id, iconName, snapUrl, cacheKey, showScore = true }) {
-  const p = panel({
-    id,
-    iconName,
-    title: L(`p.${id}.title`),
-    hint: L(`p.${id}.hint`),
-  });
+  const p = ensurePanel({ id, iconName, title: L(`p.${id}.title`), hint: L(`p.${id}.hint`) });
   try {
     const snap = await cachedJson(cacheKey, snapUrl);
     const rows = flattenAiNews(snap);
@@ -1795,9 +1878,11 @@ export const HOT_LIST_ICONS = {
  * "这条榜是什么时候的"）。条目链接指向原平台，如实呈现。
  */
 async function loadHotList(key, view = 'all') {
-  const p = panel({
+  // 头像优先取 `boards.js` 的 `BOARD_ICONS`（骨架阶段用的同一份），
+  // 缺了才回落到 `HOT_LIST_ICONS`（13 个中文热榜的历史表）与 `'monitor'`。
+  const p = ensurePanel({
     id: key,
-    iconName: HOT_LIST_ICONS[key] || 'monitor',
+    iconName: BOARD_ICONS[key] || HOT_LIST_ICONS[key] || 'monitor',
     title: L(`p.${key}.title`),
     hint: L(`p.${key}.hint`),
   });
@@ -1837,7 +1922,7 @@ async function loadHotList(key, view = 'all') {
       },
     });
     // 子视图切换（事件委托：mountBoard 重画换 DOM，绑在面板元素上只绑一次）
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'mmy', (e) => {
       const b = e.target.closest?.('[data-mmy]');
       if (b) loadHotList(key, b.getAttribute('data-mmy'));
     });
@@ -1895,12 +1980,7 @@ export function fmtCost(v) {
 }
 
 async function loadNewModels() {
-  const p = panel({
-    id: 'newmodels',
-    iconName: 'box',
-    title: L('p.newmodels.title'),
-    hint: L('p.newmodels.hint'),
-  });
+  const p = ensurePanel(shellMeta('newmodels'));
   // ★ 进页面就拉（4.8MB）—— 与 SWE-bench 同理：这一页只有这一张榜，
   // 多一次点击只是多一步。
   p.status(L('st.loadingBig', { size: '4.8MB' }), 'loading');
@@ -2012,12 +2092,7 @@ export function rankSweBench(boards, boardName = DEFAULT_SWE_BOARD) {
 }
 
 async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
-  const p = panel({
-    id: 'swebench',
-    iconName: 'code',
-    title: L('p.swebench.title'),
-    hint: L('p.swebench.hint'),
-  });
+  const p = ensurePanel(shellMeta('swebench'));
 
   // ★ 进页面就拉（4MB）。曾经是"点击才加载"，但那个按钮是**多余的仪式** ——
   // 这一页只有这一张榜，读者既然点进来了就是要看它，多一次点击只是多一步。
@@ -2061,7 +2136,7 @@ async function loadSweBench(boardName = DEFAULT_SWE_BOARD) {
       },
     });
     // 事件委托：重画会换掉 DOM，挂面板上只绑一次
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'subboard', (e) => {
       const btn = e.target.closest?.('[data-board]');
       if (btn) render(boards, btn.getAttribute('data-board'));
     });
@@ -2197,12 +2272,7 @@ export function openrouterLabel(slug, nameOf) {
 }
 
 async function loadOpenRouter() {
-  const p = panel({
-    id: 'openrouter',
-    iconName: 'bolt',
-    title: L('p.openrouter.title'),
-    hint: L('p.openrouter.hint'),
-  });
+  const p = ensurePanel(shellMeta('openrouter'));
   p.status(L('st.loadingBig', { size: '420KB + 760KB' }), 'loading');
   try {
     // 两份数据：用量榜（主数据）+ 模型清单（只为了名字）
@@ -2439,7 +2509,7 @@ function subBoardChips(views, current, attr) {
 
 /** 面板：OpenRouter 上升榜（climbing / breakouts 两个子榜） */
 async function loadOrTrends(view = 'climbing') {
-  const p = panel({ id: 'orTrends', iconName: 'trending', title: L('p.orTrends.title'), hint: L('p.orTrends.hint') });
+  const p = ensurePanel(shellMeta('orTrends'));
   try {
     const [disc, models] = await Promise.all([
       cachedJson('or-discovery', `${OR_API}/rankings/discovery`),
@@ -2483,7 +2553,7 @@ async function loadOrTrends(view = 'climbing') {
         link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
       },
     });
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'trend', (e) => {
       const b = e.target.closest?.('[data-trend]');
       if (b) loadOrTrends(b.getAttribute('data-trend'));
     });
@@ -2495,7 +2565,7 @@ async function loadOrTrends(view = 'climbing') {
 
 /** 面板：OpenRouter 机构份额 */
 async function loadOrAuthors() {
-  const p = panel({ id: 'orAuthors', iconName: 'database', title: L('p.orAuthors.title'), hint: L('p.orAuthors.hint') });
+  const p = ensurePanel(shellMeta('orAuthors'));
   try {
     const disc = await cachedJson('or-discovery', `${OR_API}/rankings/discovery`);
     const rows = rankAuthors(disc?.data?.authors);
@@ -2536,7 +2606,7 @@ async function loadOrAuthors() {
 
 /** 面板：OpenRouter 性能榜（延迟 / 吞吐两个子榜） */
 async function loadOrPerformance(view = 'latency') {
-  const p = panel({ id: 'orPerf', iconName: 'bolt', title: L('p.orPerf.title'), hint: L('p.orPerf.hint') });
+  const p = ensurePanel(shellMeta('orPerf'));
   try {
     const data = await cachedJson('or-performance', `${OR_API}/rankings/performance`);
     const rows = rankPerformance(data?.data, view);
@@ -2575,7 +2645,7 @@ async function loadOrPerformance(view = 'latency') {
           `<span class="tag">${compact(r.requests) ?? '—'} ${L('col.orReqCount')}</span>`,
       },
     });
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'perf', (e) => {
       const b = e.target.closest?.('[data-perf]');
       if (b) loadOrPerformance(b.getAttribute('data-perf'));
     });
@@ -2587,7 +2657,7 @@ async function loadOrPerformance(view = 'latency') {
 
 /** 面板：Artificial Analysis 三张评测榜（与 HF 评测榜不同来源，可并列看） */
 async function loadOrBenchmarks(view = 'intelligence') {
-  const p = panel({ id: 'aaBench', iconName: 'trophy', title: L('p.aaBench.title'), hint: L('p.aaBench.hint') });
+  const p = ensurePanel(shellMeta('aaBench'));
   try {
     const data = await cachedJson('or-benchmarks', `${OR_API}/rankings/benchmarks`);
     const rows = rankAa(data?.data?.aaData?.[view]);
@@ -2619,7 +2689,7 @@ async function loadOrBenchmarks(view = 'intelligence') {
         link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
       },
     });
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'aa', (e) => {
       const b = e.target.closest?.('[data-aa]');
       if (b) loadOrBenchmarks(b.getAttribute('data-aa'));
     });
@@ -2712,12 +2782,7 @@ function mountOrCatalog(p, rows, note) {
  * 762KB 与 models.dev（4.8MB）/ SWE-bench（4MB）同属"进页面就拉"的量级。
  */
 async function loadOrCatalog() {
-  const p = panel({
-    id: 'orCatalog',
-    iconName: 'database',
-    title: L('p.orCatalog.title'),
-    hint: L('p.orCatalog.hint'),
-  });
+  const p = ensurePanel(shellMeta('orCatalog'));
   p.status(L('st.loadingBig', { size: '0.76MB' }), 'loading');
   p.body(skeleton(6));
   try {
@@ -2746,7 +2811,7 @@ async function loadOrCatalog() {
 
 /** 面板：OpenRouter 应用榜 + 多模态用量（三个子榜） */
 async function loadOrApps(view = 'day') {
-  const p = panel({ id: 'orApps', iconName: 'cube', title: L('p.orApps.title'), hint: L('p.orApps.hint') });
+  const p = ensurePanel(shellMeta('orApps'));
   const views = { day: 'p.orApps.day', week: 'p.orApps.week', image: 'p.orApps.image', video: 'p.orApps.video', audio: 'p.orApps.audio' };
   try {
     const isMedia = view === 'image' || view === 'video' || view === 'audio';
@@ -2807,7 +2872,7 @@ async function loadOrApps(view = 'day') {
       beforeControls: () => subBoardChips(views, view, 'app'),
       card,
     });
-    p.el.addEventListener('click', (e) => {
+    wireOnce(p.el, 'app', (e) => {
       const b = e.target.closest?.('[data-app]');
       if (b) loadOrApps(b.getAttribute('data-app'));
     });
@@ -2898,6 +2963,9 @@ const BOARD_LOADERS = {
  *
  * localStorage 的快照**不清**（它是上游挂掉时的回退物），但要立一个
  * **强制重拉**标记：评测榜对 7 天内快照直接复用，不设标记的话按钮对它无效。
+ *
+ * 扁平页上不再把 `#panels` 清空重建 —— 那会让滚动位置与已展开的折叠区全都跳掉。
+ * 改为：已经加载过的面板**原地重跑** loader，没加载过的交回观察器（滚到才拉）。
  */
 function reloadAll() {
   clearCache();
@@ -2906,11 +2974,28 @@ function reloadAll() {
   } catch {
     /* 存不进就算了：顶多评测榜这次仍用快照，不是错误 */
   }
-  panelsRoot.innerHTML = '';
-  startAll();
+  if (SINGLE_BOARD) {
+    // 单面板页：唯一那个面板重建就行（此时清空无害 —— 整页就它一个）
+    panelsRoot.innerHTML = '';
+    startAll();
+    return;
+  }
+  const pending = [];
+  for (const id of wantedIds) {
+    if (loaded.has(id)) startLoader(id); // 已加载的：重跑（清过缓存，会真的重拉）
+    else pending.push(id);
+  }
+  observePending(pending);
 }
 
-/** 逐个启动面板（不 await 彼此）：最慢的源不该挡住最快的源 */
+/**
+ * 逐个启动面板（不 await 彼此）：最慢的源不该挡住最快的源。
+ *
+ * 扁平页把"建骨架"与"拉数据"拆开：所有骨架先同步建好（零网络），
+ * 观察器盯着它们；滚到视口附近才调 loader。今天重型面板是靠"翻页"才不加载的
+ * （models.dev 4.8MB、SWE-bench 4MB、评测榜 46 页），一页装下之后必须改用懒加载，
+ * 否则进页面会同时开拉十几个源。
+ */
 function startAll() {
   // 页面指名的 panel 不存在 → 明着报，不要渲染一个空白页。
   // 走到这里只会是页面写错 id 或 id 改过（`SITE_FILES` / 导航 / data-board 三处要一起改）
@@ -2920,73 +3005,178 @@ function startAll() {
       `${esc(L('err.unknownBoard', { id: requestedBoard }))}</p></section>`;
     return;
   }
-  for (const id of wantedIds) {
-    Promise.resolve()
-      .then(() => BOARD_LOADERS[id]())
-      .catch((e) => {
-        // 兜底：面板构造本身出错也要看得见，不能静默消失
-        const el = document.createElement('section');
+  // ① 建骨架：同步、无网络。面板的头像与标题因此立刻可见，页面有形状。
+  for (const id of wantedIds) ensurePanel(shellMeta(id));
+  // ② 触发加载：单面板页直接全加载（就一个）；扁平页交给观察器
+  if (SINGLE_BOARD) for (const id of wantedIds) startLoader(id);
+  else observePending(wantedIds);
+}
+
+/** 已经跑过 loader 的面板 id（刷新时据此决定"原地重跑"还是"重新交给观察器"） */
+const loaded = new Set();
+/** 正在拉取中的面板 id —— 挡住"观察器 + 深链接"对同一个面板重复发起 */
+const inflight = new Set();
+
+/** 跑一个面板的 loader，出错时**画进它自己那块面板**（不静默消失） */
+function startLoader(id) {
+  if (inflight.has(id)) return; // 同一次加载不重复发起
+  inflight.add(id);
+  loaded.add(id);
+  Promise.resolve()
+    .then(() => BOARD_LOADERS[id]())
+    .catch((e) => {
+      // 兜底：面板构造本身出错也要看得见。骨架已经在 DOM 里，往它里面写错误即可；
+      // 万一连骨架都没有（不该发生），**经由 attachPanel** 补一块 —— 不直接 appendChild，
+      // 那正是本站修过的"同 id 两个面板"缺陷（见 attachPanel 的注释）。
+      let el = panelsRoot.querySelector(`#panel-${id}`);
+      if (!el) {
+        el = document.createElement('section');
         el.className = 'panel';
-        el.innerHTML = `<p class="panel-status err">${L('err.init', { msg: esc(e.message) })}</p>`;
-        panelsRoot.appendChild(el);
-      });
+        el.id = `panel-${id}`;
+        attachPanel(rootFor(id), el, id);
+      }
+      el.innerHTML = `<p class="panel-status err">${L('err.init', { msg: esc(e.message) })}</p>`;
+    })
+    .finally(() => inflight.delete(id));
+}
+
+/**
+ * 扁平页的懒加载：滚到视口附近才调 loader。
+ *
+ * `rootMargin` 给一屏（600px）的提前量 —— 出发点是"滚到那一块时数据已经在了"，
+ * 而不是"滚到了才开始数秒等待"。命中即 `unobserve`（每个面板只拉一次）。
+ *
+ * **观察器只建一个**（`panelObserver`，模块级）：`reloadAll` 会给"还没加载过的"
+ * 面板再 `observePending` 一次，若每次都 `new IntersectionObserver` 就会在同一批
+ * 目标上叠出第二个、第三个观察器。`armed` 记着"这个 id 已经交给观察器了"，
+ * 重复调用不重复观察。`rootFor`/`ensurePanel` 之外，这是"面板只做一次事"的
+ * 又一环（另两环见 `inflight` 与 `wireOnce`）。
+ *
+ * 没有 `IntersectionObserver` 时退化成"全部加载"：与"没写 data-board 就跑全部"
+ * 同一个思路 —— 慢一点，但不会空白。
+ */
+let panelObserver = null;
+const armed = new Set();
+
+function observePending(ids) {
+  const todo = ids.filter((id) => !armed.has(id) && !loaded.has(id));
+  if (!todo.length) return;
+  if (!('IntersectionObserver' in window)) {
+    for (const id of todo) startLoader(id);
+    return;
   }
+  if (!panelObserver) {
+    panelObserver = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (!en.isIntersecting) continue;
+          const id = en.target.id.replace(/^panel-/, '');
+          panelObserver.unobserve(en.target);
+          armed.delete(id);
+          startLoader(id);
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+  }
+  for (const id of todo) {
+    const el = panelsRoot.querySelector(`#panel-${id}`);
+    if (!el) continue;
+    armed.add(id);
+    panelObserver.observe(el);
+  }
+}
+
+/**
+ * 扁平页的交互总线：主题筛选（索引条）与标签筛选（面板头）。
+ *
+ * 两者是**同一条轴上的收窄**：主题是分类（每个榜恰好一个），标签是"主题或来源"
+ * （来源会横跨主题）。所以取交集就能满足"点主题 = 看这一类"与"点 HuggingFace =
+ * 看这个来源"，且两者可以叠加。收窄只切显示，面板始终留在 DOM 里 ——
+ * 于是索引条里的 `#panel-<id>` 锚点永远有效。
+ */
+const filter = { topic: '*', tag: '*' };
+
+/** 收窄后该不该显示某个榜 —— 抽成纯函数便于测试（不碰 DOM） */
+export function boardVisible(id, f) {
+  const t = BOARD_TAGS[id];
+  if (!t) return false;
+  if (f.topic !== '*' && t.topic !== f.topic) return false;
+  if (f.tag !== '*' && t.topic !== f.tag && t.source !== f.tag) return false;
+  return true;
+}
+
+function applyFilter() {
+  for (const el of panelsRoot.querySelectorAll('.panel')) {
+    const id = el.id.replace(/^panel-/, '');
+    el.hidden = !boardVisible(id, filter);
+  }
+  // 空主题段整段藏起来：只留一个空标题会让人以为"这一段坏了"
+  for (const sec of document.querySelectorAll('.topic')) {
+    const anyShown = [...sec.querySelectorAll('.panel')].some((p) => !p.hidden);
+    sec.hidden = !anyShown;
+  }
+  // 索引条与面板头里的筛选片：标出当前选中（不只靠颜色，还用 aria-pressed）
+  for (const b of document.querySelectorAll('[data-topic-filter],[data-tag-filter]')) {
+    const v = b.getAttribute('data-topic-filter') ?? b.getAttribute('data-tag-filter');
+    const attr = b.hasAttribute('data-topic-filter') ? 'topic' : 'tag';
+    const on = filter[attr] === v || (v === '*' && filter[attr] === '*');
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+}
+
+function wireFilters() {
+  // ★ 绑在 `document` 而不是 `panelsRoot`：**索引条是 `#panels` 的兄弟**（构建期落在
+  //   它前面），不是它的子节点 —— 绑在 `panelsRoot` 上时，索引条里的主题/来源筛选片
+  //   点下去根本冒泡不到那里（面板头里的标签片倒是能）。这个缺陷页面上不报错，
+  //   只表现为"点了索引条的分类没反应"，本地一条 DOM 探针才照得出来。
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest?.('[data-topic-filter],[data-tag-filter]');
+    if (!chip) return;
+    if (chip.hasAttribute('data-topic-filter')) {
+      // 选主题 = 只看这一类：把来源筛选清掉，否则"主题 A ∧ 来源 B"极易落成空集
+      filter.topic = chip.getAttribute('data-topic-filter');
+      filter.tag = '*';
+    } else {
+      const tag = chip.getAttribute('data-tag-filter');
+      filter.tag = filter.tag === tag ? '*' : tag; // 再点一次取消
+    }
+    applyFilter();
+  });
+
+  // 索引条里的跳转：先清掉筛选，否则目标可能正被隐藏着 —— 那时浏览器滚不过去。
+  document.addEventListener('click', (e) => {
+    const jump = e.target.closest?.('[data-jump]');
+    if (!jump) return;
+    filter.topic = '*';
+    filter.tag = '*';
+    applyFilter();
+    // 跳到还没加载过的面板：立刻发起，不必等观察器（浏览器已经在滚了）
+    const id = jump.getAttribute('data-jump');
+    if (id && !loaded.has(id)) startLoader(id);
+  });
+}
+
+/** 「刷新数据」按钮：与筛选同一行，由 `src/site/nav.js` 落在索引条里 */
+function wireRefresh() {
+  const btn = document.getElementById('refresh');
+  const hint = document.getElementById('refresh-hint');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    btn.disabled = true;
+    if (hint) hint.textContent = L('hero.refreshing');
+    reloadAll();
+    // 评测榜要拉 46 页、约 8 秒，按钮禁用久一点，避免连点
+    setTimeout(() => {
+      btn.disabled = false;
+      if (hint) hint.textContent = L('hero.refreshed');
+    }, 1200);
+  });
 }
 
 if (panelsRoot) {
   startAll();
-  if (SINGLE_BOARD) buildBoardNav();
-}
-
-/**
- * 单面板页的页脚：其余面板的链接 + 「刷新数据」按钮。
- *
- * 两样都**由脚本生成**而不是写进 22 个页面文件：面板名与"刷新"的文案
- * 都来自 `i18n.js`（页面骨架的文案不进字典，所以只能由脚本取），
- * 而且链接的 href 与 `BOARD_IDS` 天然同源 —— 抄进 22 份就迟早抄错。
- *
- * 刷新按钮原来长在大盘页的 hero 里，那页被拆掉后它没地方待了。
- * 放在这里而不是页面骨架里，是因为它依赖本模块的 `reloadAll`。
- */
-function buildBoardNav() {
-  const current = BOARD_IDS.indexOf(requestedBoard);
-  const links = BOARD_IDS.map((id) => {
-    const label = esc(L(`p.${id}.title`));
-    return id === requestedBoard
-      ? `<a href="${id}.html" aria-current="page">${label}</a>`
-      : `<a href="${id}.html">${label}</a>`;
-  }).join('');
-
-  const nav = document.createElement('nav');
-  nav.className = 'board-links';
-  nav.setAttribute('aria-label', L('ui.boardNav'));
-  nav.innerHTML = `${links}
-    <div class="board-tags">
-      <span class="muted">${esc(L('ui.boardTags'))}</span>
-      ${tagChips(tagsOfBoard(requestedBoard), TAG_PREFIX, LOCALE)}
-    </div>
-    <div class="board-actions">
-      <button class="btn-sm" type="button" id="refresh">
-        <span class="ic" data-icon="refresh"></span>${esc(L('ui.refresh'))}
-      </button>
-      <span class="muted" id="refresh-hint"></span>
-    </div>`;
-  // 插在 #panels 之后（面板还在加载时它就在了 —— 导航不该等数据）
-  panelsRoot.after(nav);
-
-  const refreshBtn = nav.querySelector('#refresh');
-  refreshBtn.addEventListener('click', () => {
-    const hint = nav.querySelector('#refresh-hint');
-    refreshBtn.disabled = true;
-    hint.textContent = L('hero.refreshing');
-    reloadAll();
-    // 评测榜要拉 46 页、约 8 秒，按钮禁用久一点，避免连点
-    setTimeout(() => {
-      refreshBtn.disabled = false;
-      hint.textContent = L('hero.refreshed');
-    }, 1200);
-  });
-
-  // 图标由 ui.js 按 [data-icon] 回填；这一段是后插进来的，这里补一次
-  injectIcons(nav);
+  wireFilters();
+  wireRefresh();
 }

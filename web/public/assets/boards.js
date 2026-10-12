@@ -195,3 +195,65 @@ export function tagsOfBoard(id) {
   const t = BOARD_TAGS[id];
   return t ? [t.topic, t.source] : [];
 }
+
+/**
+ * 面板图标 —— 与 `assets/ui.js` 的内联 SVG 图标表同源（值就是 `ICONS` 的键）。
+ *
+ * ## 为什么住在**这里**（而不是继续留在 `src/site/nav.js`）
+ * 扁平站之后 `trend.js` 要在浏览器里**预建骨架**（每个面板的头像必须先在，
+ * 懒加载的观察器才有东西可盯），而 `ui.js` 的 `icon()` 在遇到未登记的图标名时
+ * 会**直接抛错**（见 `ui.js`）。头像名因此成了"面板渲染会不会炸"的真值。
+ * 真值只能有一处：以前它在 `src/site/nav.js`（构建期），浏览器够不着，
+ * 于是它在那儿另存了一份 `BOARD_ICONS` 供标签页用 —— 两份迟早会漂移
+ * （改一头像只改一边 → 某面板上线成"未知图标：xxx"）。搬到这里之后
+ * `nav.js` 隔着目录引同一份，不再有第二份。
+ *
+ * 加面板时这里必须补一条：漏了会静默回落到 `'box'`（骨架不炸，但头像不对）。
+ */
+export const BOARD_ICONS = {
+  trending: 'trending',
+  liked: 'heart',
+  downloaded: 'download',
+  eval: 'trophy',
+  aider: 'code',
+  spaces: 'cube',
+  datasets: 'layers',
+  papers: 'file',
+  aiNews: 'file',
+  aiPress: 'file',
+  repos: 'star',
+  ghTrending: 'trending',
+  zhihu: 'file',
+  csdn: 'code',
+  juejin: 'code',
+  itzhijia: 'monitor',
+  huxiu: 'file',
+  aifaner: 'monitor',
+  zhongguancun: 'monitor',
+  bilibili: 'monitor',
+  weibo: 'trending',
+  toutiao: 'trending',
+  hupu: 'trending',
+  douban: 'star',
+  zhidemai: 'star',
+  newmodels: 'box',
+  openrouter: 'bolt',
+  orCatalog: 'database',
+  orTrends: 'trending',
+  orAuthors: 'database',
+  orPerf: 'bolt',
+  aaBench: 'trophy',
+  orApps: 'cube',
+  swebench: 'code',
+};
+
+/**
+ * 面板在页面上的**排列顺序** —— 按主题六类分段（`TOPIC_SLUGS` 的顺序），
+ * 段内沿用 `BOARD_IDS` 的顺序。扁平站的骨架按它铺，于是"同一类的榜挨在一起"，
+ * 而 `BOARD_IDS` 本身不必为了排版而重排（它同时是别的消费者眼里的稳定清单）。
+ *
+ * 是**推导**出来的，不是手写第二份：`BOARD_IDS` 加一个 id、`BOARD_TAGS` 给它
+ * 一个主题，它就自动出现在该主题段里（`site.test.js` 有一条断言盯着
+ * "每个 id 恰好出现一次"）。
+ */
+export const BOARD_ORDER = TOPIC_SLUGS.flatMap((topic) => boardsWithTag(topic));

@@ -6,17 +6,23 @@
 <title>{{BRAND}}</title>
 <meta name="description" content="{{BRAND}} 是一个 AI 趋势大盘：把各家平台的模型榜单与开源生态热度收进一个页面。">
 <!--
-  这个页面是**手写静态页**，由 GitHub Pages 直接发出，没有任何服务端。
+  单页站：34 个榜单全部在这一页上铺开（按主题六类分段），没有二级页面。
 
   页面里刻意**没有** canonical / og:url / 站长验证这类标记：它们的地址必须是
   **绝对 URL**，而本站不写死域名（路径全用相对，见下）。GTM 与它们不同 ——
-  容器 ID 与部署地址无关，所以它**有**，由构建期落下（见下）。写法见 `src/site/gtm.js`。
+  容器 ID 与部署地址无关，所以它**有**，由构建期落下（见 `src/site/gtm.js`）。
 
   路径全部是**相对路径**（`site.css` 而不是 `/site.css`）：站点既可能挂在
   `https://<用户名>.github.io/<仓库>/` 下，也可能挂在自定义域名的根下，
   相对路径两种都能用，不需要任何 BASE_PATH 配置，也就不存在"换个域名整站白屏"。
   下面这行 base 标签把这些相对路径钉在**本文件所在目录**上，与访问地址怎么写无关
-  （少了它，`/trend.html` 与 `/trend.html/` 这类地址会解析到不同的目录）。
+  （少了它，`/index.html` 与 `/index.html/` 这类地址会解析到不同的目录）。
+
+  两个占位符由构建期落值（`src/site/nav.js`）：
+    · 索引条占位（主题筛选 + 面板跳转 + 刷新）
+    · 主题分段占位（六个主题段的骨架，面板由 trend.js 挂进去）
+  两者的真值都只在 `assets/boards.js`（面板/主题清单）与 `assets/i18n.js`（文案）。
+  （这里刻意不写出占位符的字面量：注入是朴素的字符串替换，写在注释里也会被撑开。）
 -->
 <base href="./">
 <link rel="stylesheet" href="site.css">
@@ -35,287 +41,23 @@
 </header>
 
 <main class="wrap">
-  <!-- 首页不放正文：它的唯一作用是把人送进各个面板页。
-       每条趋势各一张卡片，**一张卡对一个页面** —— 卡片本身就是链接（整块可点），
-       文案压到"标题 + 半句说明"。
-       ★ 这 11 张卡与 11 个面板一一对应（href 各不相同），
-         `site.test.js` 有一条断言盯着这件事：重复的 href 意味着有人把几张卡
-         指向了同一页，而那会让一半的面板没有入口。 -->
-  <section class="entry-grid">
-    <a class="entry" href="trending.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">正在流行的模型</span>
-        <span class="entry-desc">HuggingFace 上按趋势分排序</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="liked.html">
-      <span class="ic" data-icon="heart"></span>
-      <span class="entry-body">
-        <span class="entry-title">最受喜欢的模型</span>
-        <span class="entry-desc">累计喜欢数最高的模型</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="downloaded.html">
-      <span class="ic" data-icon="download"></span>
-      <span class="entry-body">
-        <span class="entry-title">下载最多的模型</span>
-        <span class="entry-desc">累计下载量最高的模型</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="eval.html">
-      <span class="ic" data-icon="trophy"></span>
-      <span class="entry-body">
-        <span class="entry-title">开源模型评测榜</span>
-        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO 取平均分</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aider.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">编程能力榜</span>
-        <span class="entry-desc">Aider Polyglot 真实代码任务的通过率</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="spaces.html">
-      <span class="ic" data-icon="cube"></span>
-      <span class="entry-body">
-        <span class="entry-title">正在流行的 AI 应用</span>
-        <span class="entry-desc">HuggingFace Spaces 按趋势分排序</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="datasets.html">
-      <span class="ic" data-icon="layers"></span>
-      <span class="entry-body">
-        <span class="entry-title">正在流行的数据集</span>
-        <span class="entry-desc">HuggingFace Datasets 按趋势分排序</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="papers.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">每日论文热榜</span>
-        <span class="entry-desc">按点赞数排序</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aiNews.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">AI 新闻热点</span>
-        <span class="entry-desc">HN · TechCrunch · The Verge · arXiv 等 8 源每日聚合</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aiPress.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">AI 官方要闻</span>
-        <span class="entry-desc">OpenAI · DeepMind · NVIDIA 等八家一手博客聚合</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="repos.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">高星 AI 开源项目</span>
-        <span class="entry-desc">本周新增星标</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="ghTrending.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">GitHub Trending（AI 过滤）</span>
-        <span class="entry-desc">github.com/trending 每日榜快照，默认只看 AI 相关</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-            <a class="entry" href="zhihu.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">知乎热榜</span>
-        <span class="entry-desc">知乎站内热度排序的问题榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="csdn.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">CSDN 热榜</span>
-        <span class="entry-desc">CSDN 技术社区热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="juejin.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">掘金热榜</span>
-        <span class="entry-desc">掘金技术社区热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="itzhijia.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">IT之家热榜</span>
-        <span class="entry-desc">IT之家科技资讯热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="huxiu.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">虎嗅热榜</span>
-        <span class="entry-desc">虎嗅科技商业热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aifaner.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">爱范儿热榜</span>
-        <span class="entry-desc">爱范儿科技媒体热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="zhongguancun.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">中关村在线热榜</span>
-        <span class="entry-desc">中关村在线硬件资讯热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="bilibili.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">B站热榜</span>
-        <span class="entry-desc">B站热门视频榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="weibo.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">微博热搜</span>
-        <span class="entry-desc">微博站内热搜榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="toutiao.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">今日头条热榜</span>
-        <span class="entry-desc">今日头条站内热榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="hupu.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">虎扑步行街热榜</span>
-        <span class="entry-desc">虎扑步行街热帖榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="douban.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">豆瓣热话</span>
-        <span class="entry-desc">豆瓣热门话题</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="zhidemai.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">值得买热榜</span>
-        <span class="entry-desc">值得买 3 小时热门促销榜</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="newmodels.html">
-      <span class="ic" data-icon="box"></span>
-      <span class="entry-body">
-        <span class="entry-title">最新发布的模型</span>
-        <span class="entry-desc">models.dev 按发布日期降序</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="openrouter.html">
-      <span class="ic" data-icon="bolt"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 模型用量榜</span>
-        <span class="entry-desc">按 OpenRouter 上的 token 用量排序，日更</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orCatalog.html">
-      <span class="ic" data-icon="database"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 模型库</span>
-        <span class="entry-desc">全部可路由模型：价格 · 上下文 · 模态</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orTrends.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 上升榜</span>
-        <span class="entry-desc">按周环比增幅排序（本周 vs 上周 token 用量）</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orAuthors.html">
-      <span class="ic" data-icon="database"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 厂商份额</span>
-        <span class="entry-desc">各机构在 OpenRouter 上的 token 份额与周环比变化</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orPerf.html">
-      <span class="ic" data-icon="bolt"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 性能榜</span>
-        <span class="entry-desc">各模型在 OpenRouter 上的实测中位延迟与吞吐（按 provider 取最优）</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aaBench.html">
-      <span class="ic" data-icon="trophy"></span>
-      <span class="entry-body">
-        <span class="entry-title">Artificial Analysis 评测榜</span>
-        <span class="entry-desc">与 HuggingFace 评测榜**不同来源**，可并列对照</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orApps.html">
-      <span class="ic" data-icon="cube"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter 应用榜</span>
-        <span class="entry-desc">哪些应用在烧 token（按 agent 应用归因），以及图像/视频/语音模型的用量</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="swebench.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">SWE-bench 真实代码修复</span>
-        <span class="entry-desc">五个子榜可切</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-  </section>
+  <!-- 页面标题：扁平页上唯一的 <h1>。主题段是 <h2>、面板标题是 <h3>（由 trend.js
+       渲染），三级层次才一以贯之。文案是**骨架文案**，按"页面骨架手写、不进字典"
+       的既有约定写在这里（面板名与主题名才走 i18n.js）。 -->
+  <h1 class="home-title">AI 趋势大盘</h1>
+
+  <!-- 粘性索引条：主题筛选（点一下只看一类）+ 34 个面板的跳转索引 + 刷新按钮。
+       它摆在正文之前、吸顶，因为一页装下 34 个面板之后"怎么找"必须先回答。 -->
+  {{BOARD_INDEX}}
+
+  <!-- 六个主题分段（模型榜 / 评测榜 / 社区生态 / 平台洞察 / 资讯 / 中文热榜）。
+       每段里的面板由 trend.js 运行时建骨架并懒加载：滚到视口附近才去上游取数，
+       否则进页面会同时开拉十几个源（其中三个是 4MB+ 的大体积榜）。 -->
+  <div id="panels">
+  {{BOARD_TOPICS}}
+  </div>
 </main>
+<script src="assets/trend.js" type="module"></script>
 <script src="assets/ui.js" type="module"></script>
 </body>
 </html>

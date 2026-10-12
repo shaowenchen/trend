@@ -610,25 +610,30 @@ export function keysOf(locale) {
 }
 
 /**
- * 一组标签的 HTML —— 榜单页的面板头与页脚共用，所以放在这里而不是各写一遍。
+ * 一组标签的 HTML —— 面板头里那两片小标签。
+ *
+ * ## 它们是**筛选控件**，不是链接（扁平站之后）
+ * 以前这里渲染的是 `<a href="tag.html?t=…">`，点进去是"按标签浏览"的独立页。
+ * 站点改成单页之后那个页面没有了，而标签的价值（"点一下只看这一类"）还在 ——
+ * 于是就地实现：`<button data-tag-filter="<slug>">`。是 `<button>` 而不是
+ * `<a href="#">`，因为这**不是另一个地址**：它没有位置、不刷新页，只是把当前
+ * 页面收窄。用 `<button>` 还顺手保证了无障碍语义（读屏器念"按钮"）、
+ * 键盘可达，以及最要紧的一点 —— 它不会在别处嵌套 `<a>` 时被浏览器提前闭合
+ * （本站曾因"卡片里套了标签链接"整片栅格散架）。
  *
  * ## 参数是 **slug**，不是显示文字
- * `tags` 里放的是 `boards.js` 的标签 slug（`['models','huggingface']`）。地址用 slug、
- * 显示用当前语言的 `tag.<slug>` —— 这样"同一个标签在任何语言下都是同一个地址"，
- * 中文站与英文站互相引用时不会各指一半。
- *
- * 为什么是链接而不是死文字：标签页的存在意义就是"点进去按类看"。
- * 少了这层链接，标签就只是装饰。
+ * `tags` 里放的是 `boards.js` 的标签 slug（`['models','huggingface']`）。
+ * 显示文字按当前语言从字典取（`tag.<slug>`），`data-tag-filter` 拿的却是
+ * slug 本身 —— 两种语言共用同一个筛选值，逻辑因此只有一处。
  *
  * @param {string[]} tags 标签 slug（顺序即显示顺序，见 `boards.js` 的 `tagsOfBoard`）
- * @param {string} prefix 本页到站点根的相对前缀（中文页 `''`，英文页 `'../'`）
  * @param {string} [locale] 显示语言，默认取 `DEFAULT_LOCALE`
  */
-export function tagChips(tags, prefix = '', locale = DEFAULT_LOCALE) {
+export function tagChips(tags, locale = DEFAULT_LOCALE) {
   return (tags || [])
     .map((slug) => {
       const label = tagLabel(slug, locale);
-      return `<a class="tag-chip" href="${prefix}tag.html?t=${encodeURIComponent(slug)}">${escTag(label)}</a>`;
+      return `<button class="tag-chip" type="button" data-tag-filter="${escTag(slug)}" aria-pressed="false">${escTag(label)}</button>`;
     })
     .join('');
 }

@@ -23,26 +23,27 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { t, LOCALES } from './i18n.js';
-import { BOARD_IDS } from './trend.js';
+import { t, LOCALES, tagChips } from './i18n.js';
+import { BOARD_IDS, BOARD_ORDER, BOARD_ICONS } from './trend.js';
 import { ALL_TAGS, boardsWithTag, tagsOfBoard, TAG_KINDS, TOPIC_SLUGS, SOURCE_SLUGS } from './boards.js';
+import { ICONS } from './ui.js';
 import { BRAND, findUnresolvedPlaceholders } from '../../../src/site/brand.js';
 import { buildSite, SITE_FILES, findMissingAssets, findMissingImports, findForbidden, assertSafeOutDir } from '../../../scripts/build-site.mjs';
 import { resolveRequest } from '../../../scripts/serve.mjs';
+import { renderIndex, renderTopics } from '../../../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const PUBLIC = path.join(ROOT, 'web', 'public');
 
 /**
- * 页面清单 —— 从 `BOARD_IDS`（trend.js 里的面板注册表）**推导**，不手写。
+ * 页面清单 —— 扁平站只有**两个**页面（中英各一）：34 个榜单全部在首页上。
  *
- * 手写清单的失效方式是静默的：新加一个面板页、登记进 `SITE_FILES` 却漏在这里，
- * 下面所有"逐页扫描"的断言就都跳过了它 —— 那一页可以带着绝对路径、串着语言
- * 上线，而门禁一路绿灯。从注册表推导则不会漂移。
+ * 仍然从一个地方推导（不再从 `BOARD_IDS`，因为页面与榜单 id 已经不再一一对应），
+ * 而不是散落在各条断言里手写。
  */
 const PAGES = {
-  zh: ['index.html', ...BOARD_IDS.map((id) => `${id}.html`), 'tags.html', 'tag.html'],
-  en: ['en/index.html', ...BOARD_IDS.map((id) => `en/${id}.html`), 'en/tags.html', 'en/tag.html'],
+  zh: ['index.html'],
+  en: ['en/index.html'],
 };
 const ALL_PAGES = [...PAGES.zh, ...PAGES.en];
 /**
@@ -115,8 +116,9 @@ await test('引用的键确实被扫到了（防止上面那条因为正则失�
   assert.ok(CLIENT_SCRIPTS.includes('assets/trend.js'), '没扫到 trend.js');
   const all = new Set(Object.values(sources).flatMap((s) => [...referencedKeys(s)]));
   assert.ok(all.size > 100, `只扫到 ${all.size} 个键，正则大概写错了`);
-  assert.ok(all.has('p.eval.title'), '没扫到 p.eval.title');
-  assert.ok(all.has('err.evalFirst'), '没扫到 err.evalFirst');
+  // 面板 id 现在也进正则扫描（`shellMeta` 会拼 `p.${id}.title` / `.hint`）——
+  // 拼模板的键本来扫不到，这里用一条真实 id 兜底：扫得到说明至少 id 是字面量出现的。
+  assert.ok(referencedKeys(sources['assets/trend.js']).size > 50, 'trend.js 的键扫得太少');
 });
 
 /* ---------------- 2 & 3. 构建产物 ---------------- */
@@ -281,99 +283,129 @@ await test('双语互链：每个页面都有指向另一语言的链接', async
   }
 });
 
-await test('★ 首页每张入口卡片都是 <a>（整块可点、键盘一次 Tab 就到）', async () => {
-  // 这条盯的是一个**看不出来的**退化：把 `<a class="entry">` 换成
-  // `<div class="entry">`，样式一模一样，但既点不动、也 Tab 不到 ——
-  // 页面看起来完全正常，只有用键盘或读屏器的人发现进不去大盘。
-  const bad = [];
-  for (const rel of [PAGES.zh[0], PAGES.en[0]]) {
-    const html = await read(rel);
-    // 抓**完整的开标签**再过滤：`href` 在 `class` 前后都可能出现，
-    // 只匹配到 class 就收尾会漏掉 href，把正确的页面判成缺陷。
-    const opens = (html.match(/<(?:a|div)\b[^>]*>/g) || []).filter((tag) => /\bclass="entry"/.test(tag));
-    if (opens.length < 2) bad.push(`${rel}: 没找到入口卡片（${opens.length}）`);
-    for (const tag of opens) {
-      if (!tag.startsWith('<a')) bad.push(`${rel}: 入口卡片不是链接 —— ${tag}`);
-      else if (!/\bhref="[^"]+"/.test(tag)) bad.push(`${rel}: 入口卡片没有 href —— ${tag}`);
-    }
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ 首页卡片与面板**一一对应**：每张卡指向自己那一页，不重复、不遗漏', async () => {
-  // 这条盯的需求是"不要多个卡片对应一个趋势页面"。
-  // 重复的 href 意味着有面板**没有入口** —— 页面上看不出来（卡片数量没变、
-  // 名字也都在），只有点进去才发现两张卡到了同一个地方。
-  const bad = [];
-  for (const rel of [PAGES.zh[0], PAGES.en[0]]) {
-    const html = await read(rel);
-    const hrefs = [...html.matchAll(/<a class="entry"[^>]*href="([^"]+)"/g)].map((m) => m[1]);
-    const wanted = BOARD_IDS.map((id) => `${id}.html`);
-    const dup = hrefs.filter((h, i) => hrefs.indexOf(h) !== i);
-    if (dup.length) bad.push(`${rel}: 有卡片指向同一页 —— ${[...new Set(dup)].join(' ')}`);
-    const missing = wanted.filter((h) => !hrefs.includes(h));
-    if (missing.length) bad.push(`${rel}: 这些面板没有入口卡片 —— ${missing.join(' ')}`);
-    const extra = hrefs.filter((h) => !wanted.includes(h));
-    if (extra.length) bad.push(`${rel}: 有卡片指向了非面板页 —— ${extra.join(' ')}`);
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ 每个面板页都指名了自己那一个面板，且名字是真的', async () => {
-  // data-board 写错时页面**不报错**，只是渲染出空白（或别的面板）。
-  // 这里同时核对"写的是合法 id"与"页面文件名与 id 一致"，
-  // 后者是地址契约：trending.html 必须跑 trending 面板。
-  const bad = [];
-  for (const id of BOARD_IDS) {
-    for (const rel of [`${id}.html`, `en/${id}.html`]) {
-      const html = await read(rel);
-      const m = html.match(/<div id="panels" data-board="([^"]+)"><\/div>/);
-      if (!m) bad.push(`${rel}: 没有 <div id="panels" data-board="…"></div>`);
-      else if (m[1] !== id) bad.push(`${rel}: data-board="${m[1]}" 与文件名不符`);
-    }
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ 每个面板 id 都有名字（页脚导航是动态拼键 `p.<id>.title`，正则扫不到）', () => {
-  // 上面那条"被引用的键都存在"靠正则抓 `L('字面量')`，而页脚导航拼的是
-  // `L(`p.${id}.title`)` —— 模板字符串躲过扫描。于是新加一个面板 id 却忘了
-  // 加 `p.<id>.title` 时，那一页的标题与导航会上线成键名本身（`p.foo.title`）。
-  const bad = [];
-  for (const id of BOARD_IDS) {
-    for (const locale of LOCALES) {
-      const key = `p.${id}.title`;
-      if (t(locale, key) === key) bad.push(`${locale} 缺 ${key}`);
-    }
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ 每个页面指名的 panel 都在 BOARD_IDS 里（否则线上报\"不存在的面板\"）', async () => {
-  // 这条盯的是一次真实故障：页面按新代码发出去了，而**脚本是上一版**（缓存/半发布），
-  // 于是新页面指名的 panel 在旧脚本的 BOARD_IDS 里找不到，页面上只剩一句错误。
-  // 断言本身管不到缓存，但能管住另一半：**同一份仓库里**页面与注册表必须自洽 ——
-  // 加面板时只改页面不改 BOARD_IDS，就会在这里暴露。
+await test('★ 扁平页：首页是**单页**，`#panels` 不带 data-board（带了就只跑一个面板）', async () => {
+  // 单页站的核心契约：`#panels` **没有** data-board —— 那正是 `trend.js` 里
+  // "没写就跑全部"的分支。带上了（比如从旧版复制过来的 `data-board="trending"`）
+  // 页面不报错，只会**只渲染一个面板**，其余 33 个静默消失。
   const bad = [];
   for (const rel of ALL_PAGES) {
     const html = await read(rel);
-    const m = html.match(/<div id="panels" data-board="([^"]+)"><\/div>/);
-    if (!m) continue; // 首页与标签页没有面板容器
-    if (!BOARD_IDS.includes(m[1])) bad.push(`${rel}: data-board="${m[1]}" 不在 BOARD_IDS 里`);
+    const m = html.match(/<div id="panels"(\s[^>]*)?>/);
+    if (!m) { bad.push(`${rel}: 没有 <div id="panels">`); continue; }
+    if (/data-board=/.test(m[1] || '')) bad.push(`${rel}: #panels 带了 data-board（会只跑一个面板）`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ 发布集合里的面板页与 BOARD_IDS 完全对齐（少了线上 404，多了构建失败）', () => {
-  const expected = [
+await test('★ 六个主题分段都在（模型/评测/生态/平台/资讯/中文热榜）—— 面板要挂进各自的段', async () => {
+  // `trend.js` 的 `rootFor(id)` 按 `#topic-<topic> [data-panels]` 找容器；
+  // 少一段，那一段的榜会**回落到 #panels 末尾**（不报错、但次序与分组都乱了）。
+  for (const [rel, lang] of [['index.html', 'zh'], ['en/index.html', 'en']]) {
+    const html = await distRead(rel);
+    for (const topic of TOPIC_SLUGS) {
+      assert.match(
+        html,
+        new RegExp(`<section class="topic" id="topic-${topic}"[^>]*>[\\s\\S]*?<div class="topic-grid" data-panels></div>`),
+        `${rel}: 缺主题段 ${topic}（或它里面没有 [data-panels] 容器）`
+      );
+      // 段标题取字典的 `tag.<slug>`，与索引条上的筛选片同一份文案
+      assert.ok(html.includes(t(lang, `tag.${topic}`)), `${rel}: 主题 ${topic} 的标题不是字典里的文字`);
+    }
+  }
+});
+
+await test('★ 索引条落在首页：主题筛选 + 全部面板的跳转锚点 + 刷新按钮', async () => {
+  const bad = [];
+  for (const [rel, lang] of [['index.html', 'zh'], ['en/index.html', 'en']]) {
+    const html = await distRead(rel);
+    if (!/class="board-index"/.test(html)) bad.push(`${rel}: 没有索引条`);
+    // 主题筛选片：六个主题 + 一个「全部」
+    for (const topic of ['*', ...TOPIC_SLUGS]) {
+      if (!html.includes(`data-topic-filter="${topic}"`)) bad.push(`${rel}: 缺主题筛选片 ${topic}`);
+    }
+    // 跳转锚点：**每个面板一个**，指向 `#panel-<id>`（trend.js 建的骨架 id）
+    const jumps = [...html.matchAll(/data-jump="([^"]+)"/g)].map((m) => m[1]);
+    const dup = jumps.filter((x, i) => jumps.indexOf(x) !== i);
+    if (dup.length) bad.push(`${rel}: 有重复的跳转片 —— ${[...new Set(dup)].join(' ')}`);
+    const missing = BOARD_IDS.filter((id) => !jumps.includes(id));
+    if (missing.length) bad.push(`${rel}: 这些面板没有跳转入口 —— ${missing.join(' ')}`);
+    const extra = jumps.filter((id) => !BOARD_IDS.includes(id));
+    if (extra.length) bad.push(`${rel}: 跳转片指向了不存在的面板 —— ${extra.join(' ')}`);
+    // 刷新按钮：trend.js 的 wireRefresh 按 id 找它，缺了刷新就静默消失
+    if (!/id="refresh"/.test(html)) bad.push(`${rel}: 没有刷新按钮`);
+    if (!/id="board-index"/.test(html)) bad.push(`${rel}: 索引条没有 id（跳转前的清筛选锚点要靠它）`);
+    if (lang === 'en' && /[一-鿿]/.test(html.replace(/中文/g, ''))) bad.push(`${rel}: 英文页的索引条里混进了中文`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 页面标题（h1）：每页**恰好一个 h1**，且不是面板名', async () => {
+  // 扁平页的标题层级：页面 h1（站点名）→ 主题段 h2 → 面板 h3（由 trend.js 渲染）。
+  // 这里盯的是静态骨架那一半：恰好一个 h1，且 h2 只作主题段标题。
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    const h1 = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)];
+    assert.equal(h1.length, 1, `${rel}: 有 ${h1.length} 个 <h1>（应为 1）`);
+  }
+});
+
+await test('★ 每个面板 id 都有名字与说明（`shellMeta` 拼 `p.<id>.title` / `.hint`，正则扫不到）', () => {
+  // 上面那条"被引用的键都存在"靠正则抓 `L('字面量')`，而 `shellMeta` 拼的是
+  // `L(`p.${id}.title`)` 与 `L(`p.${id}.hint`)` —— 模板字符串躲过扫描。
+  // 于是新加一个面板 id 却忘了加键时，那一页的标题/说明会上线成键名本身
+  // （`p.foo.title`）。扁平页的骨架在启动时**同步**建 34 个，所以这条比过去更要紧。
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    for (const locale of LOCALES) {
+      for (const field of ['title', 'hint']) {
+        const key = `p.${id}.${field}`;
+        if (t(locale, key) === key) bad.push(`${locale} 缺 ${key}`);
+      }
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 面板头像都有对应的图标（`icon()` 遇到未登记的名字会**抛错**，那会炸掉整页骨架）', () => {
+  // 启动时 34 个骨架**同步**建，每个都调 `icon(BOARD_ICONS[id])`；`ui.js` 的
+  // `icon()` 对未知名字直接 throw —— 一个拼错的头像名会在任何一次取数之前
+  // 让整页只剩一半骨架。这条是最便宜也最要紧的新门禁之一。
+  const bad = [];
+  for (const id of BOARD_IDS) {
+    const name = BOARD_ICONS[id];
+    if (!name) bad.push(`${id} 没有登记头像`);
+    else if (!ICONS[name]) bad.push(`${id} 的头像 '${name}' 不在 ui.js 的 ICONS 里`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 发布集合里的 HTML 页面恰好是 index.html 与 en/index.html（扁平站只有两页）', () => {
+  const actual = SITE_FILES.filter((f) => f.endsWith('.html')).sort();
+  assert.deepEqual(actual, ['en/index.html', 'index.html']);
+  // 反向：旧版每个榜一页，那些页面不该再被发布
+  assert.equal(SITE_FILES.some((f) => BOARD_IDS.some((id) => f === `${id}.html` || f === `en/${id}.html`)), false);
+});
+
+await test('★ 旧的二级页面确实已经删掉（残留会与单页站并存，让人以为还有两条路）', async () => {
+  const gone = [
     ...BOARD_IDS.map((id) => `${id}.html`),
     ...BOARD_IDS.map((id) => `en/${id}.html`),
+    'tags.html',
+    'tag.html',
+    'en/tags.html',
+    'en/tag.html',
+    'assets/tags.js',
   ];
-  // 榜单页 = 发布集合里除入口页与**两个标签页**之外的全部 HTML
-  // （`tags.html` 列标签、`tag.html` 按标签筛，中英各一份，共四个）
-  const notBoards = new Set(['index.html', 'en/index.html', 'tags.html', 'tag.html', 'en/tags.html', 'en/tag.html']);
-  const actual = SITE_FILES.filter((f) => f.endsWith('.html') && !notBoards.has(f));
-  assert.deepEqual(actual.sort(), expected.sort());
+  const bad = [];
+  for (const rel of gone) {
+    try {
+      await fs.access(path.join(PUBLIC, rel));
+      bad.push(`${rel} 还在 web/public 里`);
+    } catch {
+      /* 不存在才对 */
+    }
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
 /* ---------------- 标签 ---------------- */
@@ -439,93 +471,57 @@ await test('★ 标签的种类自洽：主题就是主题、来源就是来源�
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ tags 页列出全部标签，且每个链接都带 ?t=<slug>', async () => {
+await test('★ 每个标签都在索引条里有筛选片，且用 slug 作值、本地化文字作显示（否则会显示成 slug）', async () => {
+  // 标签页两个页面删掉之后，"按标签逛"就地实现：索引条里有 21 个来源筛选片，
+  // 每个面板头里有它自己的主题 + 来源两片。这条盯的是**索引条那一半**：
+  // 数据值是 slug（trend.js 拿它跟 BOARD_TAGS 比），显示是本页语言的文字。
   const bad = [];
-  for (const rel of ['tags.html', 'en/tags.html']) {
+  for (const [rel, lang] of [['index.html', 'zh'], ['en/index.html', 'en']]) {
     const html = await distRead(rel);
-    for (const tag of ALL_TAGS) {
-      if (!html.includes(`tag.html?t=${encodeURIComponent(tag)}`)) bad.push(`${rel} 缺标签 ${tag} 的链接`);
+    for (const slug of SOURCE_SLUGS) {
+      const label = t(lang, `tag.${slug}`);
+      if (!html.includes(`data-tag-filter="${slug}"`)) bad.push(`${rel} 的索引条缺来源 ${slug} 的筛选片`);
+      // 显示文字必须落在页面上（否则读者看到的是 slug）
+      if (!html.includes(label)) bad.push(`${rel} 的索引条缺 ${slug} 的本地化文字「${label}」`);
+    }
+    // 主题筛选片同理（值 slug、文字取自字典）
+    for (const slug of TOPIC_SLUGS) {
+      if (!html.includes(`data-topic-filter="${slug}"`)) bad.push(`${rel} 缺主题筛选片 ${slug}`);
+      if (!html.includes(t(lang, `tag.${slug}`))) bad.push(`${rel} 缺主题 ${slug} 的本地化文字`);
     }
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ tag 页的分组用 slug 匹配地址、但显示本地化文字（否则标题会显示成 slug）', async () => {
-  // data-tag 必须是 slug（tags.js 拿它跟地址里的 ?t= 比），
-  // data-tag-label 必须是本页语言的文字（脚本拿它回填标题）。
-  const bad = [];
-  for (const [rel, locale] of [['tag.html', 'zh'], ['en/tag.html', 'en']]) {
-    const html = await distRead(rel);
-    for (const tag of ALL_TAGS) {
-      const label = t(locale, `tag.${tag}`);
-      if (!html.includes(`data-tag="${tag}" data-tag-label="${label}"`)) {
-        bad.push(`${rel} 的 ${tag} 分组缺 data-tag/data-tag-label`);
-      }
-    }
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ tag 页把全部面板都渲染进分组里（卡片链接必须指向真实存在的榜单页）', async () => {
-  const bad = [];
-  for (const rel of ['tag.html', 'en/tag.html']) {
-    const html = await distRead(rel);
-    for (const id of BOARD_IDS) {
-      // 每一个面板至少出现在一个标签组里 —— 否则按标签逛会漏掉它
-      if (!new RegExp(`<a class="entry" href="(?:\\.\\./|en/)?${id}\\.html"`).test(html)) {
-        bad.push(`${rel} 没有任何标签组包含 ${id}`);
-      }
-    }
-    // 分组本身要在（脚本靠它收窄；没有分组就等于这页永远是全部）
-    if (!/data-tag="/.test(html)) bad.push(`${rel} 没有标签分组`);
-  }
-  assert.deepEqual(bad, [], bad.join('\n      '));
-});
-
-await test('★ tag 页的分组默认**不隐藏**（没有 JS 时应当看到全部，而不是空白）', async () => {
-  for (const rel of ['tag.html', 'en/tag.html']) {
-    const html = await distRead(rel);
-    for (const m of html.matchAll(/<section class="tag-group"[^>]*>/g)) {
-      assert.ok(!/\bhidden\b/.test(m[0]), `${rel} 的分组带了 hidden —— 禁用 JS 时会是一片空白`);
-    }
-  }
-});
-
-await test('★ 生成的标签页不串语言（正文是构建期落的，源页扫描扫不到它）', async () => {
-  // 标签页正文在源文件里只是一个 {{TAG_PAGE}} 占位符，所以上面那两条"语言不串页"
-  // 的门禁（它们读 web/public 源文件）**扫不到真正渲染出来的内容** ——
-  // 中文标签名"模型榜"若落到英文页上，之前一路绿灯。这里补一道，扫发布物。
-  const bad = [];
-  for (const rel of ['en/tags.html', 'en/tag.html']) {
-    // 与源页那条同样的例外：语言切换链接是有意的「中文」，先摘掉再查
-    const text = visibleText(await distRead(rel)).split('中文').join('');
-    const hit = text.match(/[一-鿿]+/g);
-    if (hit) bad.push(`${rel}: ${[...new Set(hit)].slice(0, 8).join(' ')}`);
-  }
-  assert.deepEqual(bad, [], `英文标签页里混进了中文：\n      ${bad.join('\n      ')}`);
-});
-
-await test('★ 榜单页的页脚标出了本页标签（可点进标签页）', async () => {
+await test('★ 面板头里的标签是**筛选按钮**（不是通往标签页的链接）且主题/来源齐全', () => {
+  // 扁平站之后没有标签页，标签就地筛选。判据：`tagChips()` 输出 `<button data-tag-filter>`，
+  // 且写进 `boards.js` 的每个榜都有主题 + 来源两个 slug（缺了那一片就不渲染）。
   const bad = [];
   for (const id of BOARD_IDS) {
-    for (const rel of [`${id}.html`, `en/${id}.html`]) {
-      const src = await read(rel);
-      // 标签由 trend.js 运行期渲染，所以源页里看不到 —— 这里查的是
-      // "这个面板在 boards.js 里有标签"，以及脚本确实被引到了
-      if (tagsOfBoard(id).length !== 2) bad.push(`${id} 没有标签`);
-      if (!/assets\/trend\.js/.test(src)) bad.push(`${rel} 没有引入 trend.js（标签渲染不出来）`);
-    }
+    if (tagsOfBoard(id).length !== 2) bad.push(`${id} 的标签不是两个：${JSON.stringify(tagsOfBoard(id))}`);
   }
+  // 直接看 tagChips 的输出形态：不是 <a>，带 data-tag-filter，没有 href
+  const sample = tagChips(['models'], 'zh');
+  if (!/^<button class="tag-chip"/.test(sample)) bad.push(`tagChips 输出的不是 <button：${sample.slice(0, 60)}`);
+  if (!/data-tag-filter="models"/.test(sample)) bad.push('tagChips 没带 data-tag-filter');
+  if (/href=/.test(sample)) bad.push('tagChips 输出里还有 href（应就地筛选，不跳页）');
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ 每个面板页都有指向它自己的英文版 / 中文版', async () => {
+await test('★ 生成的首页不串语言（索引条与主题段是构建期落的，源页扫描扫不到）', async () => {
+  // 索引条与六个主题段的正文在源文件里是 `{{BOARD_INDEX}}` / `{{BOARD_TOPICS}}`
+  // 占位符，所以"源页不串语言"那两条扫不到真正渲染出来的内容。这里扫发布物。
   const bad = [];
-  for (const id of BOARD_IDS) {
-    if (!(await distRead(`${id}.html`)).includes(`href="en/${id}.html"`)) bad.push(`${id}.html 没有指向 en/${id}.html`);
-    if (!(await distRead(`en/${id}.html`)).includes(`href="../${id}.html"`)) bad.push(`en/${id}.html 没有指向 ../${id}.html`);
+  const text = visibleText(await distRead('en/index.html')).split('中文').join('');
+  const hit = text.match(/[一-鿿]+/g);
+  if (hit) bad.push(`en/index.html: ${[...new Set(hit)].slice(0, 8).join(' ')}`);
+  assert.deepEqual(bad, [], `英文首页里混进了中文（索引条/主题段）：\n      ${bad.join('\n      ')}`);
+});
+
+await test('★ 首页引入了 trend.js（否则 34 个面板与索引条的交互全都不会跑）', async () => {
+  for (const rel of ALL_PAGES) {
+    assert.match(await read(rel), /assets\/trend\.js/, `${rel} 没有引入 trend.js`);
   }
-  assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
 await test('语言切换链接带地球图标，与普通导航项有区分的类名', async () => {
@@ -541,12 +537,11 @@ await test('语言切换链接带地球图标，与普通导航项有区分的�
 /**
  * 页头导航是**构建期**生成的，所以它自己的性质要单独盯住。
  *
- * 它只有两样：左边「首页」（指向本语言的首页），右边语言切换。
- * 上面那条"语言切换指向对应榜单页"already 盯着切换的目标，这里盯它的**组成**：
- * 页头不许再长出别的链接 —— 榜单入口在首页的卡片里，页头多一条就是同一个目录
- * 出现两次，而且按 id 硬推链接的写法（下拉菜单）已经没有调用方了。
+ * 它只有**两样**：左边「首页」（指向本语言的首页），右边语言切换。
+ * 原来的「标签」入口随 `tags.html` / `tag.html` 一起删掉了（标签现在是页内筛选，
+ * 由索引条承担）。这里盯它的**组成**：页头不许再长出别的链接。
  */
-await test('★ 页头导航只有「首页」「标签」与语言切换三项，且首页指向本语言的首页', async () => {
+await test('★ 页头导航只有「首页」与语言切换两项，且首页指向本语言的首页', async () => {
   const bad = [];
   for (const rel of ALL_PAGES) {
     const html = await distRead(rel);
@@ -556,7 +551,7 @@ await test('★ 页头导航只有「首页」「标签」与语言切换三项�
     if (!header) { bad.push(`${rel}: 没找到页头`); continue; }
 
     const hrefs = [...header.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
-    if (hrefs.length !== 3) bad.push(`${rel}: 页头有 ${hrefs.length} 个链接，应为 3（首页 + 标签 + 语言切换）`);
+    if (hrefs.length !== 2) bad.push(`${rel}: 页头有 ${hrefs.length} 个链接，应为 2（首页 + 语言切换）`);
 
     // 首页链接指向本语言的首页，不是对方语言的（那是语言切换的活）
     const isEn = rel.startsWith('en/');
@@ -564,45 +559,34 @@ await test('★ 页头导航只有「首页」「标签」与语言切换三项�
     const want = isEn ? '../index.html' : 'index.html';
     if (home !== want) bad.push(`${rel}: 首页链接是 ${home}，应为 ${want}`);
 
-    // 首页页面上，首页链接要带 aria-current（读屏器靠它播报"当前页"）；
-    // 榜单页与标签页上不该带 —— 那是别的页面。
-    const isHome = rel === 'index.html' || rel === 'en/index.html';
-    const current = /<a class="nav-home"[^>]*aria-current="page"/.test(header);
-    if (isHome !== current) bad.push(`${rel}: 首页的 aria-current ${current ? '多了' : '少了'}`);
+    // 扁平站里**每个页面都是首页**，所以首页链接恒带 aria-current
+    if (!/<a class="nav-home"[^>]*aria-current="page"/.test(header)) {
+      bad.push(`${rel}: 首页链接缺 aria-current`);
+    }
 
-    // 「标签」项永远指向 tags 页（本语言的那一份），并且只有 tags 页自己带 aria-current
-    const tagsHref = header.match(/<a class="nav-tags" href="([^"]+)"/)?.[1];
-    const wantTags = isEn ? '../tags.html' : 'tags.html';
-    if (tagsHref !== wantTags) bad.push(`${rel}: 标签链接是 ${tagsHref}，应为 ${wantTags}`);
-    const tagsCurrent = /<a class="nav-tags"[^>]*aria-current="page"/.test(header);
-    const isTags = rel === 'tags.html' || rel === 'en/tags.html';
-    if (isTags !== tagsCurrent) bad.push(`${rel}: 标签项的 aria-current ${tagsCurrent ? '多了' : '少了'}`);
-
-    // 下拉菜单是更早一版的东西，必须彻底消失（有 .nav-boards 就说明模板还留着）
+    // 旧东西必须彻底消失：「标签」入口、下拉菜单
+    if (/nav-tags/.test(header)) bad.push(`${rel}: 页头还有「标签」入口（标签页已删）`);
     if (/nav-boards/.test(html)) bad.push(`${rel}: 还有榜单下拉的痕迹`);
   }
   assert.deepEqual(bad, [], bad.join('\n      '));
 });
 
-await test('★ 卡片里的标签不能是链接（HTML 不允许 <a> 套 <a>）', async () => {
-  // 这条盯的是一次真实的手误：给首页卡片的标签加了跳转链接，于是卡片 `<a>` 里
-  // 套了 `<a>`。浏览器解析时会把外层卡片**提前闭合** —— 整片入口栅格散架、
-  // 卡片高度塌掉，而 `npm test` 当时全绿（没有任何断言看标签是怎么渲染的）。
-  // 判据：`.entry` 卡片内部不许出现标签页的链接。
+await test('★ 发布物里没有任何通往已删标签页的链接（href 指向 tag.html / tags.html）', async () => {
+  // `<a>` 套 `<a>` 的老毛病随 `.entry` 卡片一起消失了（`tagChips` 现在出 `<button>`），
+  // 但换了个形态的危险还在：某个地方若还写着 `tag.html?t=…`，线上就是 404。
   const bad = [];
-  for (const rel of ALL_PAGES) {
+  for (const rel of built.files.filter((f) => f.endsWith('.html'))) {
     const html = await distRead(rel);
-    for (const m of html.matchAll(/<a class="entry"[^>]*>([\s\S]*?)<\/a>/g)) {
-      if (/href="[^"]*tag\.html/.test(m[1])) bad.push(`${rel}: 卡片内部出现了标签链接`);
-    }
+    for (const m of html.matchAll(/href="([^"]*(?:tag|tags)\.html[^"]*)"/g)) bad.push(`${rel}: ${m[1]}`);
   }
-  assert.deepEqual(bad, [], bad.join('\n      '));
+  assert.deepEqual(bad, [], `指向已删标签页的链接：\n      ${bad.join('\n      ')}`);
 });
 
 await test('★ 导航里没有残留的占位符，且语言切换仍是链接', async () => {
   for (const rel of ALL_PAGES) {
     const html = await distRead(rel);
     assert.doesNotMatch(html, /\{\{SITE_NAV\}\}/, `${rel} 的导航占位符没被替换`);
+    assert.doesNotMatch(html, /\{\{BOARD_(INDEX|TOPICS)\}\}/, `${rel} 的正文占位符没被替换`);
     assert.match(html, /<a class="lang" href="[^"]+"/, `${rel} 的语言切换不是链接`);
   }
 });

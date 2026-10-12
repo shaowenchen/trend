@@ -42,37 +42,27 @@ import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/bran
 import { injectGtm } from '../src/site/gtm.js';
 // 面板 id 与标签的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的
 // 文件，所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
-import { BOARD_IDS } from '../web/public/assets/boards.js';
-import { injectNav, injectTagsPage, injectTagPage } from '../src/site/nav.js';
+import { injectNav, injectIndex, injectTopics } from '../src/site/nav.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
  * 发布集合 —— **白名单**，相对 `web/public/`。
  *
- * 三类页面：
- *   · 入口页（中英各一）；
- *   · 榜单页（`BOARD_IDS` 每个 id 一中一英）；
- *   · 标签页（`tags.html` 列出全部标签；`tag.html` 按 `?t=` 筛出含该标签的榜单）。
- *     后两个的标签是**运行期**从地址读的，所以构建时只落一次文案。
+ * 扁平站之后只有**两个页面**：`index.html`（中文）与 `en/index.html`（英文）。
+ * 34 个榜单全部在这两页上铺开（`trend.js` 运行时建骨架 + 懒加载），
+ * 原来的 34×2 个榜单页与 `tags.html` / `tag.html` 都已删除。
  *
- * 这份清单必须与 `BOARD_IDS` **完全对齐** —— 少登记一页，那一页本地能点、
- * 线上 404；多登记一个不存在的 id，构建会因为读不到文件而失败
+ * 这份清单必须与源码目录**完全对齐** —— 少登记一个，线上 404（比如某个快照
+ * JSON 没发布）；多登记一个不存在的文件，构建会因为读不到文件而失败
  * （`site.test.js` 另有一条断言比对两者）。
  */
-const BOARD_PAGES = BOARD_IDS;
-
 export const SITE_FILES = [
   'index.html',
   'site.css',
   'en/index.html',
-  'tags.html',
-  'tag.html',
-  'en/tags.html',
-  'en/tag.html',
   'assets/trend.js',
   'assets/boards.js',
-  'assets/tags.js',
   'assets/ui.js',
   'assets/i18n.js',
   // 构建期快照（scripts/fetch-*.mjs 生成并提交；在白名单里 = 文件缺失会让
@@ -81,8 +71,6 @@ export const SITE_FILES = [
   'assets/data/ai-news.json',
   'assets/data/ai-press.json',
   'assets/data/cn-hot.json',
-  ...BOARD_PAGES.map((id) => `${id}.html`),
-  ...BOARD_PAGES.map((id) => `en/${id}.html`),
 ];
 
 /* ================================================================== */
@@ -230,27 +218,22 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
   const files = {};
   for (const rel of SITE_FILES) {
     const buf = await fs.readFile(path.join(srcDir, rel), 'utf8');
-    // 页头导航按文件的语言、层级与所属榜单落值：中文页在根、英文页在 `en/` 下，
-    // 于是同一份导航要落成两套相对路径；而语言切换要指向**对应的那一页**，
-    // 所以还要知道本页是哪个榜单（首页为 null）。见 `src/site/nav.js`。
-    const isEn = rel === 'en/index.html' || rel.startsWith('en/');
-    const id = path.basename(rel, '.html');
-    // `tags.html` / `tag.html` 是页面种类，不是榜单 —— 导航要按它们自己的规则落
-    // （Tags 项带 aria-current；两者共用同一份 tag 列表文案）
-    const isTagsPage = id === 'tags';
-    const isTagPage = id === 'tag';
-    const boardId = id === 'index' || isTagsPage || isTagPage ? null : id;
-    let out = injectNav(
-      buf,
-      isEn ? 'en' : 'zh',
-      isEn ? '../' : '',
-      isTagPage ? 'tag' : boardId,
-      { tags: isTagsPage }
-    );
-    // 两个标签页的正文由构建期生成（标签清单只有 `boards.js` 一处来源）
-    if (isTagsPage || isTagPage) {
-      out = (isTagsPage ? injectTagsPage : injectTagPage)(out, isEn ? 'en' : 'zh', isEn ? '../' : '');
+    // ★ 占位符只在 **HTML** 里替换。这里曾经对每个发布文件都跑一遍，于是
+    //   `site.css` 注释里作为**说明**出现的 `{{SITE_NAV}}` 被整段导航 HTML 顶替 ——
+    //   产物里是一段看着像损坏的 CSS。朴素字符串替换不认识"这只是注释"，
+    //   所以按文件类型收口，并让说明文字不再写出占位符字面量。
+    if (!rel.endsWith('.html')) {
+      files[rel] = buf;
+      continue;
     }
+    // 扁平站只有两个页面，但仍是"中文页在根、英文页在 `en/` 下"两种层级，
+    // 所以同一份导航要落成两套相对路径。见 `src/site/nav.js`。
+    const isEn = rel === 'en/index.html' || rel.startsWith('en/');
+    const lang = isEn ? 'en' : 'zh';
+    let out = injectNav(buf, lang, isEn ? '../' : '');
+    // 首页正文：粘性索引条 + 六个主题分段的骨架，都由构建期落值
+    // （真值只有 `boards.js` 的面板/主题清单 + `i18n.js` 的文案各一处）
+    out = injectTopics(injectIndex(out, lang), lang);
     files[rel] = injectGtm(injectBrand(out, BRAND));
   }
 

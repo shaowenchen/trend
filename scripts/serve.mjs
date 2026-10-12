@@ -87,8 +87,7 @@ async function main() {
 
   server.listen(port, () => {
     console.log(`\n  本地预览已启动 · http://localhost:${port}`);
-    console.log(`  中文入口  /index.html   · 英文入口 /en/`);
-    console.log(`  趋势页    每个面板一页，例如 /trending.html、/eval.html、/en/swebench.html`);
+    console.log(`  单页站：中文 /index.html · 英文 /en/  —— 34 个榜单都在这一页上`);
     console.log(`  （产物在 dist/，共 ${files.length} 个文件；改源码后重新跑 npm start）\n`);
   });
 }

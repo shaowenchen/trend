@@ -187,11 +187,13 @@ a { color: var(--accent); }
 }
 
 /* ── 页头导航 ──────────────────────────────────────────────
- * 由构建期生成（`src/site/nav.js` + `{{SITE_NAV}}`），不是手写在每个页面里。
+ * 由构建期生成（`src/site/nav.js` 的 `renderNav` 落到页面的导航占位符里），
+ * 不是手写在每个页面里。
  *
- * 三样：左边「首页」+「标签」，右边切换语言 —— 十七个榜单不进页头，它们在
- * 首页的入口卡片里各有一张卡（见 `.entry-grid`）；「标签」是一条按主题/来源逛的
- * 入口，不是榜单清单。页头的两个子元素靠 `header-inner` 的 `space-between` 各就各位。
+ * 两样：左边「首页」，右边切换语言 —— 全部 34 个榜单不进页头，它们就在首页上
+ * （按主题分段铺开），页头再列一遍就是同一份目录的第二次出现。
+ * 找榜/筛选由首页那条吸顶索引条（`.board-index`）承担。
+ * 页头的两个子元素靠 `header-inner` 的 `space-between` 各就各位。
  *
  * 两块链接的高度统一用 `--nav-h`：高度不一致是"这一排没对齐"最常见的原因，
  * 而定成一个变量之后，改一处就全跟着走。
@@ -284,110 +286,158 @@ a { color: var(--accent); }
 .icon-btn:focus-visible,
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* 页面底部的来源行页脚已移除：`{{BRAND}}` 与面板导航都不再依赖它
-   （品牌在页头，面板间的跳转由 trend.js 生成的 .board-links 承担）。
-   留一段空规则会让人以为还有个页脚要维护，所以整块去掉。 */
+/* 页面底部的来源行页脚已移除：品牌在页头，而"在榜单之间跳"由首页那条吸顶
+   索引条（`.board-index`）承担。留一段空规则会让人以为还有个页脚要维护。 */
 
-/* 首屏（`hero-compact`）的样式已随大盘页一起删掉：拆成"一个面板一页"之后，
-   页面标题由 trend.js 渲染成面板头里的 <h1>，没有任何页面再用那些类名。
-   留一段死规则会让人以为还有调用方。 */
+/* 首屏（`hero-compact`）与"面板页之间的链接"（`.board-links`）的样式都已删掉：
+   前者随大盘页一起去掉，后者随"一个面板一页"一起去掉（扁平站只有首页）。 */
 
-/* ---------------- 入口卡片（首页）----------------
+/* ---------------- 首页索引条（吸顶）----------------
  *
- * 首页不放正文段落，只放卡片：这个页面的唯一作用是**把人送进大盘**，
- * 而大段介绍会让"入口"变成"要读一遍才能走"的东西。
- * 所以卡片本身就是链接 —— 整块可点，不用瞄准一小行字。
+ * 一页装下 34 个面板之后，"怎么找、怎么只看一类"必须先回答 —— 这条就是答案。
+ * 它吸在页头下方（页头 52px 高），四行：
+ *   主题筛选（6 类 + 全部）· 面板跳转（34 个，横向滚动）
+ *   · 来源筛选（21 个，横向滚动）· 刷新
  *
- * 卡片**没有描边**：一屏几十张卡时，每张一圈边线会把版面切成碎片
- * （momoyu.cc 那一版也是靠"底色比页面亮一档"而不是靠边线来分卡）。
- * hover 换成整块提亮 + 强调色描边，这时才需要边线来确认"我指的是这一张"。
+ * ## 为什么吸顶而不是页头里再挂一条下拉
+ * 34 个面板要滚很久，索引条如果跟着滚走，翻到中段想换一类就得回到顶部。
+ * 吸顶让"换一类/跳一个"随时可在。`--idx-h` 是它给下方锚点留出的高度
+ * （`.panel` / `.topic` 的 `scroll-margin-top` 与它对应）。
  */
-.entry-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  gap: 10px;
-  margin: 16px 0 8px;
+/* 页面标题（唯一的 h1）：与面板头同一档字号，不抢版面 —— 单页站的标题是
+   站点名，不是某个榜的名字。 */
+.home-title { margin: 18px 0 0; font-size: 18px; letter-spacing: -.3px; }
+
+.board-index {
+  position: sticky;
+  top: 52px; /* = 页头高度 */
+  z-index: 9;
+  margin: 14px 0 0;
+  padding: 10px 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.idx-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* 跳转与来源那两行**不换行、横向滚动**：34 / 21 个条目平铺会把索引条撑得比面板还高，
+   而吸顶的东西一旦超过一屏就没法用了。滚动条在移动端隐藏（`::-webkit-scrollbar`）。 */
+.idx-jumps, .idx-sources {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.idx-jumps::-webkit-scrollbar, .idx-sources::-webkit-scrollbar { display: none; }
+.idx-lbl {
+  flex: none;
+  color: var(--muted);
+  font-size: 12px;
+  padding-right: 2px;
 }
 
-/* 用一个 <a> 而不是"div 包 h2+p+a"：整块可点、键盘一次 Tab 就到、
-   读屏器把标题与说明作为链接名一起念出来 —— 三种都有，且不需要 JS。 */
-.entry {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 11px 13px;
-  background: var(--surface);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  color: var(--ink);
-  text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease;
-}
-.entry:hover {
-  background: var(--hover);
-  border-color: var(--accent);
-}
-.entry .ic {
+/* 筛选片：与面板头里的小标签同一种视觉，但这里是"带数量的按钮" */
+.idx-chip {
   flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.idx-chip:hover { color: var(--ink); border-color: var(--accent); background: var(--hover); }
+/* 选中态：加边框 + 强调色，不只靠颜色（色觉障碍的访客也能看出选的是哪一个） */
+.idx-chip.on {
+  color: var(--accent);
+  border-color: var(--accent);
   background: var(--accent-soft);
-  color: var(--src, var(--accent));
+  font-weight: 600;
+}
+.idx-chip.subtle { font-size: 11.5px; padding: 2px 9px; }
+.idx-n {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.idx-chip.on .idx-n { color: var(--accent); }
+
+/* 跳转索引：`<a href="#panel-…">`。图标小一圈，名字单行不换行 */
+.idx-jump {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .15s ease, background-color .15s ease;
+}
+.idx-jump:hover { color: var(--ink); background: var(--hover); }
+.idx-ic {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--src, var(--muted));
 }
-.entry .ic > svg { width: 18px; height: 18px; }
-.entry .entry-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.entry .entry-title {
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 1.35;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* 说明收成一行：卡片矮下来之后，两行说明会把卡撑得比同行的高，
-   栅格里就会显得参差（`title` 属性里留着全文）。 */
-.entry .entry-desc {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* 末尾的箭头往右推，暗示"点了会去哪" */
-.entry .entry-go {
-  margin-left: auto;
-  flex: none;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1;
-}
-.entry:hover .entry-go { color: var(--accent); }
-/* 键盘聚焦时给箭头同样的强调，否则焦点只在卡片上、看不出重点 */
-.entry:focus-visible .entry-go { color: var(--accent); }
+.idx-ic > svg { width: 100%; height: 100%; }
 
-/* 小屏：图标缩小、字号收一档，让三张卡在 560px 下能一屏看完 */
+.idx-actions { gap: 10px; }
+.idx-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.idx-refresh:hover { border-color: var(--accent); background: var(--hover); }
+.idx-refresh:disabled { opacity: .5; cursor: default; }
+.idx-refresh .ic { display: inline-flex; width: 14px; height: 14px; }
+.idx-refresh .ic > svg { width: 100%; height: 100%; }
+#refresh-hint { font-size: 12px; }
+
+/* 小屏：索引条本体收一档，跳转与来源行本来就横向滚动，不受影响 */
 @media (max-width: 560px) {
-  .entry { padding: 10px 12px; gap: 10px; }
-  .entry .ic { width: 30px; height: 30px; border-radius: 8px; }
-  .entry .ic > svg { width: 17px; height: 17px; }
-  .entry .entry-title { font-size: 13.5px; }
-  .entry .entry-desc { font-size: 11.5px; }
-}
-
-/* 触屏没有 hover：别让提亮"粘"在卡片上 */
-@media (hover: none) {
-  .entry:hover { background: var(--surface); border-color: transparent; }
+  .board-index { padding: 8px 0; gap: 6px; }
+  .idx-chip { font-size: 11.5px; padding: 3px 9px; }
+  .idx-jump { font-size: 12px; padding: 3px 7px; }
 }
 
 /* ---------------- 面板 ---------------- */
 
-#panels { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+/* 扁平页的外层容器：#panels 里装六个主题段（`.topic`），不再直接装面板。
+   面板之间的间距因此落在 `.topic-grid` 上（见下），主题段之间另给一档更大的间隔。 */
+#panels { margin-top: 16px; }
+
+/* 一个主题段（模型榜 / 评测榜 / …）：一个小标题 + 一列面板。
+   `scroll-margin-top` 让 `#panel-<id>` 锚点落下来时**别钻到吸顶索引条底下** ——
+   少了它，点索引跳过去会看到标题被索引条盖住。 */
+.topic { scroll-margin-top: 96px; }
+.topic + .topic { margin-top: 26px; }
+.topic-head {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.topic-grid { display: flex; flex-direction: column; gap: 14px; }
 
 .panel {
   background: var(--surface);
@@ -395,15 +445,16 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  /* 锚点跳到这里时别贴住吸顶条 */
+  scroll-margin-top: 96px;
 }
 
 .panel-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
-/* ★ `:is(h1, h2)` 不是随手写的兜底：单面板页（现在**所有**榜单页都是）
- * 会用 `<h1>` 承担面板标题，而这里原来只写 `.panel-head h2` ——
- * 于是每个榜单页的标题都退回浏览器默认的 `2em` + 上下 margin，
- * 比它下面所有内容都大一截（`trend.js` 的 `panel()` 里那句
- * `SINGLE_BOARD ? 'h1' : 'h2'` 就是那一半真值）。两半必须同时认这两个标签。 */
-.panel-head :is(h1, h2) {
+/* ★ `:is(h1, h2, h3)` 不是随手写的兜底：单面板页（`data-board`）用 `<h1>` 承担
+ * 面板标题，扁平页用 `<h3>`（页面 h1 是站点名、主题段 h2）—— 两半必须同时认这几个
+ * 标签，否则标题退回浏览器默认的 `2em` + 上下 margin，比它下面所有内容都大一截。
+ * （`trend.js` 的 `panel()` 里那句 `SINGLE_BOARD ? 'h1' : 'h3'` 就是那一半真值。） */
+.panel-head :is(h1, h2, h3) {
   margin: 0;
   font-size: 16px;
   display: flex;
@@ -431,30 +482,30 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
  * 颜色取自那一版站方给的 `icon_color` 字段（见 `scripts/fetch-momoyu-hot.mjs`
  * 注释里的来源说明），不是我们自己挑的 —— 各平台的品牌色本来就是它们的身份。
  *
- * ## 为什么是把颜色写进 `--src`、而不是直接染 `.panel-icon` / `.entry .ic`
- * 同一个榜有两处图标要染：榜单页**面板头**（`#panel-<id>`，由 `trend.js` 的
- * `panel()` 落在 section 上）与**首页入口卡**（`a.entry[href="<id>.html"]`，
- * 构建期由 `src/site/nav.js` 与手写首页落下）。与其写两份规则、将来加一个榜
- * 漏掉一处，不如只声明一次变量，两个选择器各自去取：
+ * ## 为什么是把颜色写进 `--src`、而不是直接染 `.panel-icon` / `.idx-ic`
+ * 同一个榜有两处图标要染：**面板头**（`#panel-<id>`，由 `trend.js` 的 `panel()`
+ * 落在 section 上）与**索引条里的跳转片**（`a.idx-jump[data-jump="<id>"]` 里的
+ * `.idx-ic`，构建期由 `src/site/nav.js` 落下）。与其写两份规则、将来加一个榜
+ * 漏掉一处，不如**一条声明带两个选择器**，两处各自去取：
  *      图标规则写 `color: var(--src, var(--accent))`（无色时回落到强调色）。
  *
  * ## 一处例外
  * 爱范儿站方给的是 `#fff` —— 白图标在浅色主题里等于没有，改用可读的灰。
  *
  * 只染**图标**，不染标题与数值：一页里彩色的东西一多，就没人看正文了。 */
-#panel-zhihu, a.entry[href="zhihu.html"] { --src: #0177d7; }
-#panel-douban, a.entry[href="douban.html"] { --src: #2e963d; }
-#panel-weibo, a.entry[href="weibo.html"] { --src: #e30e24; }
-#panel-toutiao, a.entry[href="toutiao.html"] { --src: #ff2f49; }
-#panel-hupu, a.entry[href="hupu.html"] { --src: #c50100; }
-#panel-bilibili, a.entry[href="bilibili.html"] { --src: #0ea2e2; }
-#panel-itzhijia, a.entry[href="itzhijia.html"] { --src: #d22222; }
-#panel-zhongguancun, a.entry[href="zhongguancun.html"] { --src: #2764bd; }
-#panel-aifaner, a.entry[href="aifaner.html"] { --src: #6c7a89; }
-#panel-csdn, a.entry[href="csdn.html"] { --src: #fc5531; }
-#panel-huxiu, a.entry[href="huxiu.html"] { --src: #a3a3a3; }
-#panel-zhidemai, a.entry[href="zhidemai.html"] { --src: #f04848; }
-#panel-juejin, a.entry[href="juejin.html"] { --src: #006cff; }
+#panel-zhihu, .idx-jump[data-jump="zhihu"] { --src: #0177d7; }
+#panel-douban, .idx-jump[data-jump="douban"] { --src: #2e963d; }
+#panel-weibo, .idx-jump[data-jump="weibo"] { --src: #e30e24; }
+#panel-toutiao, .idx-jump[data-jump="toutiao"] { --src: #ff2f49; }
+#panel-hupu, .idx-jump[data-jump="hupu"] { --src: #c50100; }
+#panel-bilibili, .idx-jump[data-jump="bilibili"] { --src: #0ea2e2; }
+#panel-itzhijia, .idx-jump[data-jump="itzhijia"] { --src: #d22222; }
+#panel-zhongguancun, .idx-jump[data-jump="zhongguancun"] { --src: #2764bd; }
+#panel-aifaner, .idx-jump[data-jump="aifaner"] { --src: #6c7a89; }
+#panel-csdn, .idx-jump[data-jump="csdn"] { --src: #fc5531; }
+#panel-huxiu, .idx-jump[data-jump="huxiu"] { --src: #a3a3a3; }
+#panel-zhidemai, .idx-jump[data-jump="zhidemai"] { --src: #f04848; }
+#panel-juejin, .idx-jump[data-jump="juejin"] { --src: #006cff; }
 
 .panel-hint { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
 
@@ -635,7 +686,6 @@ tbody tr:last-child td { border-bottom: 0; }
   th, td { padding: 8px 11px; font-size: 12.5px; }
   .bar { width: 34px; }
   .panel-head, .panel-status { padding-left: 14px; padding-right: 14px; }
-  .board-links .board-actions { padding-left: 14px; padding-right: 14px; }
   .skeleton span { margin-left: 14px; margin-right: 14px; }
 }
 
@@ -718,222 +768,38 @@ tbody tr:last-child td { border-bottom: 0; }
 /* 刷新中让图标转起来，给一个"正在做事"的反馈 */
 .btn-ghost:disabled .ic svg { animation: spin .8s linear infinite; }
 
-/* ---------------- 面板页之间的链接（trend.js 插在 #panels 之后）----------------
+/* ---------------- 面板头里的标签（就地筛选片）----------------
  *
- * 每个面板一页之后，从"正在流行的模型"去"下载最多的模型"如果没有这条路，
- * 就得先回首页再点一次。浏览器返回键当然能用，但它不是"逛"。
+ * 每个面板头上两片：主题 + 来源。**它们是筛选控件**（`<button data-tag-filter>`），
+ * 不再是通往独立标签页的链接 —— 扁平站之后标签页没有了，"点一下只看这一类"
+ * 就地完成（逻辑在 `trend.js` 的 `applyFilter`）。
  *
- * 刻意**不放进页头导航**：11 个面板名塞进页头会挤成一坨，而且这一条
- * 页面内的目录/页脚这类导航不该跟"首页 + 语言切换"抢同一排。
+ * 尺寸按"附注"来：比正文小一档，否则面板头会被这两片撑得比标题还重。
+ * 仍保留 ≥24px 的可点尺寸（触控下限）。选中态由 `.on` + `aria-pressed` 一起标出。
  */
-.board-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 22px;
-  padding: 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  font-size: 13.5px;
-}
-.board-links a {
-  color: var(--muted);
-  text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-}
-.board-links a:hover { color: var(--ink); background: var(--hover); }
-/* 当前页：加边框而不只是变色 —— 只靠颜色区分对色觉障碍的访客等于没标 */
-.board-links a[aria-current="page"] {
-  color: var(--ink);
-  font-weight: 600;
-  border-color: var(--line);
-  background: var(--hover);
-}
-/* 刷新按钮：与面板间链接同处页脚，但它是"动作"不是"链接"，上面一条分隔线分开 */
-.board-links .board-actions {
-  flex: 1 0 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-
-/* 面板头里的标签：与说明同一行区域，但单独一行更清楚 */
-.panel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0 0; }
-/* 标签片（可点，进 tag.html?t=…）。页面上出现三种大小：面板头 / 页脚 / 标签页，
-   共用这一个类名，靠上下文调尺寸。 */
+.panel-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 0; }
 .tag-chip {
   display: inline-flex;
   align-items: center;
-  padding: 3px 9px;
+  min-height: 24px;
+  padding: 1px 9px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--bg);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: 1.6;
-  text-decoration: none;
-  transition: color .15s ease, border-color .15s ease;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
 .tag-chip:hover { color: var(--ink); border-color: var(--accent); background: var(--hover); }
-
-/* 面板头 / 页脚里的标签比标签页的小一档：那里是**附注**，36px 的高度会把
-   面板头撑得比标题还重。仍然保留 ≥24px 的可点尺寸（触控下限）。 */
-.panel-tags .tag-chip,
-.board-tags .tag-chip {
-  min-height: 26px;
-  padding: 2px 10px;
-  font-size: 12px;
-}
-
-/* 页脚：面板之间的跳转之后，再来一行"本页标签" */
-.board-tags {
-  flex: 1 0 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  font-size: 12.5px;
-}
-
-/* ---------------- 标签页（tags.html / tag.html）----------------
- *
- * 两个页面共用这一组样式。设计上跟站内其余卡片走同一套语言（surface 底、
- * 同样的圆角与阴影、hover 抬起），所以它看起来是站点的第 N 个页面，
- * 而不是另一个站点。
- *
- * 三种元素：
- *   · `.tag-cards` / `.tag-card` —— tags 页的标签卡（名字 + 数量 + 包含哪些榜）
- *   · `.tag-grid` / `.tag-chip`  —— tag 页顶部的标签选择条（带数量角标）
- *   · `.tag-group`               —— tag 页的分组段落（JS 按 ?t= 收窄）
- */
-.tag-page { padding-top: 24px; }
-.tag-page > h1 { margin: 0 0 18px; font-size: clamp(19px, 4vw, 23px); letter-spacing: -.4px; }
-/* tag 页的返回链接与大标题之间留一口气 */
-.tag-page > p:first-child { margin: 0 0 16px; }
-
-/* ── tags 页：标签卡 ──────────────────────────────────────
- * 一张卡回答三个问题：叫什么、多少个榜、都是哪些榜。
- * 前两个在上排（名字 + 数量），第三个在下排（名字连着列）。
- */
-.tag-section { margin: 0 0 26px; }
-.tag-section-head {
-  margin: 0 0 12px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.tag-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
-  gap: 10px;
-}
-.tag-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-decoration: none;
-  transition: border-color .15s ease, background-color .15s ease;
-}
-.tag-card:hover {
-  border-color: var(--accent);
-  background: var(--hover);
-}
-.tag-card:active { background: var(--hover); }
-.tag-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.tag-card-name { font-weight: 600; font-size: 15px; color: var(--ink); }
-/* 数量做成一个胶囊：它是这张卡上最需要被一眼看到的数字 */
-.tag-card-count {
-  flex: none;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: var(--accent-soft);
+.tag-chip.on {
   color: var(--accent);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-/* 包含哪些榜：一行放不下就截断（读者点进去能看到全部） */
-.tag-card-boards {
-  color: var(--muted);
-  font-size: 12.5px;
-  line-height: 1.5;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-/* ── tag 页：顶部标签选择条 ─────────────────────────────── */
-.tag-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin: 0 0 22px;
-}
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 11px;
-  min-height: 32px; /* 触控目标不要比手指小 */
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--muted);
-  font-size: 13px;
-  text-decoration: none;
-  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
-}
-.tag-chip:hover { border-color: var(--accent); color: var(--ink); background: var(--hover); }
-/* 当前标签：加边框 + 变色，不只靠颜色（与页头导航同样的处理） */
-.tag-chip[aria-current='page'] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
-/* 数量角标：每个标签几个榜 */
-.tag-chip-n {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: var(--hover);
-  color: var(--muted);
-  font-size: 11.5px;
+  border-color: var(--accent);
+  background: var(--accent-soft);
   font-weight: 600;
 }
-.tag-chip[aria-current='page'] .tag-chip-n { background: var(--surface); color: var(--accent); }
-/* 角标自带内边距，把外层的右内边距收回去 —— 榜单页页脚的标签没有角标，
-   所以不能把"更窄的右侧"写死在外层（`：has` 不支持时只是略宽，无碍）。 */
-.tag-chip:has(.tag-chip-n) { padding-right: 7px; }
-
-/* ── tag 页：分组段落（JS 会把非当前组收掉）───────────────── */
-.tag-group { margin: 0 0 30px; }
-.tag-group[hidden] { display: none; }
-.tag-group-head {
-  display: flex;
-  align-items: baseline;
-  gap: 9px;
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 600;
-}
-.tag-group-count { font-size: 12.5px; font-weight: 500; color: var(--muted); }
 
 /* ---------------- 面板内的切换片（GitHub 时间段 / 加载按钮） ---------------- */
 

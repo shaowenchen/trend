@@ -6,13 +6,23 @@
 <title>{{BRAND}}</title>
 <meta name="description" content="{{BRAND}} is an AI trend board: model charts, community heat, open-model evaluation scores and coding benchmarks in one page.">
 <!--
-  English page. Same notes as the Chinese one: hand-written static file served
-  straight by GitHub Pages, relative paths only, `<base href="./">` pins them to
-  this directory. There is deliberately no canonical / og:url / site verification
+  Single-page site: all 34 boards live on this page, grouped into six topic
+  sections. There are no second-level pages any more.
+
+  Same notes as the Chinese page: hand-written static file served straight by
+  GitHub Pages, relative paths only, `<base href="./">` pins them to this
+  directory. There is deliberately no canonical / og:url / site verification
   here — those need an absolute URL and this site never hard-codes its domain.
-  GTM is different: the container id does not depend on where the site is hosted,
-  so it is here, resolved at build time (see `src/site/gtm.js`).
+  GTM is different: the container id does not depend on where the site is
+  hosted, so it is here, resolved at build time (see `src/site/gtm.js`).
   The brand is a `{{BRAND}}` placeholder resolved at build time.
+
+  Two build-time placeholders (see `src/site/nav.js`):
+    - the sticky index bar (topic filter + board jumps + refresh)
+    - the six topic sections; trend.js mounts the panels into them
+  Both derive from `assets/boards.js` (board/topic list) and `assets/i18n.js` (text).
+  (The placeholder literals are deliberately not spelled out here: injection is a
+  plain string replace, so a mention inside a comment would be expanded too.)
 -->
 <base href="./">
 <link rel="stylesheet" href="../site.css">
@@ -30,285 +40,27 @@
 </header>
 
 <main class="wrap">
-  <!-- Entry cards only — the page's one job is to hand the visitor a board.
-       One card per board, and every card points at its own page: `site.test.js`
-       asserts the hrefs are all distinct, because a duplicate means some board
-       lost its only way in. -->
-  <section class="entry-grid">
-    <a class="entry" href="trending.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">Trending models</span>
-        <span class="entry-desc">Ranked by HuggingFace trending score</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="liked.html">
-      <span class="ic" data-icon="heart"></span>
-      <span class="entry-body">
-        <span class="entry-title">Most-liked models</span>
-        <span class="entry-desc">The models with the most likes</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="downloaded.html">
-      <span class="ic" data-icon="download"></span>
-      <span class="entry-body">
-        <span class="entry-title">Most-downloaded models</span>
-        <span class="entry-desc">The models pulled the most times</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="eval.html">
-      <span class="ic" data-icon="trophy"></span>
-      <span class="entry-body">
-        <span class="entry-title">Open-model evaluation board</span>
-        <span class="entry-desc">IFEval · BBH · MATH · GPQA · MMLU-PRO averaged</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aider.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">Coding ability (Aider)</span>
-        <span class="entry-desc">Pass rate on real Aider Polyglot code tasks</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="spaces.html">
-      <span class="ic" data-icon="cube"></span>
-      <span class="entry-body">
-        <span class="entry-title">Trending AI apps</span>
-        <span class="entry-desc">HuggingFace Spaces by trending score</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="datasets.html">
-      <span class="ic" data-icon="layers"></span>
-      <span class="entry-body">
-        <span class="entry-title">Trending datasets</span>
-        <span class="entry-desc">HuggingFace Datasets by trending score</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="papers.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">Daily paper leaderboard</span>
-        <span class="entry-desc">Papers ranked by upvotes</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aiNews.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">AI news roundup</span>
-        <span class="entry-desc">HN, TechCrunch, The Verge, arXiv — 8 sources daily</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aiPress.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">AI official news</span>
-        <span class="entry-desc">OpenAI, DeepMind, NVIDIA — 8 first-party blogs</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="repos.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">Top-starred AI projects</span>
-        <span class="entry-desc">Stars gained this week</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="ghTrending.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">GitHub Trending (AI filter)</span>
-        <span class="entry-desc">daily snapshot of github.com/trending, AI-related by default</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-            <a class="entry" href="zhihu.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">Zhihu hot list</span>
-        <span class="entry-desc">Hottest questions on Zhihu</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="csdn.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">CSDN hot list</span>
-        <span class="entry-desc">Hot posts on the CSDN developer community</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="juejin.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">Juejin hot list</span>
-        <span class="entry-desc">Hot posts on the Juejin developer community</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="itzhijia.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">ITHome hot list</span>
-        <span class="entry-desc">Hot tech stories on ITHome</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="huxiu.html">
-      <span class="ic" data-icon="file"></span>
-      <span class="entry-body">
-        <span class="entry-title">Huxiu hot list</span>
-        <span class="entry-desc">Hot tech-business stories on Huxiu</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aifaner.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">Ifanr hot list</span>
-        <span class="entry-desc">Hot stories on Ifanr</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="zhongguancun.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">ZOL hot list</span>
-        <span class="entry-desc">Hot hardware stories on ZOL</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="bilibili.html">
-      <span class="ic" data-icon="monitor"></span>
-      <span class="entry-body">
-        <span class="entry-title">Bilibili hot list</span>
-        <span class="entry-desc">Hot videos on Bilibili</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="weibo.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">Weibo trending</span>
-        <span class="entry-desc">Trending topics on Weibo</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="toutiao.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">Toutiao hot list</span>
-        <span class="entry-desc">Trending stories on Toutiao</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="hupu.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">Hupu hot list</span>
-        <span class="entry-desc">Hot threads on Hupu</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="douban.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">Douban hot topics</span>
-        <span class="entry-desc">Hot topics on Douban</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="zhidemai.html">
-      <span class="ic" data-icon="star"></span>
-      <span class="entry-body">
-        <span class="entry-title">Smzdm hot deals</span>
-        <span class="entry-desc">Hot deals on Smzdm (3-hour window)</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="newmodels.html">
-      <span class="ic" data-icon="box"></span>
-      <span class="entry-body">
-        <span class="entry-title">Latest model releases</span>
-        <span class="entry-desc">models.dev, newest releases first</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="openrouter.html">
-      <span class="ic" data-icon="bolt"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter model usage</span>
-        <span class="entry-desc">Ranked by tokens consumed on OpenRouter, daily</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orCatalog.html">
-      <span class="ic" data-icon="database"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter model catalog</span>
-        <span class="entry-desc">every routable model: pricing · context · modality</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orTrends.html">
-      <span class="ic" data-icon="trending"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter fastest climbers</span>
-        <span class="entry-desc">ranked by week-over-week growth (this week vs last, in tokens)</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orAuthors.html">
-      <span class="ic" data-icon="database"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter vendor share</span>
-        <span class="entry-desc">each vendor's share of OpenRouter tokens, with week-over-week change</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orPerf.html">
-      <span class="ic" data-icon="bolt"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter performance</span>
-        <span class="entry-desc">measured median latency and throughput per model (best provider)</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="aaBench.html">
-      <span class="ic" data-icon="trophy"></span>
-      <span class="entry-body">
-        <span class="entry-title">Artificial Analysis benchmarks</span>
-        <span class="entry-desc">a **different source** from the HuggingFace board — compare the two side by side</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="orApps.html">
-      <span class="ic" data-icon="cube"></span>
-      <span class="entry-body">
-        <span class="entry-title">OpenRouter app usage</span>
-        <span class="entry-desc">which apps are burning tokens (attributed per agent app), plus image/video/speech models</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-    <a class="entry" href="swebench.html">
-      <span class="ic" data-icon="code"></span>
-      <span class="entry-body">
-        <span class="entry-title">SWE-bench (real code fixes)</span>
-        <span class="entry-desc">Five sub-boards you can switch between</span>
-      </span>
-      <span class="entry-go" aria-hidden="true">→</span>
-    </a>
-  </section>
+  <!-- Page title: the single <h1> on the flat page. Topic sections are <h2> and
+       panel titles <h3> (rendered by trend.js), so the three levels line up.
+       Skeleton copy, written here per the "page chrome is hand-written, not in
+       the dictionary" convention (panel and topic names do come from i18n.js). -->
+  <h1 class="home-title">AI trend boards</h1>
+
+  <!-- Sticky index bar: topic filter (narrow to one class), jumps to all 34
+       panels, and the refresh button. It sits before the boards and sticks to
+       the top, because with 34 panels on one page "how do I find one" comes first. -->
+  {{BOARD_INDEX}}
+
+  <!-- Six topic sections (Models / Benchmarks / Ecosystem / Platform / News /
+       Chinese hot lists). trend.js mounts each panel's skeleton at runtime and
+       lazy-loads it: data is only fetched when a panel scrolls near the
+       viewport, otherwise one visit would fire a dozen upstream requests at
+       once (three of them 4MB+ boards). -->
+  <div id="panels">
+  {{BOARD_TOPICS}}
+  </div>
 </main>
+<script src="../assets/trend.js" type="module"></script>
 <script src="../assets/ui.js" type="module"></script>
 </body>
 </html>

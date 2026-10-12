@@ -21,7 +21,9 @@ import {
   fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
   parseGhTrending, isAiRepo, isAiText, flattenGhTrending, flattenOrCatalog,
   flattenAiNews, flattenHotList, HOT_LIST_KEYS,
+  BOARD_IDS, BOARD_ORDER, BOARD_TAGS, BOARD_ICONS, boardVisible, wireOnce,
 } from './trend.js';
+import { ICONS } from './ui.js';
 
 let pass = 0;
 const t = (name, fn) => {
@@ -855,14 +857,16 @@ t('attachPanel：替换时**保持原来的位置**（否则面板会被挪到�
 t('★ panel() 只能经由 attachPanel 挂载（改回 appendChild 会让切子榜重新变成追加）', () => {
   const src = readFileSync(new URL('./trend.js', import.meta.url), 'utf8');
   const body = src.slice(src.indexOf('function panel({'));
-  const end = body.indexOf('\n}\n', body.indexOf('attachPanel(panelsRoot'));
+  const end = body.indexOf('\n}\n', body.indexOf('attachPanel(rootFor(id), el, id)'));
   assert.ok(end > 0, '没找到 panel() 的函数体 —— 上面的切片定位已失效，请同步本条');
   const fn = body.slice(0, end);
-  assert.match(fn, /attachPanel\(panelsRoot, el, id\)/, 'panel() 不再调用 attachPanel');
-  // 反证：函数体里不该再出现直接往 panelsRoot 里塞元素/HTML 的写法
+  // ★ 挂的容器是 `rootFor(id)`（该面板所属**主题段**，扁平页）而不是 `panelsRoot` ——
+  //   扁平站把面板按主题分段铺开，`rootFor` 找不到段时回落到 `panelsRoot`。
+  assert.match(fn, /attachPanel\(rootFor\(id\), el, id\)/, 'panel() 不再经由 attachPanel 挂载');
+  // 反证：函数体里不该再出现直接往容器里塞元素/HTML 的写法
   assert.doesNotMatch(
     fn,
-    /panelsRoot\.(appendChild|insertAdjacent|innerHTML)/,
+    /(panelsRoot|root)\.(appendChild|insertAdjacent|innerHTML)/,
     'panel() 里出现了绕过 attachPanel 的直接挂载'
   );
 });
@@ -1224,6 +1228,87 @@ t('★ HOT_LIST_KEYS：13 个中文热榜面板成员（用户返修：每个榜
                    'zhongguancun', 'aifaner', 'csdn', 'huxiu', 'zhidemai', 'juejin']) {
     assert.ok(HOT_LIST_KEYS.includes(k), `${k} 应在 13 榜成员里`);
   }
+});
+
+/* ---------------- 扁平页：分组、懒加载闸门、筛选（纯逻辑部分） ---------------- */
+
+/*
+ * 扁平站把"一个面板一页"改成"一页装下 34 个面板"，于是多了几件**只在扁平页上
+ * 才成立**的性质：面板按主题分段、滚到才加载、筛选收窄。这里盯住它们里
+ * **不碰 DOM** 的那部分（其余靠 `site.test.js` 的静态门禁与本地无头实测）。
+ */
+
+t('★ BOARD_ORDER：恰好 34 个面板、不重不漏，且按主题分段连续（与骨架铺法同源）', () => {
+  assert.equal(BOARD_ORDER.length, BOARD_IDS.length, 'BOARD_ORDER 应恰好覆盖全部面板');
+  assert.equal(new Set(BOARD_ORDER).size, BOARD_IDS.length, '不得出现重复面板');
+  // 每个面板都会被铺进去（一个都不能漏），且次序是"按主题、段内按 BOARD_IDS"
+  const sortedA = [...BOARD_IDS].sort();
+  const sortedB = [...BOARD_ORDER].sort();
+  assert.deepEqual(sortedB, sortedA, 'BOARD_ORDER 与 BOARD_IDS 应是同一集合');
+});
+
+t('★ 主题分段：每个面板恰好落进一个主题段（分段重叠会让它被铺两次）', () => {
+  const topicOf = (id) => BOARD_TAGS[id]?.topic;
+  for (const id of BOARD_IDS) {
+    assert.ok(topicOf(id), `${id} 没有主题 —— rootFor() 找不到它的段`);
+  }
+  // 相邻同主题 → 段落连续（`BOARD_ORDER` 是 flatMap(boardsWithTag)，天然如此）
+  const seq = BOARD_ORDER.map(topicOf);
+  const runs = seq.filter((v, i) => v !== seq[i - 1]);
+  assert.equal(new Set(runs).size, runs.length, '同一主题的段应当连着，不该来回跳');
+});
+
+t('★ 面板头像都能被 ui.js 渲染（未知名字会让 icon() 抛错，整页骨架同步建时会炸）', () => {
+  for (const id of BOARD_IDS) {
+    const name = BOARD_ICONS[id];
+    assert.ok(name, `${id} 没登记头像`);
+    assert.ok(ICONS[name], `${id} 的头像 '${name}' 不在 ICONS 里 —— icon() 会 throw`);
+  }
+});
+
+t('★ 源码级：扁平页的启动走"先建骨架 → 观察器懒加载"，不是直接调 loader', () => {
+  // 这条盯的是一个**性能回归**：把 `observePending(wantedIds)` 改回
+  // "for (id) startLoader(id)"（或让 `startAll` 直接调 loader），34 个面板会一起
+  // 开拉（含 models.dev 4.8MB、SWE-bench 4MB、评测榜 46 页）。页面上看不出来，
+  // 只有"进页面就转半天"这一种症状，很难归因。
+  const src = readFileSync(new URL('./trend.js', import.meta.url), 'utf8');
+  const boot = src.slice(src.indexOf('function startAll()'));
+  assert.match(boot, /observePending\(wantedIds\)/, 'startAll 没有把扁平页交给懒加载观察器');
+  // loader 只应经由 startLoader 调起（观察器、深链接、刷新按钮都走它）
+  assert.match(src, /function startLoader\(/, '没有 startLoader');
+  assert.match(src, /BOARD_LOADERS\[id\]\(\)/, 'startLoader 没调 loader —— 上面的切片可能失效了');
+});
+
+t('★ boardVisible：主题筛选 ∧ 标签筛选的取交集（扁平页筛选的全部语义）', () => {
+  const all = { topic: '*', tag: '*' };
+  // 不筛 → 全部可见
+  assert.equal(boardVisible('trending', all), true);
+  assert.equal(boardVisible('weibo', all), true);
+  // 主题筛选：只看模型榜 → 微博（中文热榜）不可见
+  assert.equal(boardVisible('trending', { topic: 'models', tag: '*' }), true);
+  assert.equal(boardVisible('weibo', { topic: 'models', tag: '*' }), false);
+  // 来源筛选：点 huggingface → 只有它的榜可见（跨主题）
+  assert.equal(boardVisible('trending', { topic: '*', tag: 'huggingface' }), true);
+  assert.equal(boardVisible('eval', { topic: '*', tag: 'huggingface' }), true);
+  assert.equal(boardVisible('aaBench', { topic: '*', tag: 'huggingface' }), false);
+  // 交集：主题 models ∧ 来源 huggingface → trending 是，newmodels（models.dev）不是
+  assert.equal(boardVisible('trending', { topic: 'models', tag: 'huggingface' }), true);
+  assert.equal(boardVisible('newmodels', { topic: 'models', tag: 'huggingface' }), false);
+  // 未知 id → 不可见（不抛错）
+  assert.equal(boardVisible('nope', all), false);
+});
+
+t('★ wireOnce：同一个元素上同 key 的委托只装一次（重复挂载会让 chip 一点触发 N 次）', () => {
+  // 扁平站的真缺陷：`ensurePanel` 让 loader 复用同一个面板元素，而各 loader 用
+  // 事件委托把子榜切换绑在 `p.el` 上 —— 重跑一次就多一个监听器，且**页面上
+  // 完全看不出来**（点一次 chip，loader 被调 N 次）。这里用一个记录调用的假元素验证。
+  const el = { dataset: {}, clicks: 0, addEventListener: () => { el.clicks += 1; } };
+  const handler = () => {};
+  wireOnce(el, 'range', handler);
+  wireOnce(el, 'range', handler); // 模拟"刷新后 loader 重跑，又绑一次"
+  assert.equal(el.clicks, 1, '同 key 被绑了多次 —— chip 会触发多次加载');
+  wireOnce(el, 'ghtrend', handler); // 不同 key：各自一份
+  assert.equal(el.clicks, 2, '不同 key 的委托应各自装一次');
 });
 
 console.log(`\n  通过 ${pass} 失败 ${process.exitCode ? 1 : 0}\n`);
