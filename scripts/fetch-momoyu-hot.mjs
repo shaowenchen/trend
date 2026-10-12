@@ -35,7 +35,17 @@ const OUT_PATH = path.resolve(
 );
 const UA =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 trend-snapshot/1.0';
-const PER_SOURCE_LIMIT = 20;
+/**
+ * 每来源保留多少条。**0 = 不截断，站方给多少收多少**（2026-10-12 起）。
+ *
+ * 原来是 20，理由是"热榜头部的信息密度本来就集中在前排"。但那是一次**看不见的
+ * 丢弃**：站方的榜本身就有 30–100 条（实测 B站 100、虎扑 60、微博 52），
+ * 切掉尾巴之后页面上没有任何提示 —— 读者看到的"完整列表（20 条）"其实是
+ * 我们截过的，而"第 30 名是谁"这种问题原本答得出来。
+ * 现在整份快照约 180KB（13 个来源 ~470 条），一次请求的量，不值得为它丢数据。
+ * 真要收口，改回一个数字即可（`slice` 仍在，只是上限是 `Infinity`）。
+ */
+const PER_SOURCE_LIMIT = Infinity;
 const MIN_SOURCES = 3; // 少于这个数 = 结构变了/半截数据，拒绝产出
 const MIN_ITEMS = 1;
 

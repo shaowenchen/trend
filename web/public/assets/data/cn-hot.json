@@ -1,127 +1,222 @@
 {
- "fetchedAt": "2026-10-01T03:41:52.632Z",
+ "fetchedAt": "2026-10-12T06:16:53.044Z",
  "sources": [
   {
    "key": "zhihu",
    "name": "知乎热榜",
-   "fetchedAt": "2026-10-01T03:30:24.000Z",
+   "fetchedAt": "2026-10-12T06:00:15.000Z",
    "items": [
     {
-     "title": "现在大家都把国庆当纯放假玩，有没有什么老派过节体验",
-     "url": "https://www.zhihu.com/question/2085753079916388794",
-     "extra": "1168 万"
+     "title": "儿科医生按号顺序抢救车祸重伤儿童，后一位家长插队被拒后打电话投诉，此事背后反映了哪些问题",
+     "url": "https://www.zhihu.com/question/2092686581832180646",
+     "extra": "768 万"
     },
     {
-     "title": "为什么酒精灯里酒精不用 100% 浓度而是用 95% 浓度",
-     "url": "https://www.zhihu.com/question/302935324",
-     "extra": "244 万"
+     "title": "《纽约时报》评选 21 世纪百佳剧集《绝命毒师》登顶，这份榜单符合你的预期吗",
+     "url": "https://www.zhihu.com/question/2087154137708480258",
+     "extra": "446 万"
     },
     {
-     "title": "许鞍华复盘《第一炉香》称马思纯拍摄时状态浮肿，她和彭于晏台词功底不好，自己作为导演本该叫停，你怎么看",
-     "url": "https://www.zhihu.com/question/2088582238271010192",
-     "extra": "191 万"
+     "title": "女子 3 个月对盒马 399 件商品申请仅退款，快递员取件退还吃剩的，涉嫌诈骗罪被采取刑事强制，如何看待此事",
+     "url": "https://www.zhihu.com/question/2092372203266487423",
+     "extra": "337 万"
     },
     {
-     "title": "为啥只有 8090 后的人喜欢用电脑的程度大于手机",
-     "url": "https://www.zhihu.com/question/2079838395874988448",
-     "extra": "174 万"
+     "title": "郑钦文成为中网历史上首位本土女单冠军，你认为她有机会在职业生涯内超越李娜的历史地位吗",
+     "url": "https://www.zhihu.com/question/2092732351969063873",
+     "extra": "323 万"
     },
     {
-     "title": "迪拜航空客机发出紧急信号返航，被曝俄裔机长与乌克兰裔副驾发生激烈争吵，还有哪些信息值得关注",
-     "url": "https://www.zhihu.com/question/2088649572151194406",
-     "extra": "172 万"
+     "title": "如何评价真人化 AI 漫剧《持械入宋》",
+     "url": "https://www.zhihu.com/question/2082386644385251930",
+     "extra": "251 万"
     },
     {
-     "title": "番茄小说流量跌跌不休，24 年下滑 31%，25 年下滑 26%，今年下滑 22%，为什么读者放弃了番茄小说",
-     "url": "https://www.zhihu.com/question/2087907468932339038",
-     "extra": "138 万"
+     "title": "莫氏鸡煲莫叔称为养鸡场砸了 600 万，儿女都已辞职，很可能会再背上一身债务，如何看待他的选择",
+     "url": "https://www.zhihu.com/question/2091597639112512575",
+     "extra": "248 万"
     },
     {
-     "title": "如何看待南开大学两位教授胡金牛陈璟因实诚简介再次走红",
-     "url": "https://www.zhihu.com/question/1928586591108035982",
+     "title": "北京 2000 多万人口拥有 26 个 211 大学，山河四省 3 亿多人口拥有 6 个 211 大学，这种情况是否合理",
+     "url": "https://www.zhihu.com/question/1974334411270014436",
+     "extra": "221 万"
+    },
+    {
+     "title": "知名数码博主疑爆料华为将推出新品牌星芒，消息靠谱吗华为为何在此时选择推子品牌",
+     "url": "https://www.zhihu.com/question/2092699409863501705",
+     "extra": "218 万"
+    },
+    {
+     "title": "日本用工市场再现挑企业潮，12.1 万求职者对应 49.9 万岗位，应届生薪资普涨达 40%，你怎么看",
+     "url": "https://www.zhihu.com/question/2092365723654006104",
+     "extra": "209 万"
+    },
+    {
+     "title": "为何两宋极为流行的词随着宋朝灭亡，到了元朝明朝突然不再流行了",
+     "url": "https://www.zhihu.com/question/1896219006316311665",
+     "extra": "204 万"
+    },
+    {
+     "title": "沙特利雅得机场再次遇袭造成 1 死 11 伤，胡塞武装称也门萨那国际机场也遭沙特袭击，双方冲突会持续升级吗",
+     "url": "https://www.zhihu.com/question/2092882292787999562",
+     "extra": "201 万"
+    },
+    {
+     "title": "胡歌被问工作的意义，坦言拍《仙剑 3》时也曾觉得无聊，但演员先要养活自己，如何看待理想和谋生之间的取舍",
+     "url": "https://www.zhihu.com/question/2092597766102803245",
+     "extra": "199 万"
+    },
+    {
+     "title": "如何看待理记发文称将在 20 至 40 天内退出所有自媒体平台，彻底停止内容更新",
+     "url": "https://www.zhihu.com/question/2092927081319330010",
+     "extra": "188 万"
+    },
+    {
+     "title": "如何评价周鸿祎攀岩从 3 米高处摔下，左膝粉碎性骨折",
+     "url": "https://www.zhihu.com/question/2092747969921602735",
+     "extra": "169 万"
+    },
+    {
+     "title": "从世排掉到 100 开外，到如今 2-0 胜安德列娃，郑钦文是如何一路逆袭的她找回状态的关键点是什么",
+     "url": "https://www.zhihu.com/question/2092731710257329435",
+     "extra": "151 万"
+    },
+    {
+     "title": "如何看待 10 月 12 日，江淮汽车开盘大跌，市值跌破 500 亿江淮汽车该如何翻身",
+     "url": "https://www.zhihu.com/question/2092934926333129329",
+     "extra": "148 万"
+    },
+    {
+     "title": "新能源车没备胎，自驾游该不该自己买一个不买的人是真懂车，还是心大",
+     "url": "https://www.zhihu.com/question/2087602058774028958",
+     "extra": "144 万"
+    },
+    {
+     "title": "OpenAI 撤回三篇数学论文，原因是符号写错导致论证失效，这反映了什么",
+     "url": "https://www.zhihu.com/question/2091604789729681531",
      "extra": "135 万"
     },
     {
-     "title": "网友称胖东来九成销售额靠外地游客，是真的吗若数据真实意味着什么",
-     "url": "https://www.zhihu.com/question/2087807933077611808",
-     "extra": "133 万"
+     "title": "特朗普称俄乌冲突进入能源停火状态，双方均已同意，意味着什么",
+     "url": "https://www.zhihu.com/question/2092744779473891449",
+     "extra": "135 万"
     },
     {
-     "title": "陈芋汐长高十厘米一斤肉没长，怎样看待这种极度自律这真的健康吗",
-     "url": "https://www.zhihu.com/question/2088625016011060624",
-     "extra": "131 万"
-    },
-    {
-     "title": "为什么没有经历过那个时代听《我的祖国》也就是那首一条大河波浪宽那首歌竟然感动的哭了",
-     "url": "https://www.zhihu.com/question/268772430",
-     "extra": "128 万"
-    },
-    {
-     "title": "如何评价 10 月 1 号发布的 Gemini 4 Argon",
-     "url": "https://www.zhihu.com/question/2088845041045337914",
-     "extra": "128 万"
-    },
-    {
-     "title": "25 岁画师约稿时遭遇境外网络诈骗，诱导扫码和借贷，被骗 4 万余元最终坠亡离世，这起悲剧留给我们哪些反思",
-     "url": "https://www.zhihu.com/question/2088693062239367611",
+     "title": "广州一放生团体因官方报备太严格，直接放生两万条鲮鱼，还有放生者称做善事干吗报备，随意放生有啥危害",
+     "url": "https://www.zhihu.com/question/2092292280925287418",
      "extra": "127 万"
     },
     {
-     "title": "C 罗社媒官宣离开国家队集训，声称在适当的时候声明离开国家队的原因，他这么做的原因是什么",
-     "url": "https://www.zhihu.com/question/2088829795757048100",
-     "extra": "127 万"
+     "title": "1 秒 20 次，啄木鸟为什么不会脑震荡?",
+     "url": "https://www.zhihu.com/question/666881215",
+     "extra": "111 万"
     },
     {
-     "title": "我是一个资深程序员，30 岁，每天都用 AI，现在觉得 Agent 的能力太强大了，我未来的路在哪",
-     "url": "https://www.zhihu.com/question/2083222866280171324",
-     "extra": "125 万"
+     "title": "73 岁林毅夫终成世界计量经济学会士，含金量如何",
+     "url": "https://www.zhihu.com/question/2092194495961850755",
+     "extra": "96 万"
     },
     {
-     "title": "为何机械硬盘价格如此离谱",
-     "url": "https://www.zhihu.com/question/2082856338791706870",
-     "extra": "125 万"
+     "title": "如果人类数学家摆烂不去验证那些 GPT 搞出来的答案，会怎么样",
+     "url": "https://www.zhihu.com/question/2092047568033399251",
+     "extra": "94 万"
     },
     {
-     "title": "前有张雪机车团队在意大利被盗，后有惠英红团队巴黎遇抢劫，为啥欧洲小偷都这么猖獗海外遇抢劫该如何应对",
-     "url": "https://www.zhihu.com/question/2088690399845902204",
-     "extra": "125 万"
+     "title": "怎么看微软 CEO 发长文说：大模型提供 CoT 透明是底线",
+     "url": "https://www.zhihu.com/question/2092670679795634670",
+     "extra": "93 万"
     },
     {
-     "title": "黄渤称观众看见自己就乐很沮丧，想打破喜剧标签，对此你怎么看",
-     "url": "https://www.zhihu.com/question/2087701224590140233",
-     "extra": "125 万"
+     "title": "郑钦文右肩受伤，退出 2026 年武汉网球公开赛，她的伤势有多严重对后续比赛影响有多大",
+     "url": "https://www.zhihu.com/question/2092939140517950117",
+     "extra": "84 万"
     },
     {
-     "title": "如何看待江苏十五五规划提出支持南京大学东南大学苏州大学等高校建设世界一流大学",
-     "url": "https://www.zhihu.com/question/2087929053441479782",
-     "extra": "114 万"
+     "title": "我国验证出一种全新抗癌疗法，一针纳米材料打进肿瘤可让癌细胞生锈死亡，原理是什么这一成果具有哪些意义",
+     "url": "https://www.zhihu.com/question/2092387652544589909",
+     "extra": "81 万"
     },
     {
-     "title": "广汽集团拟通过发行股份购买一汽丰田 50% 股权，股票 9 月 29 日复牌，怎样解读对双方将产生哪些影响",
-     "url": "https://www.zhihu.com/question/2088012562457519505",
-     "extra": "107 万"
+     "title": "明明没人要求，为什么有些人总要把事情做到最好",
+     "url": "https://www.zhihu.com/question/2074422169950484371",
+     "extra": "65 万"
     },
     {
-     "title": "有没有非常喜欢听的红歌听多少次都不会觉得腻的那种",
-     "url": "https://www.zhihu.com/question/1983202516142407843",
-     "extra": "103 万"
+     "title": "曼城 3-0 送十人利物浦首败，哈兰德谢尔基破门，如何评价这场比赛",
+     "url": "https://www.zhihu.com/question/2092759303287584695",
+     "extra": "65 万"
+    },
+    {
+     "title": "每个英语单词为什么包含这么多中文意思",
+     "url": "https://www.zhihu.com/question/23135949",
+     "extra": "65 万"
+    },
+    {
+     "title": "金妮的塑造失败主要是因为伏笔和铺垫不足吗",
+     "url": "https://www.zhihu.com/question/661890247",
+     "extra": "65 万"
     }
    ]
   },
   {
    "key": "douban",
    "name": "豆瓣热话",
-   "fetchedAt": "2026-09-29T16:01:20.000Z",
+   "fetchedAt": "2026-10-12T04:01:20.000Z",
    "items": [
+    {
+     "title": "我的“小众怒点”",
+     "url": "https://www.douban.com/gallery/topic/3667766/",
+     "extra": ""
+    },
+    {
+     "title": "学会屏蔽外界声音后，你的生活发生了什么变化",
+     "url": "https://www.douban.com/gallery/topic/3667764/",
+     "extra": ""
+    },
+    {
+     "title": "咪陪我度过的这个月",
+     "url": "https://www.douban.com/gallery/topic/3667763/",
+     "extra": ""
+    },
+    {
+     "title": "\"活得简单\"其实是一种特权",
+     "url": "https://www.douban.com/gallery/topic/3667762/",
+     "extra": "3220"
+    },
+    {
+     "title": "世界候鸟日",
+     "url": "https://www.douban.com/gallery/topic/3667761/",
+     "extra": "1547"
+    },
+    {
+     "title": "那些没有如愿的事，后来把你带去了哪里",
+     "url": "https://www.douban.com/gallery/topic/3667760/",
+     "extra": "689"
+    },
+    {
+     "title": "爱一个人格底色好的人才会长久",
+     "url": "https://www.douban.com/gallery/topic/3667759/",
+     "extra": ""
+    },
+    {
+     "title": "天气一变冷就会莫名其妙的伤春悲秋",
+     "url": "https://www.douban.com/gallery/topic/3667758/",
+     "extra": ""
+    },
+    {
+     "title": "加拿大诗人安妮·卡森获2026年诺贝尔文学奖",
+     "url": "https://www.douban.com/gallery/topic/3667756/",
+     "extra": "31.6万"
+    },
     {
      "title": "我是如何学会“对任何人都不抱过高期待” 的",
      "url": "https://www.douban.com/gallery/topic/3667753/",
-     "extra": "322"
+     "extra": "4026"
     },
     {
      "title": "人把自己的生活理顺了，一切就都顺了",
      "url": "https://www.douban.com/gallery/topic/3667752/",
-     "extra": ""
+     "extra": "344"
     },
     {
      "title": "那些让我重新活过来的时刻",
@@ -131,27 +226,27 @@
     {
      "title": "平淡，才是生活最真实的模样",
      "url": "https://www.douban.com/gallery/topic/3667750/",
-     "extra": ""
+     "extra": "1.3万"
     },
     {
      "title": "允许自己逃避，也鼓励自己勇敢",
      "url": "https://www.douban.com/gallery/topic/3667749/",
-     "extra": "2315"
+     "extra": "1.2万"
     },
     {
      "title": "记录的意义是为了翻阅时再次感到幸福",
      "url": "https://www.douban.com/gallery/topic/3667748/",
-     "extra": "247"
+     "extra": "337"
     },
     {
      "title": "我拍到了古诗词里的中秋",
      "url": "https://www.douban.com/gallery/topic/3667747/",
-     "extra": "2019"
+     "extra": "2091"
     },
     {
      "title": "桂花飘香的时候，秋意就浓了",
      "url": "https://www.douban.com/gallery/topic/3667746/",
-     "extra": "2632"
+     "extra": "2.3万"
     },
     {
      "title": "我的爱好终于在家里有了一席之地",
@@ -161,27 +256,27 @@
     {
      "title": "有时候，遵从本心才是最短的捷径",
      "url": "https://www.douban.com/gallery/topic/3667744/",
-     "extra": "1845"
+     "extra": "4095"
     },
     {
      "title": "每一个不被打扰的夜晚，都是属于自己的乌托邦",
      "url": "https://www.douban.com/gallery/topic/3667743/",
-     "extra": "317"
+     "extra": "2064"
     },
     {
      "title": "假期旅行时，我最喜欢的瞬间",
      "url": "https://www.douban.com/gallery/topic/3667741/",
-     "extra": "359"
+     "extra": "814"
     },
     {
      "title": "我的秋日出游成果汇报",
      "url": "https://www.douban.com/gallery/topic/3667740/",
-     "extra": "2188"
+     "extra": "2.0万"
     },
     {
      "title": "镜头里的秋意",
      "url": "https://www.douban.com/gallery/topic/3667731/",
-     "extra": "7604"
+     "extra": "2.3万"
     },
     {
      "title": "我的极简行李清单",
@@ -191,12 +286,12 @@
     {
      "title": "旅行中的温暖",
      "url": "https://www.douban.com/gallery/topic/3667735/",
-     "extra": "480"
+     "extra": "1883"
     },
     {
      "title": "适合假期看的治愈系电影",
      "url": "https://www.douban.com/gallery/topic/3667734/",
-     "extra": "713"
+     "extra": "8534"
     },
     {
      "title": "试错试错再试错而不是计划计划再计划",
@@ -206,225 +301,585 @@
     {
      "title": "十一出走计划，记录我的旅行进行时",
      "url": "https://www.douban.com/gallery/topic/3667732/",
-     "extra": "1.7万"
+     "extra": "22.4万"
     },
     {
      "title": "夜观植物的有趣发现",
      "url": "https://www.douban.com/gallery/topic/3667730/",
-     "extra": "2455"
+     "extra": "2568"
+    },
+    {
+     "title": "用拼豆拼一轮家乡的月亮",
+     "url": "https://www.douban.com/gallery/topic/3667729/",
+     "extra": "1243"
+    },
+    {
+     "title": "人生变顺的秘诀：让自己流动起来",
+     "url": "https://www.douban.com/gallery/topic/3667728/",
+     "extra": "5729"
+    },
+    {
+     "title": "你受过的委屈，身体一直都记得",
+     "url": "https://www.douban.com/gallery/topic/3667727/",
+     "extra": "14.3万"
+    },
+    {
+     "title": "有些人闯入生命，只为给你上一课",
+     "url": "https://www.douban.com/gallery/topic/3667726/",
+     "extra": "15.7万"
+    },
+    {
+     "title": "旅行时，遇到了一家喜欢的书店",
+     "url": "https://www.douban.com/gallery/topic/3667723/",
+     "extra": "9879"
+    },
+    {
+     "title": "国庆反向旅行，交出你的小众目的地",
+     "url": "https://www.douban.com/gallery/topic/3667722/",
+     "extra": "2.8万"
+    },
+    {
+     "title": "秋天就是要无所事事",
+     "url": "https://www.douban.com/gallery/topic/3667721/",
+     "extra": "5363"
+    },
+    {
+     "title": "收集生活里的温热时刻",
+     "url": "https://www.douban.com/gallery/topic/3667720/",
+     "extra": "1981"
+    },
+    {
+     "title": "你对“幸福”的定义，曾经和现在有什么变化吗",
+     "url": "https://www.douban.com/gallery/topic/3667719/",
+     "extra": ""
+    },
+    {
+     "title": "生命中那些充满“宿命感”的闭环时刻",
+     "url": "https://www.douban.com/gallery/topic/3667718/",
+     "extra": "587"
+    },
+    {
+     "title": "总有一些微小的快乐，让我爱上这日复一日的生活",
+     "url": "https://www.douban.com/gallery/topic/3667717/",
+     "extra": "48.8万"
     }
    ]
   },
   {
    "key": "weibo",
    "name": "微博热搜",
-   "fetchedAt": "2026-10-01T03:36:02.000Z",
+   "fetchedAt": "2026-10-12T06:12:02.000Z",
    "items": [
     {
-     "title": "华为Mate90价格",
-     "url": "https://s.weibo.com/weibo?q=%23华为Mate90价格%23",
-     "extra": "277.2万"
+     "title": "霸王茶姬店员劝退消费者",
+     "url": "https://s.weibo.com/weibo?q=%23霸王茶姬店员劝退消费者%23",
+     "extra": "331.6万"
     },
     {
-     "title": "小米汽车",
-     "url": "https://s.weibo.com/weibo?q=%23小米汽车%23",
-     "extra": "109.7万"
+     "title": "霸王茶姬就崩了致歉",
+     "url": "https://s.weibo.com/weibo?q=%23霸王茶姬就崩了致歉%23",
+     "extra": "130.3万"
     },
     {
-     "title": "清澈的爱只为中国",
-     "url": "https://s.weibo.com/weibo?q=%23清澈的爱只为中国%23",
-     "extra": "81.6万"
+     "title": "探访东北虎豹国家公园",
+     "url": "https://s.weibo.com/weibo?q=%23探访东北虎豹国家公园%23",
+     "extra": "128.1万"
     },
     {
-     "title": "Mate90系列今日发布即开售",
-     "url": "https://s.weibo.com/weibo?q=%23Mate90系列今日发布即开售%23",
-     "extra": "79.0万"
+     "title": "今晚8点 双11京东开启",
+     "url": "https://s.weibo.com/weibo?q=%23今晚8点 双11京东开启%23",
+     "extra": "128.0万"
     },
     {
-     "title": "Mate90",
-     "url": "https://s.weibo.com/weibo?q=%23Mate90%23",
-     "extra": "78.7万"
+     "title": "谭松韵闷声干大事",
+     "url": "https://s.weibo.com/weibo?q=%23谭松韵闷声干大事%23",
+     "extra": "127.9万"
     },
     {
-     "title": "赛力斯",
-     "url": "https://s.weibo.com/weibo?q=%23赛力斯%23",
-     "extra": "54.9万"
+     "title": "武网说理解尊重郑钦文的决定",
+     "url": "https://s.weibo.com/weibo?q=%23武网说理解尊重郑钦文的决定%23",
+     "extra": "126.9万"
     },
     {
-     "title": "自带矿泉水就行 为何搞那么离谱",
-     "url": "https://s.weibo.com/weibo?q=%23自带矿泉水就行 为何搞那么离谱%23",
-     "extra": "46.2万"
+     "title": "牛顿顿顿吃肉下联怎么对",
+     "url": "https://s.weibo.com/weibo?q=%23牛顿顿顿吃肉下联怎么对%23",
+     "extra": "99.0万"
     },
     {
-     "title": "为啥陈芋汐就能平稳熬过去",
-     "url": "https://s.weibo.com/weibo?q=%23为啥陈芋汐就能平稳熬过去%23",
-     "extra": "43.1万"
+     "title": "14岁女孩被强奸后患病7年未痊愈",
+     "url": "https://s.weibo.com/weibo?q=%2314岁女孩被强奸后患病7年未痊愈%23",
+     "extra": "97.8万"
     },
     {
-     "title": "主持人阿丘被通报",
-     "url": "https://s.weibo.com/weibo?q=%23主持人阿丘被通报%23",
-     "extra": "42.9万"
+     "title": "郑钦文夺冠了三老头互相拥抱",
+     "url": "https://s.weibo.com/weibo?q=%23郑钦文夺冠了三老头互相拥抱%23",
+     "extra": "91.6万"
     },
     {
-     "title": "国庆节",
-     "url": "https://s.weibo.com/weibo?q=%23国庆节%23",
-     "extra": "30.9万"
+     "title": "谭松韵回应兰香没戴红线的原因",
+     "url": "https://s.weibo.com/weibo?q=%23谭松韵回应兰香没戴红线的原因%23",
+     "extra": "90.9万"
     },
     {
-     "title": "Mate90全系搭载旗舰韬芯片",
-     "url": "https://s.weibo.com/weibo?q=%23Mate90全系搭载旗舰韬芯片%23",
-     "extra": "30.9万"
+     "title": "A股yyds又回来了",
+     "url": "https://s.weibo.com/weibo?q=%23A股yyds又回来了%23",
+     "extra": "82.2万"
     },
     {
-     "title": "女画师被假闲鱼客服骗四万后坠亡",
-     "url": "https://s.weibo.com/weibo?q=%23女画师被假闲鱼客服骗四万后坠亡%23",
-     "extra": "30.9万"
+     "title": "李佳琦疑似有孩子了",
+     "url": "https://s.weibo.com/weibo?q=%23李佳琦疑似有孩子了%23",
+     "extra": "82.2万"
     },
     {
-     "title": "奚梦瑶晒婆婆赠送的婚嫁敬茶礼",
-     "url": "https://s.weibo.com/weibo?q=%23奚梦瑶晒婆婆赠送的婚嫁敬茶礼%23",
-     "extra": "30.8万"
+     "title": "郑钦文从头到脚都签约出去了",
+     "url": "https://s.weibo.com/weibo?q=%23郑钦文从头到脚都签约出去了%23",
+     "extra": "81.7万"
     },
     {
-     "title": "多位球星点赞C罗退集训声明",
-     "url": "https://s.weibo.com/weibo?q=%23多位球星点赞C罗退集训声明%23",
-     "extra": "30.7万"
+     "title": "曝李勒优和崔晋妈妈闹掰的原因",
+     "url": "https://s.weibo.com/weibo?q=%23曝李勒优和崔晋妈妈闹掰的原因%23",
+     "extra": "62.0万"
     },
     {
-     "title": "机长被刺伤仍开舱门救乘客",
-     "url": "https://s.weibo.com/weibo?q=%23机长被刺伤仍开舱门救乘客%23",
-     "extra": "30.7万"
+     "title": "郑钦文退出武汉赛",
+     "url": "https://s.weibo.com/weibo?q=%23郑钦文退出武汉赛%23",
+     "extra": "43.6万"
     },
     {
-     "title": "多少明星都没这么多粉丝群",
-     "url": "https://s.weibo.com/weibo?q=%23多少明星都没这么多粉丝群%23",
-     "extra": "30.6万"
+     "title": "关晓彤宋雨琦我晕腿了",
+     "url": "https://s.weibo.com/weibo?q=%23关晓彤宋雨琦我晕腿了%23",
+     "extra": "40.4万"
     },
     {
-     "title": "央视国庆晚会阵容发布",
-     "url": "https://s.weibo.com/weibo?q=%23央视国庆晚会阵容发布%23",
-     "extra": "30.6万"
+     "title": "郑钦文距离李娜还有多远",
+     "url": "https://s.weibo.com/weibo?q=%23郑钦文距离李娜还有多远%23",
+     "extra": "37.3万"
     },
     {
-     "title": "奚梦瑶给女儿买了可爱版菜篮子",
-     "url": "https://s.weibo.com/weibo?q=%23奚梦瑶给女儿买了可爱版菜篮子%23",
-     "extra": "30.3万"
+     "title": "林俊杰对七七说不要害羞",
+     "url": "https://s.weibo.com/weibo?q=%23林俊杰对七七说不要害羞%23",
+     "extra": "34.6万"
     },
     {
-     "title": "华为Mate90系列发布会",
-     "url": "https://s.weibo.com/weibo?q=%23华为Mate90系列发布会%23",
-     "extra": "29.9万"
+     "title": "海尔全球品牌代言人要来了",
+     "url": "https://s.weibo.com/weibo?q=%23海尔全球品牌代言人要来了%23",
+     "extra": "28.4万"
     },
     {
-     "title": "特斯拉Model 3升级",
-     "url": "https://s.weibo.com/weibo?q=%23特斯拉Model 3升级%23",
-     "extra": "29.5万"
+     "title": "有偿地陪牵手拥抱300元一小时",
+     "url": "https://s.weibo.com/weibo?q=%23有偿地陪牵手拥抱300元一小时%23",
+     "extra": "27.1万"
+    },
+    {
+     "title": "英伟达最强游戏显卡被曝将停产",
+     "url": "https://s.weibo.com/weibo?q=%23英伟达最强游戏显卡被曝将停产%23",
+     "extra": "27.0万"
+    },
+    {
+     "title": "四无婚礼火了",
+     "url": "https://s.weibo.com/weibo?q=%23四无婚礼火了%23",
+     "extra": "27.0万"
+    },
+    {
+     "title": "红果AI漫剧怎么到处都在",
+     "url": "https://s.weibo.com/weibo?q=%23红果AI漫剧怎么到处都在%23",
+     "extra": "26.9万"
+    },
+    {
+     "title": "单位欠缴社保最高罚三倍",
+     "url": "https://s.weibo.com/weibo?q=%23单位欠缴社保最高罚三倍%23",
+     "extra": "26.6万"
+    },
+    {
+     "title": "朱一龙高叶彭冠英北影同学聚会",
+     "url": "https://s.weibo.com/weibo?q=%23朱一龙高叶彭冠英北影同学聚会%23",
+     "extra": "25.3万"
+    },
+    {
+     "title": "55岁商人侵害14岁女孩获刑7年",
+     "url": "https://s.weibo.com/weibo?q=%2355岁商人侵害14岁女孩获刑7年%23",
+     "extra": "23.9万"
+    },
+    {
+     "title": "肖战 演唱会",
+     "url": "https://s.weibo.com/weibo?q=%23肖战 演唱会%23",
+     "extra": "23.2万"
+    },
+    {
+     "title": "A股",
+     "url": "https://s.weibo.com/weibo?q=%23A股%23",
+     "extra": "23.0万"
+    },
+    {
+     "title": "宋雨琦问关晓彤27岁最难忘的事",
+     "url": "https://s.weibo.com/weibo?q=%23宋雨琦问关晓彤27岁最难忘的事%23",
+     "extra": "21.8万"
+    },
+    {
+     "title": "相亲双方都满意就能这么介绍吗",
+     "url": "https://s.weibo.com/weibo?q=%23相亲双方都满意就能这么介绍吗%23",
+     "extra": "21.7万"
+    },
+    {
+     "title": "小城良方是央视心肝剧",
+     "url": "https://s.weibo.com/weibo?q=%23小城良方是央视心肝剧%23",
+     "extra": "21.4万"
+    },
+    {
+     "title": "郑钦文武网退赛不会扣积分",
+     "url": "https://s.weibo.com/weibo?q=%23郑钦文武网退赛不会扣积分%23",
+     "extra": "21.2万"
+    },
+    {
+     "title": "第五人格",
+     "url": "https://s.weibo.com/weibo?q=%23第五人格%23",
+     "extra": "21.0万"
+    },
+    {
+     "title": "变瘦之后最大的爽感",
+     "url": "https://s.weibo.com/weibo?q=%23变瘦之后最大的爽感%23",
+     "extra": "20.9万"
+    },
+    {
+     "title": "孙颖莎王楚钦领跑WTT1000冠军榜",
+     "url": "https://s.weibo.com/weibo?q=%23孙颖莎王楚钦领跑WTT1000冠军榜%23",
+     "extra": "20.7万"
+    },
+    {
+     "title": "罗永浩谈为什么不撕预制洋快餐",
+     "url": "https://s.weibo.com/weibo?q=%23罗永浩谈为什么不撕预制洋快餐%23",
+     "extra": "20.6万"
+    },
+    {
+     "title": "醉梦官宣定档",
+     "url": "https://s.weibo.com/weibo?q=%23醉梦官宣定档%23",
+     "extra": "20.5万"
+    },
+    {
+     "title": "孙颖莎海尔",
+     "url": "https://s.weibo.com/weibo?q=%23孙颖莎海尔%23",
+     "extra": "20.4万"
+    },
+    {
+     "title": "李连杰称离婚时要孩子财产交给了前妻",
+     "url": "https://s.weibo.com/weibo?q=%23李连杰称离婚时要孩子财产交给了前妻%23",
+     "extra": "20.1万"
+    },
+    {
+     "title": "心动的信号",
+     "url": "https://s.weibo.com/weibo?q=%23心动的信号%23",
+     "extra": "19.7万"
+    },
+    {
+     "title": "郑合惠子任宥纶合体录综艺",
+     "url": "https://s.weibo.com/weibo?q=%23郑合惠子任宥纶合体录综艺%23",
+     "extra": "19.0万"
+    },
+    {
+     "title": "国产剧史上最穷剧组",
+     "url": "https://s.weibo.com/weibo?q=%23国产剧史上最穷剧组%23",
+     "extra": "17.4万"
+    },
+    {
+     "title": "武网回应郑钦文退赛",
+     "url": "https://s.weibo.com/weibo?q=%23武网回应郑钦文退赛%23",
+     "extra": "17.4万"
+    },
+    {
+     "title": "李娜说郑钦文的成功绝非昙花一现",
+     "url": "https://s.weibo.com/weibo?q=%23李娜说郑钦文的成功绝非昙花一现%23",
+     "extra": "17.0万"
+    },
+    {
+     "title": "侯明昊工作室 别扯了单身勿扰",
+     "url": "https://s.weibo.com/weibo?q=%23侯明昊工作室 别扯了单身勿扰%23",
+     "extra": "17.0万"
+    },
+    {
+     "title": "玉簟秋观后感",
+     "url": "https://s.weibo.com/weibo?q=%23玉簟秋观后感%23",
+     "extra": "17.0万"
+    },
+    {
+     "title": "晋妈崔晋未给李勒优庆生",
+     "url": "https://s.weibo.com/weibo?q=%23晋妈崔晋未给李勒优庆生%23",
+     "extra": "16.9万"
+    },
+    {
+     "title": "郭宇欣玉簟秋演技口碑",
+     "url": "https://s.weibo.com/weibo?q=%23郭宇欣玉簟秋演技口碑%23",
+     "extra": "16.9万"
+    },
+    {
+     "title": "曝弗格将加盟广东宏远",
+     "url": "https://s.weibo.com/weibo?q=%23曝弗格将加盟广东宏远%23",
+     "extra": "16.9万"
+    },
+    {
+     "title": "安德列娃退出武网",
+     "url": "https://s.weibo.com/weibo?q=%23安德列娃退出武网%23",
+     "extra": "15.5万"
+    },
+    {
+     "title": "嫁金钗醉梦同一天播",
+     "url": "https://s.weibo.com/weibo?q=%23嫁金钗醉梦同一天播%23",
+     "extra": "15.5万"
     }
    ]
   },
   {
    "key": "toutiao",
    "name": "今日头条",
-   "fetchedAt": "2026-10-01T03:36:00.000Z",
+   "fetchedAt": "2026-10-12T06:12:00.000Z",
    "items": [
     {
-     "title": "成都天府广场4万余人观看升旗仪式",
-     "url": "https://www.toutiao.com/trending/7691286887235878975/?topic_id=7691286887235878975",
+     "title": "“中国天眼”发现真实宇宙三体世界",
+     "url": "https://www.toutiao.com/trending/7695464182212313610/?topic_id=7695464182212313610",
      "extra": ""
     },
     {
-     "title": "华为Mate90全系搭载旗舰韬芯片",
-     "url": "https://www.toutiao.com/trending/7691528727615786538/?topic_id=7691528727615786538",
+     "title": "郑钦文3年商业收入追平李娜整个生涯",
+     "url": "https://www.toutiao.com/trending/7694804774537088554/?topic_id=7694804774537088554",
      "extra": ""
     },
     {
-     "title": "全力夺取粮食丰收到手",
-     "url": "https://www.toutiao.com/article/7691197772183208502?topic_id=undefined",
+     "title": "文物里的长征故事",
+     "url": "https://www.toutiao.com/article/7695266647078978091?topic_id=undefined",
      "extra": ""
     },
     {
-     "title": "天安门前看升旗队伍一眼望不到头",
-     "url": "https://www.toutiao.com/trending/7690441594739261467/?topic_id=7690441594739261467",
+     "title": "农业大棚开工一年即烂尾 负责人失联",
+     "url": "https://www.toutiao.com/trending/7695387010010365971/?topic_id=7695387010010365971",
      "extra": ""
     },
     {
-     "title": "媒体：旅客至上不等于“机闹至上”",
-     "url": "https://www.toutiao.com/trending/7691316073517288969/?topic_id=7691316073517288969",
+     "title": "郑钦文因伤退出武网",
+     "url": "https://www.toutiao.com/trending/7695617578823061055/?topic_id=7695617578823061055",
      "extra": ""
     },
     {
-     "title": "原央视主持人阿丘被通报",
-     "url": "https://www.toutiao.com/trending/7690117944391450643/?topic_id=7690117944391450643",
+     "title": "成都都江堰“日照金山”火了",
+     "url": "https://www.toutiao.com/trending/7695568268614598706/?topic_id=7695568268614598706",
      "extra": ""
     },
     {
-     "title": "天安门广场万人合唱《歌唱祖国》",
-     "url": "https://www.toutiao.com/trending/7690860475143438379/?topic_id=7690860475143438379",
+     "title": "男子“举报”母亲在家大量囤积废品",
+     "url": "https://www.toutiao.com/trending/7694935985720967178/?topic_id=7694935985720967178",
      "extra": ""
     },
     {
-     "title": "武汉街头国旗高挂",
-     "url": "https://www.toutiao.com/trending/7691162526700830746/?topic_id=7691162526700830746",
+     "title": "郑钦文对手输球告状：没有加油声",
+     "url": "https://www.toutiao.com/trending/7694804774537137706/?topic_id=7694804774537137706",
      "extra": ""
     },
     {
-     "title": "长假让国人开始关注“诗与远方”",
-     "url": "https://www.toutiao.com/trending/7691272513183924267/?topic_id=7691272513183924267",
+     "title": "中方制裁巴拉圭伯利兹反华政客",
+     "url": "https://www.toutiao.com/trending/7695600521406598675/?topic_id=7695600521406598675",
      "extra": ""
     },
     {
-     "title": "天安门放飞10000多只和平鸽",
-     "url": "https://www.toutiao.com/trending/7691460802536030262/?topic_id=7691460802536030262",
+     "title": "挪威学者：乌克兰在军事上已彻底战败",
+     "url": "https://www.toutiao.com/trending/7695271203308863551/?topic_id=7695271203308863551",
      "extra": ""
     },
     {
-     "title": "饮用无醇啤酒不会构成酒驾假的",
-     "url": "https://www.toutiao.com/trending/7691156131334930475/?topic_id=7691156131334930475",
+     "title": "北京热力辟谣内部人员代缴采暖费打折",
+     "url": "https://www.toutiao.com/trending/7695638679355706907/?topic_id=7695638679355706907",
      "extra": ""
     },
     {
-     "title": "农民交公粮能否视同缴社保为何引热议",
-     "url": "https://www.toutiao.com/trending/7691300839389924906/?topic_id=7691300839389924906",
+     "title": "实探荒野求生赛场",
+     "url": "https://webcast-open.douyin.com/open/media_live/809696601260?topic_id=undefined",
      "extra": ""
     },
     {
-     "title": "向太陈岚祝大家节日快乐",
-     "url": "https://www.toutiao.com/trending/7691508022229172234/?topic_id=7691508022229172234",
+     "title": "张雪机车葡萄牙站再登领奖台",
+     "url": "https://www.toutiao.com/trending/7694983541905428031/?topic_id=7694983541905428031",
      "extra": ""
     },
     {
-     "title": "机长遇袭的赴以客机舱内画面曝光",
-     "url": "https://www.toutiao.com/trending/7691235611198095414/?topic_id=7691235611198095414",
+     "title": "全网家长学山东食谱养娃",
+     "url": "https://www.toutiao.com/trending/7695332844306235455/?topic_id=7695332844306235455",
      "extra": ""
     },
     {
-     "title": "张雪机车团队回应在意大利被盗",
-     "url": "https://www.toutiao.com/trending/7690268800071647295/?topic_id=7690268800071647295",
+     "title": "郑钦文父亲多家公司取名满贯",
+     "url": "https://www.toutiao.com/trending/7695534231834263606/?topic_id=7695534231834263606",
      "extra": ""
     },
     {
-     "title": "亲爱的祖国生日快乐",
-     "url": "https://www.toutiao.com/trending/7690925881901498414/?topic_id=7690925881901498414",
+     "title": "医生提醒：不要捡街头的银杏果吃",
+     "url": "https://www.toutiao.com/trending/7695358584452415497/?topic_id=7695358584452415497",
      "extra": ""
     },
     {
-     "title": "葡足协主席正劝说C罗回心转意",
-     "url": "https://www.toutiao.com/trending/7691399639601431067/?topic_id=7691399639601431067",
+     "title": "媒体：女局长离婚风波不能止于八卦",
+     "url": "https://www.toutiao.com/trending/7694583739858698267/?topic_id=7694583739858698267",
      "extra": ""
     },
     {
-     "title": "美军灰溜溜走了 伊拉克全国放假4天",
-     "url": "https://www.toutiao.com/trending/7690745612685364772/?topic_id=7690745612685364772",
+     "title": "人民日报评郑钦文夺冠",
+     "url": "https://www.toutiao.com/trending/7695589741475008027/?topic_id=7695589741475008027",
      "extra": ""
     },
     {
-     "title": "天安门广场国庆升旗仪式",
-     "url": "https://www.toutiao.com/trending/7691465972502253098/?topic_id=7691465972502253098",
+     "title": "外围主要股市迭创历史新高泡沫大吗",
+     "url": "https://www.toutiao.com/trending/7695585432205004329/?topic_id=7695585432205004329",
      "extra": ""
     },
     {
-     "title": "5000架无人机如繁星点亮长江",
-     "url": "https://www.toutiao.com/trending/7691298192077324342/?topic_id=7691298192077324342",
+     "title": "“拖鞋军”为何能打瘫沙特首都机场",
+     "url": "https://www.toutiao.com/trending/7695188447270830099/?topic_id=7695188447270830099",
+     "extra": ""
+    },
+    {
+     "title": "郑钦文红袍加身举金杯旋转拍照",
+     "url": "https://www.toutiao.com/trending/7695060721759125513/?topic_id=7695060721759125513",
+     "extra": ""
+    },
+    {
+     "title": "五胞胎爸爸：尿不湿4个月用4000多片",
+     "url": "https://www.toutiao.com/trending/7695022916592779274/?topic_id=7695022916592779274",
+     "extra": ""
+    },
+    {
+     "title": "胡塞武装的弹道导弹美国能拦截吗",
+     "url": "https://www.toutiao.com/trending/7695609864352960027/?topic_id=7695609864352960027",
+     "extra": ""
+    },
+    {
+     "title": "媒体人谈央视曝光农业大棚被撂荒",
+     "url": "https://www.toutiao.com/trending/7695646664815545882/?topic_id=7695646664815545882",
+     "extra": ""
+    },
+    {
+     "title": "加油新规11月1日起全面实施",
+     "url": "https://www.toutiao.com/trending/7694896490082304026/?topic_id=7694896490082304026",
+     "extra": ""
+    },
+    {
+     "title": "郑钦文决赛闪身步躲球",
+     "url": "https://www.toutiao.com/trending/7695256702116347923/?topic_id=7695256702116347923",
+     "extra": ""
+    },
+    {
+     "title": "中国旅客转机亲历爆炸：大家都在哭喊",
+     "url": "https://www.toutiao.com/trending/7695637876234587675/?topic_id=7695637876234587675",
+     "extra": ""
+    },
+    {
+     "title": "泽连斯基回应特朗普说乌需要新总统",
+     "url": "https://www.toutiao.com/trending/7695170750323916863/?topic_id=7695170750323916863",
+     "extra": ""
+    },
+    {
+     "title": "控糖的“最小有效时间”找到了",
+     "url": "https://www.toutiao.com/trending/7694818305185972251/?topic_id=7694818305185972251",
+     "extra": ""
+    },
+    {
+     "title": "事关肉制品校园食品 中央政法委发文",
+     "url": "https://www.toutiao.com/trending/7695067628653658155/?topic_id=7695067628653658155",
+     "extra": ""
+    },
+    {
+     "title": "博主：沙特能否明白胡塞打不垮",
+     "url": "https://www.toutiao.com/trending/7695625191249956393/?topic_id=7695625191249956393",
+     "extra": ""
+    },
+    {
+     "title": "郑钦文首夺中网冠军",
+     "url": "https://www.toutiao.com/trending/7694547961828851748/?topic_id=7694547961828851748",
+     "extra": ""
+    },
+    {
+     "title": "新皇岗口岸迎来首位入境旅客",
+     "url": "https://www.toutiao.com/trending/7694547450522075178/?topic_id=7694547450522075178",
+     "extra": ""
+    },
+    {
+     "title": "学生直播切片带货赚700万或有风险",
+     "url": "https://www.toutiao.com/trending/7695212095247499305/?topic_id=7695212095247499305",
+     "extra": ""
+    },
+    {
+     "title": "郑钦文的“金句时刻”",
+     "url": "https://www.toutiao.com/trending/7695067640852021274/?topic_id=7695067640852021274",
+     "extra": ""
+    },
+    {
+     "title": "专家：今年暖冬基本确定",
+     "url": "https://www.toutiao.com/trending/7695198215573914122/?topic_id=7695198215573914122",
+     "extra": ""
+    },
+    {
+     "title": "蔡琴宣布退出舞台时间",
+     "url": "https://www.toutiao.com/trending/7694996893696884799/?topic_id=7694996893696884799",
+     "extra": ""
+    },
+    {
+     "title": "军事管理区周边不能随意安装摄像头",
+     "url": "https://www.toutiao.com/trending/7695559599750922282/?topic_id=7695559599750922282",
+     "extra": ""
+    },
+    {
+     "title": "A股短期调整 市场信心是否稳固",
+     "url": "https://www.toutiao.com/trending/7694980829847552051/?topic_id=7694980829847552051",
+     "extra": ""
+    },
+    {
+     "title": "沙特公布利雅得机场遭袭画面",
+     "url": "https://www.toutiao.com/trending/7695607263788305958/?topic_id=7695607263788305958",
+     "extra": ""
+    },
+    {
+     "title": "更换社保卡必须在原发卡地吗",
+     "url": "https://www.toutiao.com/trending/7695323517756489791/?topic_id=7695323517756489791",
+     "extra": ""
+    },
+    {
+     "title": "国防部批赖清德是“台湾之祸”",
+     "url": "https://www.toutiao.com/trending/7694983541897203242/?topic_id=7694983541897203242",
+     "extra": ""
+    },
+    {
+     "title": "国资委原副部长级干部潘良被公诉",
+     "url": "https://www.toutiao.com/trending/7695595178064855094/?topic_id=7695595178064855094",
+     "extra": ""
+    },
+    {
+     "title": "尼泊尔再次暴发严重山洪",
+     "url": "https://www.toutiao.com/trending/7695476122242531849/?topic_id=7695476122242531849",
+     "extra": ""
+    },
+    {
+     "title": "分析师：指数有望探底回升",
+     "url": "https://www.toutiao.com/trending/7695263513837781042/?topic_id=7695263513837781042",
+     "extra": ""
+    },
+    {
+     "title": "深圳市委原常委王守睿被查",
+     "url": "https://www.toutiao.com/trending/7695596654631587369/?topic_id=7695596654631587369",
+     "extra": ""
+    },
+    {
+     "title": "“速成车”为什么越来越多",
+     "url": "https://www.toutiao.com/trending/7695626025215987241/?topic_id=7695626025215987241",
+     "extra": ""
+    },
+    {
+     "title": "郑钦文回应夺冠：压力大到呕吐",
+     "url": "https://www.toutiao.com/trending/7695545620387548699/?topic_id=7695545620387548699",
+     "extra": ""
+    },
+    {
+     "title": "华为折叠机累计发货量已破2000万台",
+     "url": "https://www.toutiao.com/trending/7694712174861664275/?topic_id=7694712174861664275",
+     "extra": ""
+    },
+    {
+     "title": "中国是如何成为石油超级大国的",
+     "url": "https://www.toutiao.com/trending/7695584795136364070/?topic_id=7695584795136364070",
      "extra": ""
     }
    ]
@@ -432,280 +887,880 @@
   {
    "key": "hupu",
    "name": "虎扑步行街",
-   "fetchedAt": "2026-10-01T03:36:01.000Z",
+   "fetchedAt": "2026-10-12T06:06:02.000Z",
    "items": [
     {
-     "title": "女性明显比男性长寿很多，但退休年龄女性比男性要早五年，到底为啥",
-     "url": "https://bbs.hupu.com/642696872.html",
-     "extra": "53回复"
+     "title": "兄弟们有没有做过一些不能说的事",
+     "url": "https://bbs.hupu.com/642906020.html",
+     "extra": "154回复"
     },
     {
-     "title": "赵今麦泳装不常见，大家看了有何反应",
-     "url": "https://bbs.hupu.com/642697391.html",
-     "extra": "23回复"
+     "title": "吴宗宪：身为一个艺人，我永远不会表态",
+     "url": "https://bbs.hupu.com/642905036.html",
+     "extra": "155回复"
     },
     {
-     "title": "发现女友有过几段一夜情关系怎么办",
-     "url": "https://bbs.hupu.com/642696411.html",
-     "extra": "84回复"
+     "title": "韩国综艺还是有很多可以学习的",
+     "url": "https://bbs.hupu.com/642908034.html",
+     "extra": "11回复"
     },
     {
-     "title": "客观的讲，日本的先天条件在所有国家里是不是算比较差的",
-     "url": "https://bbs.hupu.com/642697132.html",
-     "extra": "20回复"
+     "title": "刷推看到一条关于伊斯兰的推文",
+     "url": "https://bbs.hupu.com/642903103.html",
+     "extra": "244回复"
     },
     {
-     "title": "X上消息说，“哥伦比亚前总统商拍一次大概13万人民币，背景都不用换！”",
-     "url": "https://bbs.hupu.com/642696850.html",
-     "extra": "14回复"
+     "title": "39岁大龄剩女吐槽：相亲了一个厨师，在县城里面做厨师一个月也就五六千块钱，我图他什么呢",
+     "url": "https://bbs.hupu.com/642907794.html",
+     "extra": "33回复"
     },
     {
-     "title": "豆包这么厉害了吗",
-     "url": "https://bbs.hupu.com/642690580.html",
-     "extra": "139回复"
+     "title": "郎才女貌，巴旦木公主分享LOL知名主播卢本伟向其求婚照片，PDD现身现场！",
+     "url": "https://bbs.hupu.com/642905609.html",
+     "extra": "70回复"
     },
     {
-     "title": "2026年，亚洲电视10大品牌，你最喜欢哪个",
-     "url": "https://bbs.hupu.com/642696804.html",
-     "extra": "8回复"
+     "title": "小舅子两口要出国劳务，想把孩子（10岁了）放在我们家带，我没吐口该怎么办",
+     "url": "https://bbs.hupu.com/642908371.html",
+     "extra": "25回复"
     },
     {
-     "title": "网传北美华人圈暴雷，真的假的",
-     "url": "https://bbs.hupu.com/642687966.html",
-     "extra": "164回复"
+     "title": "中国是不是世界上人均最幸福的国家而且没有之一！",
+     "url": "https://bbs.hupu.com/642909324.html",
+     "extra": "7回复"
     },
     {
-     "title": "表弟给我分享了他们大学班级男生群里的吵架原因，看完后我只觉得两个人最恶心",
-     "url": "https://bbs.hupu.com/642695922.html",
-     "extra": "22回复"
+     "title": "学校采购篮球架，一副报价3万元，JRs觉得这价格正常吗",
+     "url": "https://bbs.hupu.com/642908663.html",
+     "extra": "16回复"
     },
     {
-     "title": "谈了一个小14岁的小女朋友，那感觉真的是太棒了",
-     "url": "https://bbs.hupu.com/642691551.html",
-     "extra": "80回复"
+     "title": "男女关系这样真的对吗",
+     "url": "https://bbs.hupu.com/642908980.html",
+     "extra": "10回复"
     },
     {
-     "title": "神话般的爱情，终究迎来了大结局！！！",
-     "url": "https://bbs.hupu.com/642688296.html",
-     "extra": "215回复"
-    },
-    {
-     "title": "阿根廷球迷把梅西头像绣在国旗上，放到中国把一个球员的头像绣在国旗上招摇过市是什么罪",
-     "url": "https://bbs.hupu.com/642691143.html",
-     "extra": "144回复"
-    },
-    {
-     "title": "半夜睡不着了，求老哥们出出主意",
-     "url": "https://bbs.hupu.com/642695584.html",
-     "extra": "17回复"
-    },
-    {
-     "title": "家人们，大学生情侣开房消费不起啊",
-     "url": "https://bbs.hupu.com/642694968.html",
-     "extra": "29回复"
-    },
-    {
-     "title": "不懂就问，这个哪个责任大",
-     "url": "https://bbs.hupu.com/642698227.html",
-     "extra": "17回复"
-    },
-    {
-     "title": "男生喜欢健身女吗",
-     "url": "https://bbs.hupu.com/642698814.html",
+     "title": "连续两年无缘！官方：郑钦文右肩受伤，退出2026年武汉网球公开赛！",
+     "url": "https://bbs.hupu.com/642907239.html",
      "extra": "9回复"
     },
     {
-     "title": "时隔一年又当爸爸啦",
-     "url": "https://bbs.hupu.com/642698415.html",
+     "title": "顶级商业价值！郑钦文手握14个品牌代言，即便休战低谷期无一解约！",
+     "url": "https://bbs.hupu.com/642908744.html",
      "extra": "8回复"
     },
     {
-     "title": "女朋友嫌我不主动，可我是真觉得没啥可聊的",
-     "url": "https://bbs.hupu.com/642698453.html",
-     "extra": "13回复"
+     "title": "老一辈都是教真东西啊",
+     "url": "https://bbs.hupu.com/642903714.html",
+     "extra": "21回复"
     },
     {
-     "title": "附近 这是pian吗",
-     "url": "https://bbs.hupu.com/642694771.html",
-     "extra": "13回复"
+     "title": "各朝代前十名将，是否合理",
+     "url": "https://bbs.hupu.com/642907161.html",
+     "extra": "20回复"
     },
     {
-     "title": "市长助理可以这样直接怼市长，孙连城是不是可以学一学毕竟李达康一屁股屎的见风使舵的小人而已",
-     "url": "https://bbs.hupu.com/642697586.html",
+     "title": "女生站在街边玩手机，男子路过问别人多少钱，最后男子下跪道歉",
+     "url": "https://bbs.hupu.com/642896371.html",
+     "extra": "329回复"
+    },
+    {
+     "title": "必须给这三位大爷排出个冠亚季军来",
+     "url": "https://bbs.hupu.com/642904191.html",
+     "extra": "23回复"
+    },
+    {
+     "title": "一百五十个存款，打算找个城市躺平，有推荐的吗",
+     "url": "https://bbs.hupu.com/642906381.html",
+     "extra": "66回复"
+    },
+    {
+     "title": "明眼人都知道这个视频的重点不在海肠",
+     "url": "https://bbs.hupu.com/642905631.html",
+     "extra": "8回复"
+    },
+    {
+     "title": "花几十万买杂牌电车的是些什么人",
+     "url": "https://bbs.hupu.com/642906128.html",
+     "extra": "48回复"
+    },
+    {
+     "title": "这就开始岁月史书给男人泼脏水回力匹克迪凯斯马克华菲相继出现男人不愿剪吊牌的广告",
+     "url": "https://bbs.hupu.com/642903898.html",
+     "extra": "38回复"
+    },
+    {
+     "title": "我看到一个帖子说许昕不如楚钦",
+     "url": "https://bbs.hupu.com/642906485.html",
+     "extra": "16回复"
+    },
+    {
+     "title": "这双创只要敢拉伸，无限的砸盘子弹在等着啊",
+     "url": "https://bbs.hupu.com/642906495.html",
      "extra": "11回复"
+    },
+    {
+     "title": "看到仙人球的时候我释然了",
+     "url": "https://bbs.hupu.com/642900031.html",
+     "extra": "79回复"
+    },
+    {
+     "title": "餐厅老板娘莫名其妙的一天！拍了拍胳膊提醒顾客上菜了，然后抽什么风呢",
+     "url": "https://bbs.hupu.com/642903738.html",
+     "extra": "60回复"
+    },
+    {
+     "title": "因不让座而引发的地铁MMA",
+     "url": "https://bbs.hupu.com/642904480.html",
+     "extra": "47回复"
+    },
+    {
+     "title": "近期网友拍摄到的吊牌侠，国庆假期旅游季显著增多！",
+     "url": "https://bbs.hupu.com/642903795.html",
+     "extra": "38回复"
+    },
+    {
+     "title": "古代有任何时候农民可以免税的么",
+     "url": "https://bbs.hupu.com/642904476.html",
+     "extra": "30回复"
+    },
+    {
+     "title": "女朋友约我去钟点房",
+     "url": "https://bbs.hupu.com/642903727.html",
+     "extra": "24回复"
+    },
+    {
+     "title": "怎么选兄弟们",
+     "url": "https://bbs.hupu.com/642905145.html",
+     "extra": "15回复"
+    },
+    {
+     "title": "《不冷笑话》第3034期：性感荷官在线发牌。",
+     "url": "https://bbs.hupu.com/642904009.html",
+     "extra": "23回复"
+    },
+    {
+     "title": "孙怡内衣代言",
+     "url": "https://bbs.hupu.com/642904356.html",
+     "extra": "14回复"
+    },
+    {
+     "title": "首当其冲是不是被误用最多的成语",
+     "url": "https://bbs.hupu.com/642904483.html",
+     "extra": "24回复"
+    },
+    {
+     "title": "为什么有钱人移民都不来中国，明明治安比美国好背后真相太现实",
+     "url": "https://bbs.hupu.com/642904208.html",
+     "extra": "21回复"
+    },
+    {
+     "title": "这家长发言什么水平",
+     "url": "https://bbs.hupu.com/642903740.html",
+     "extra": "16回复"
+    },
+    {
+     "title": "被央视开除攀附高层婚姻破裂主持一姐方琼 私生活谣言多离谱",
+     "url": "https://bbs.hupu.com/642904078.html",
+     "extra": "16回复"
+    },
+    {
+     "title": "你会去这个温泉泡澡吗",
+     "url": "https://bbs.hupu.com/642904291.html",
+     "extra": "13回复"
+    },
+    {
+     "title": "2026年度，国内城市排行榜新鲜出炉，大家觉得有没有高估或者低估的城市",
+     "url": "https://bbs.hupu.com/642903421.html",
+     "extra": "40回复"
+    },
+    {
+     "title": "老图4K修复这是2017年洗脚城气质女神马苏给《男人装》拍的大片之一。这张图已经超4K了",
+     "url": "https://bbs.hupu.com/642903197.html",
+     "extra": "17回复"
+    },
+    {
+     "title": "十年老jr不吐不快 大家都是如何渡过自己的人生低谷",
+     "url": "https://bbs.hupu.com/642903346.html",
+     "extra": "16回复"
+    },
+    {
+     "title": "周鸿祎攀岩从3米高处摔下，左膝粉碎性骨折",
+     "url": "https://bbs.hupu.com/642898512.html",
+     "extra": "114回复"
+    },
+    {
+     "title": "现在真的有人还没有去过商k去过的有什么看法！",
+     "url": "https://bbs.hupu.com/642902905.html",
+     "extra": "32回复"
+    },
+    {
+     "title": "谈恋爱碰上npd，八个月花了十几万",
+     "url": "https://bbs.hupu.com/642894876.html",
+     "extra": "138回复"
+    },
+    {
+     "title": "澳大利亚面积是咱们四分之三，但人口居然三千万不到",
+     "url": "https://bbs.hupu.com/642898382.html",
+     "extra": "110回复"
+    },
+    {
+     "title": "晒一晒",
+     "url": "https://bbs.hupu.com/642909354.html",
+     "extra": "7回复"
+    },
+    {
+     "title": "鳌拜居然还有这一手儿",
+     "url": "https://bbs.hupu.com/642909325.html",
+     "extra": "7回复"
+    },
+    {
+     "title": "假如你穿越到古代，只能从这6个里面选两个，你会选哪两个",
+     "url": "https://bbs.hupu.com/642909393.html",
+     "extra": "14回复"
+    },
+    {
+     "title": "看看颜值能排人群前百分之多少",
+     "url": "https://bbs.hupu.com/642907899.html",
+     "extra": "5回复"
+    },
+    {
+     "title": "妹妹被一个大叔骗了怎么办",
+     "url": "https://bbs.hupu.com/642909741.html",
+     "extra": "17回复"
+    },
+    {
+     "title": "让科比和湖人没想到的是，宿敌波士顿居然会送上欢呼和致敬 退役巡演不是想办就能办的",
+     "url": "https://bbs.hupu.com/642908972.html",
+     "extra": "10回复"
+    },
+    {
+     "title": "date了一个不婚不育的男生，很困惑",
+     "url": "https://bbs.hupu.com/642909978.html",
+     "extra": "13回复"
+    },
+    {
+     "title": "带着俩孩子也敢晚上逆行！！这种人真的是无知至极！当然视频车也是不是啥好鸟！开车容易上头的迟早出事！",
+     "url": "https://bbs.hupu.com/642899986.html",
+     "extra": "67回复"
+    },
+    {
+     "title": "兄弟们，这位16岁小姑娘的握力什么水平",
+     "url": "https://bbs.hupu.com/642907943.html",
+     "extra": "13回复"
+    },
+    {
+     "title": "淮海战役大反攻的时候，有没有没想过先把台湾拿下来或者重兵把守金门澎湖，断了蒋的后路，这样的话，台湾问题就不存在了",
+     "url": "https://bbs.hupu.com/642908681.html",
+     "extra": "7回复"
+    },
+    {
+     "title": "考研倒计时70天，女朋友对前任曾有一次无套，对我却连个表情包都要骂，快崩溃了求老哥们骂醒！",
+     "url": "https://bbs.hupu.com/642907613.html",
+     "extra": "21回复"
+    },
+    {
+     "title": "你是说穿这套去跟同事去水世界团建么",
+     "url": "https://bbs.hupu.com/642907241.html",
+     "extra": "6回复"
+    },
+    {
+     "title": "小孩哥我是真的羡慕你",
+     "url": "https://bbs.hupu.com/642908859.html",
+     "extra": "5回复"
+    },
+    {
+     "title": "足坛载入史册名场面+1",
+     "url": "https://bbs.hupu.com/642907620.html",
+     "extra": "5回复"
+    },
+    {
+     "title": "1984年和1986年的茅台能卖多少钱",
+     "url": "https://bbs.hupu.com/642908275.html",
+     "extra": "8回复"
+    },
+    {
+     "title": "这波科技多久能解套",
+     "url": "https://bbs.hupu.com/642907780.html",
+     "extra": "7回复"
+    },
+    {
+     "title": "大家评价一下我属于什么类型是不是男生喜欢的感觉",
+     "url": "https://bbs.hupu.com/642907250.html",
+     "extra": "12回复"
     }
    ]
   },
   {
    "key": "bilibili",
    "name": "B站",
-   "fetchedAt": "2026-10-01T03:30:17.000Z",
+   "fetchedAt": "2026-10-12T06:00:21.000Z",
    "items": [
     {
-     "title": "《原神》六周年主题曲《风的来信》",
-     "url": "https://www.bilibili.com/BV14Baa6JENd",
-     "extra": "手机游戏"
-    },
-    {
-     "title": "自学动画 爆肝俩月 自创一集《猫和老鼠》手搓动画大赛",
-     "url": "https://www.bilibili.com/BV1E6aq6pEKR",
-     "extra": "综合"
-    },
-    {
-     "title": "手绘465张！One Last KissEVA30周年回忆重逢计划",
-     "url": "https://www.bilibili.com/BV1i4aL6QEYX",
-     "extra": "绘画"
-    },
-    {
-     "title": "三幻魔集结！超越神的力量！水无月菌",
-     "url": "https://www.bilibili.com/BV14Qah6DEBL",
-     "extra": "桌游棋牌"
-    },
-    {
-     "title": "蛙跳爬泰山",
-     "url": "https://www.bilibili.com/BV1Hxah6BEGy",
-     "extra": "出行"
-    },
-    {
-     "title": "她连唐笑都在调上",
-     "url": "https://www.bilibili.com/BV1X4a36KEuH",
-     "extra": "鬼畜调教"
-    },
-    {
-     "title": "《善》善良是什么",
-     "url": "https://www.bilibili.com/BV1ygaL6YEbx",
+     "title": "《司机噩梦》",
+     "url": "https://www.bilibili.com/BV1rxp86jEYH",
      "extra": "搞笑"
     },
     {
-     "title": "“后室里的乌鲁鲁2”",
-     "url": "https://www.bilibili.com/BV1LraY6KES1",
-     "extra": "影视剪辑"
-    },
-    {
-     "title": "深不可测的恐惧：斯克拉奇溪，溯源之惧 第六章",
-     "url": "https://www.bilibili.com/BV1Gtap6NEPB",
-     "extra": "单机游戏"
-    },
-    {
-     "title": "龙泉印泥",
-     "url": "https://www.bilibili.com/BV1zLa36yE86",
-     "extra": "三农"
-    },
-    {
-     "title": "艺术斗法",
-     "url": "https://www.bilibili.com/BV1deaJ6YEWH",
+     "title": "超市生存挑战后续！4人吃完整个超市赢100万美金！",
+     "url": "https://www.bilibili.com/BV1VeHQ6tEaS",
      "extra": "日常"
     },
     {
-     "title": "《鸣潮》共鸣者心PV | 梦阑珊",
-     "url": "https://www.bilibili.com/BV1s8aq6FEfJ",
+     "title": "极极极极，极限战场首曝极首测，所见极所玩",
+     "url": "https://www.bilibili.com/BV1PTHS6MEC5",
      "extra": "手机游戏"
     },
     {
-     "title": "面具比命还重要墨西哥摔跤手的生活，有多疯狂",
-     "url": "https://www.bilibili.com/BV1yEaJ6CEUk",
-     "extra": "数码"
+     "title": "deepseek 翻唱《人是猫》完整版，大肥鱼觉得人和猫一样可爱,所以人是猫",
+     "url": "https://www.bilibili.com/BV1XXHD6sEe7",
+     "extra": "同人·手书"
     },
     {
-     "title": "手机的研究",
-     "url": "https://www.bilibili.com/BV1hXaA6jEoF",
-     "extra": "小剧场"
+     "title": "超市里未检测到人脸",
+     "url": "https://www.bilibili.com/BV1iqpt6cEMU",
+     "extra": "单机游戏"
     },
     {
-     "title": "这个量筒里到底有几毫升水别笑，你也答不上来！",
-     "url": "https://www.bilibili.com/BV1R2aG63EBP",
-     "extra": "科学科普"
-    },
-    {
-     "title": "鳄鱼 我的世界",
-     "url": "https://www.bilibili.com/BV1pNaR6gEoY",
-     "extra": "综合"
-    },
-    {
-     "title": "《无敌超人》当你拥有无限增强的超能力，会做什么Hishorts! × updream AI短片大赛+剧情单元",
-     "url": "https://www.bilibili.com/BV1aJa869EaJ",
-     "extra": "影视剪辑"
-    },
-    {
-     "title": "“苦 命 双 鸡 锅”",
-     "url": "https://www.bilibili.com/BV1SYa36wEob",
+     "title": "如果把我和男朋友这几年的约会地点列出来",
+     "url": "https://www.bilibili.com/BV16xpt6BE6t",
      "extra": "搞笑"
     },
     {
-     "title": "你管这叫只会一点点",
-     "url": "https://www.bilibili.com/BV1jXat6WEwR",
+     "title": "从什么时候开始，报喜不报忧成了本能暗叫 -",
+     "url": "https://www.bilibili.com/BV1hxHR68E24",
+     "extra": "VOCALOID·UTAU"
+    },
+    {
+     "title": "12个脑洞大开的做饭方式！",
+     "url": "https://www.bilibili.com/BV1Jjpg6QEkh",
+     "extra": "美食制作"
+    },
+    {
+     "title": "“我穿越成了一棵树。”",
+     "url": "https://www.bilibili.com/BV1qsHQ6YEs4",
+     "extra": "绘画"
+    },
+    {
+     "title": "“上大学该谈个女朋友了”。我呀我去谈恋爱啊！那无敌了",
+     "url": "https://www.bilibili.com/BV1uvpg6zEdw",
+     "extra": "日常"
+    },
+    {
+     "title": "老歌还是得老东西来唱深夜之门Stay With Me翻唱bilibili次元干杯",
+     "url": "https://www.bilibili.com/BV1FUpb6kERs",
+     "extra": "翻唱"
+    },
+    {
+     "title": "影视飓风的直升机怪东西分享9.0",
+     "url": "https://www.bilibili.com/BV1gHps6yEHL",
+     "extra": "数码"
+    },
+    {
+     "title": "虽然命还在，但是鱼没了啊！！！AI全民制作人",
+     "url": "https://www.bilibili.com/BV1xTpG6iEbV",
+     "extra": "运动综合"
+    },
+    {
+     "title": "《柯洁围棋入门课2:切断和连接》",
+     "url": "https://www.bilibili.com/BV1qMp46wE1n",
+     "extra": "影视剪辑"
+    },
+    {
+     "title": "2026英雄联盟全球总决赛主题曲《KNOW MY NAME》（以我之名）",
+     "url": "https://www.bilibili.com/BV1DRHU6LELy",
+     "extra": "网络游戏"
+    },
+    {
+     "title": "手术TV先生！我知道这很荒诞，但人还得往前看......",
+     "url": "https://www.bilibili.com/BV1Xdps6nEhe",
+     "extra": "小剧场"
+    },
+    {
+     "title": "逃离闪电侠黄金费德熊！你好邻居Mod",
+     "url": "https://www.bilibili.com/BV1QmpE6aEA7",
+     "extra": "单机游戏"
+    },
+    {
+     "title": "《阴阳师》咲耶CG丨拾此一瞬（CV：小泽亚李）",
+     "url": "https://www.bilibili.com/BV1BsHQ6YEQy",
+     "extra": "手机游戏"
+    },
+    {
+     "title": "讨伐型人格大合集",
+     "url": "https://www.bilibili.com/BV1rSpM6nEtm",
+     "extra": "日常"
+    },
+    {
+     "title": "对话孙宇晨：年轻人如何抓住AI时代的机会",
+     "url": "https://www.bilibili.com/BV1fcHD6cEw3",
+     "extra": "设计·创意"
+    },
+    {
+     "title": "新人第1次编曲耶",
+     "url": "https://www.bilibili.com/BV1oQHR6rEBB",
+     "extra": "原创音乐"
+    },
+    {
+     "title": "雨哥到处跑新车曝光！居然是",
+     "url": "https://www.bilibili.com/BV13Apt6sEhK",
+     "extra": "赛车"
+    },
+    {
+     "title": "疯牛失控窜行，民警到场一枪将其击毙，及时消除安全隐患。",
+     "url": "https://www.bilibili.com/BV1gJpi61Ejq",
+     "extra": "日常"
+    },
+    {
+     "title": "这次把荧妹也调小了一点",
+     "url": "https://www.bilibili.com/BV179pb6uEMS",
+     "extra": "仿妆cos"
+    },
+    {
+     "title": "“请不要放开我的手”",
+     "url": "https://www.bilibili.com/BV1U4ps63EEw",
+     "extra": "GMV"
+    },
+    {
+     "title": "小时候幻想过的事",
+     "url": "https://www.bilibili.com/BV15rpt6bEPm",
+     "extra": "搞笑"
+    },
+    {
+     "title": "男巫ZachKing2026最佳魔术！",
+     "url": "https://www.bilibili.com/BV1BuHC6rEuX",
+     "extra": "搞笑"
+    },
+    {
+     "title": "法国最近太烧心了",
+     "url": "https://www.bilibili.com/BV1gTHd6aE5e",
+     "extra": "人文历史"
+    },
+    {
+     "title": "teto日20262026的五月病",
+     "url": "https://www.bilibili.com/BV1xRH96DEi2",
+     "extra": "同人·手书"
+    },
+    {
+     "title": "也是当上外卖大法官了",
+     "url": "https://www.bilibili.com/BV1Vtpg65EnA",
+     "extra": "综合"
+    },
+    {
+     "title": "雀说雀巢鲸尾 | 自卑在哪一天消失",
+     "url": "https://www.bilibili.com/BV1Rgpi6DEhX",
+     "extra": "搞笑"
+    },
+    {
+     "title": "“没有共产党就没有新中国”",
+     "url": "https://www.bilibili.com/BV1v1pa63Er1",
+     "extra": "音乐综合"
+    },
+    {
+     "title": "大鸣王潮1566岁主帮岁共",
+     "url": "https://www.bilibili.com/BV1Jupb6uEXY",
+     "extra": "同人·手书"
+    },
+    {
+     "title": "我们来到了地中海，重走《奥德赛》十年回家路！",
+     "url": "https://www.bilibili.com/BV1mopE6xEqv",
+     "extra": "出行"
+    },
+    {
+     "title": "内蒙古包头一婚礼主持人发现新人买的礼炮里塞满纸钱和骂人纸条，婚礼主持人：发现及时，没使用",
+     "url": "https://www.bilibili.com/BV1nUpb6kEUK",
+     "extra": "社会"
+    },
+    {
+     "title": "有人说一台苹果18的钱能在山东大集买到多少东西和多少人快乐，咱们一起来挑战和数数！",
+     "url": "https://www.bilibili.com/BV1Tfpu6PEKq",
+     "extra": "田园美食"
+    },
+    {
+     "title": "礼花炸响那一刻 又有个家庭蒸蒸日上",
+     "url": "https://www.bilibili.com/BV1YhpY66E3p",
+     "extra": "日常"
+    },
+    {
+     "title": "邓肯新发恐怖事件！女企业家被儿子雇人送入老年护理中心丨诡异的五亿高中生坠楼谜案！",
+     "url": "https://www.bilibili.com/BV1wAp76yEu1",
+     "extra": "人文历史"
+    },
+    {
+     "title": "倒查三年流水，顶级商K集体关门！商K经济终于崩盘了",
+     "url": "https://www.bilibili.com/BV1Wqp46GEbP",
+     "extra": "财经商业"
+    },
+    {
+     "title": "新宿决战皮特VS鸡哥",
+     "url": "https://www.bilibili.com/BV1CLHQ6zEHC",
      "extra": "鬼畜剧场"
     },
     {
-     "title": "新宿决战DeepSeek娘VS豆包",
-     "url": "https://www.bilibili.com/BV1dsai6CErz",
+     "title": "《原神》过场动画-死，从不讲道理",
+     "url": "https://www.bilibili.com/BV1zLap6VEz1",
+     "extra": "手机游戏"
+    },
+    {
+     "title": "春物语我的婚后生活果然有问题 第4话：小町的加分作战，加上前社长的经验。",
+     "url": "https://www.bilibili.com/BV1qkpa6VENV",
      "extra": "MAD·AMV"
+    },
+    {
+     "title": "史上最大现金收购案 富二代如何正确拼爹",
+     "url": "https://www.bilibili.com/BV1FCps68EGf",
+     "extra": "财经商业"
+    },
+    {
+     "title": "动态视频一根头发认亲亲子鉴定是怎么做的",
+     "url": "https://www.bilibili.com/BV1ffpY6nEZR",
+     "extra": "科学科普"
+    },
+    {
+     "title": "《贫道》",
+     "url": "https://www.bilibili.com/BV1QJpi6yEPp",
+     "extra": "MV"
+    },
+    {
+     "title": "最后离开教室的人，获得1000包干脆面！",
+     "url": "https://www.bilibili.com/BV1gYpY6uEfy",
+     "extra": "小剧场"
+    },
+    {
+     "title": "丧尸入门指南，真丧尸路过都得夸你正宗",
+     "url": "https://www.bilibili.com/BV1CLHQ6zEj6",
+     "extra": "搞笑"
+    },
+    {
+     "title": "巧克力中毒",
+     "url": "https://www.bilibili.com/BV19dps6nExM",
+     "extra": "汪星人"
+    },
+    {
+     "title": "老牧师恰恰舞",
+     "url": "https://www.bilibili.com/BV1rFHC6mERK",
+     "extra": "人力VOCALOID"
+    },
+    {
+     "title": "大学讲GalGame这一块",
+     "url": "https://www.bilibili.com/BV1vWHm6mEmF",
+     "extra": "日常"
+    },
+    {
+     "title": "科普撕痂皮一时爽，留疤哭断肠！预防伤口留疤小妙招，记得收藏好",
+     "url": "https://www.bilibili.com/BV1AQHS6MEfW",
+     "extra": "科学科普"
+    },
+    {
+     "title": "Live2d模型动画Love Options",
+     "url": "https://www.bilibili.com/BV1vpHm6EEYD",
+     "extra": "原创音乐"
+    },
+    {
+     "title": "年度级预告片轮回，由你打破！",
+     "url": "https://www.bilibili.com/BV1gTp868EzE",
+     "extra": "国产动画"
+    },
+    {
+     "title": "希特勒·墨索里尼当选秘鲁市长 引关注",
+     "url": "https://www.bilibili.com/BV1wqps6eE6U",
+     "extra": "日常"
+    },
+    {
+     "title": "我是猎人！",
+     "url": "https://www.bilibili.com/BV1oDp46aEGc",
+     "extra": "电子竞技"
+    },
+    {
+     "title": "三年之期已到，恭迎世一上归位！第13集",
+     "url": "https://www.bilibili.com/BV12gpt6UER4",
+     "extra": "影视剪辑"
+    },
+    {
+     "title": "来纽约，拍到了些怪东西",
+     "url": "https://www.bilibili.com/BV1x2HS66E96",
+     "extra": "出行"
+    },
+    {
+     "title": "《绝区零》3.3版本PV | 重返天空的旅程",
+     "url": "https://www.bilibili.com/BV1rAp46vEaB",
+     "extra": "手机游戏"
+    },
+    {
+     "title": "《结账是你的谎言》",
+     "url": "https://www.bilibili.com/BV1yTpg6ZEHs",
+     "extra": "搞笑"
+    },
+    {
+     "title": "每个生命都值得被善待",
+     "url": "https://www.bilibili.com/BV1DCpj64Emi",
+     "extra": "搞笑"
+    },
+    {
+     "title": "全网首发《银松镇》正式版 高质量生化危机+寂静岭风格恐怖游戏 全收集 全结局",
+     "url": "https://www.bilibili.com/BV1fkHD6wEXt",
+     "extra": "单机游戏"
+    },
+    {
+     "title": "豪物语：就你叫嘉豪啊 UP动画",
+     "url": "https://www.bilibili.com/BV1Nap461E9p",
+     "extra": "搞笑"
+    },
+    {
+     "title": "无敌小面包升级版，挡无限子弹",
+     "url": "https://www.bilibili.com/BV15Vp46ZEJz",
+     "extra": "网络游戏"
+    },
+    {
+     "title": "《明日方舟》× 国家图书馆恒远津梁合作宣传PV",
+     "url": "https://www.bilibili.com/BV1Gmpu6rE4w",
+     "extra": "手机游戏"
+    },
+    {
+     "title": "螃蟹蒸出来的白色固体是螃蟹血原来这些动物的血都不是红色的！主播说三农",
+     "url": "https://www.bilibili.com/BV1Rcp86YE8k",
+     "extra": "三农"
+    },
+    {
+     "title": "你们考驾照费劲吗",
+     "url": "https://www.bilibili.com/BV1Lrpu61EPg",
+     "extra": "小剧场"
+    },
+    {
+     "title": "速凌宇宙第二十八集：七人小队！四方混战！全员集结到场！",
+     "url": "https://www.bilibili.com/BV1ztH96uE2g",
+     "extra": "单机游戏"
+    },
+    {
+     "title": "（改良加长版）“已经没有什么能让我睁开眼睛了”",
+     "url": "https://www.bilibili.com/BV1BMp46wEG7",
+     "extra": "影视剪辑"
+    },
+    {
+     "title": "荧：可是我觉得这样很萌啊",
+     "url": "https://www.bilibili.com/BV1Y4ph6vE2Q",
+     "extra": "手机游戏"
+    },
+    {
+     "title": "《为何要生两个》",
+     "url": "https://www.bilibili.com/BV1vGp46bEdw",
+     "extra": "日常"
+    },
+    {
+     "title": "《甲乙丙丁》，但是昭和金曲（citypop日语版）AI MV大赛",
+     "url": "https://www.bilibili.com/BV1CrpM6dEdE",
+     "extra": "MV"
+    },
+    {
+     "title": "说不痛苦那是假的",
+     "url": "https://www.bilibili.com/BV1arH968EzQ",
+     "extra": "同人·手书"
+    },
+    {
+     "title": "罗伊冰原的小小救世主    索拉逐星舞台",
+     "url": "https://www.bilibili.com/BV1K9pj6DEKJ",
+     "extra": "同人·手书"
+    },
+    {
+     "title": "时代峰峻全员过日子时代，热门壁纸技能也惨被抄袭",
+     "url": "https://www.bilibili.com/BV1nEHQ6BEEA",
+     "extra": "娱乐杂谈"
+    },
+    {
+     "title": "后来的我才明白...",
+     "url": "https://www.bilibili.com/BV1PDpv6vEsj",
+     "extra": "搞笑"
+    },
+    {
+     "title": "《涌现 · 无人指挥》",
+     "url": "https://www.bilibili.com/BV1CKa16mE83",
+     "extra": "人文历史"
+    },
+    {
+     "title": "住宅低频噪音低频振动现场溯源解决的2个案例-江苏上海",
+     "url": "https://www.bilibili.com/BV13nps6LEPT",
+     "extra": "家居房产"
+    },
+    {
+     "title": "梗百科非常中国但丁是啥梗",
+     "url": "https://www.bilibili.com/BV1cDpb6GENA",
+     "extra": "乐评盘点"
+    },
+    {
+     "title": "如何在中国合法造一把你自己的枪鹰哥Studio",
+     "url": "https://www.bilibili.com/BV1dfaR6AE6U",
+     "extra": "野生技能协会"
+    },
+    {
+     "title": "断网补全计划149太阳之子，闪身步，不烧心，农大科比，雨中霸王龙，超长蛋挞，疯狂水世界，冰冰冰，咕咕嘎嘎小孩，野人先生罗永浩风波，钟薛高复活",
+     "url": "https://www.bilibili.com/BV1Yapc6SEZ5",
+     "extra": "搞笑"
+    },
+    {
+     "title": "可观测宇宙中最困的一声囔",
+     "url": "https://www.bilibili.com/BV1BWHQ6PE3b",
+     "extra": "日常"
+    },
+    {
+     "title": "哪一行都不好干（84）",
+     "url": "https://www.bilibili.com/BV1fopY6QEmP",
+     "extra": "小剧场"
+    },
+    {
+     "title": "除了梯子，其实还是会点其他的兵器什么的",
+     "url": "https://www.bilibili.com/BV13dHD6WEoG",
+     "extra": "日常"
+    },
+    {
+     "title": "耗时一年，改造善良老人晚年，完整后续来了！",
+     "url": "https://www.bilibili.com/BV1pMH46MEmw",
+     "extra": "日常"
+    },
+    {
+     "title": "兄弟们，你们猜我今天握力pk能赢这个16岁小姑娘吗",
+     "url": "https://www.bilibili.com/BV1pBp46rEQC",
+     "extra": "运动综合"
+    },
+    {
+     "title": "慎点！可能是你见过最变态最猎奇尺度最大的游戏！！！！《克里夫·巴克的养鬼吃人》究竟讲了什么",
+     "url": "https://www.bilibili.com/BV16opg6WEcD",
+     "extra": "单机游戏"
+    },
+    {
+     "title": "西班牙住房危机大爆发，桑切斯掀桌提前大选",
+     "url": "https://www.bilibili.com/BV1svp46CEbA",
+     "extra": "社科·法律·心理"
+    },
+    {
+     "title": "挑战蛙跳爬泰山7800个台阶",
+     "url": "https://www.bilibili.com/BV1uTpt6QEwg",
+     "extra": "出行"
+    },
+    {
+     "title": "逆转裁判朋友的酒",
+     "url": "https://www.bilibili.com/BV1a6H96cECt",
+     "extra": "单机游戏"
+    },
+    {
+     "title": "为什么说黑死病搜是因为死的太快，导致传染链断裂才控制住的呢",
+     "url": "https://www.bilibili.com/BV149H96HEaH",
+     "extra": "日常"
+    },
+    {
+     "title": "《生》生命是什么",
+     "url": "https://www.bilibili.com/BV1zVpJ6yEi3",
+     "extra": "搞笑"
+    },
+    {
+     "title": "嘘声一片：委内瑞拉感谢美国，以色列送伊朗星链——联大一般性辩论02",
+     "url": "https://www.bilibili.com/BV1wrp46zERC",
+     "extra": "社科·法律·心理"
+    },
+    {
+     "title": "颠覆我用AI魔改周星驰电影宇宙  AI全民制作人",
+     "url": "https://www.bilibili.com/BV1akH96fEaW",
+     "extra": "人力VOCALOID"
+    },
+    {
+     "title": "假小子仙人最新力作，耗时55555秒制作！！！1-5集大合集",
+     "url": "https://www.bilibili.com/BV11Gpx6zEYW",
+     "extra": "娱乐粉丝创作"
+    },
+    {
+     "title": "杀人经历写进小说，意外成为名作家现实比剧更离奇！万字解析《悬案：旅馆案》下",
+     "url": "https://www.bilibili.com/BV1Hrp46zEWf",
+     "extra": "影视杂谈"
+    },
+    {
+     "title": "老詹 退役巡演AI MV大赛",
+     "url": "https://www.bilibili.com/BV1oNpe6jEi2",
+     "extra": "音乐综合"
+    },
+    {
+     "title": "当你说你睡不着，多想跨过距离，安安静静陪在你的身旁，给你冲一杯驼奶，熬过这充满心事的夜",
+     "url": "https://www.bilibili.com/BV1Ptpe6aEtm",
+     "extra": "动物综合"
+    },
+    {
+     "title": "水上闯关这么简单的游戏 怎么会有人过不了",
+     "url": "https://www.bilibili.com/BV1Cepi6NEYq",
+     "extra": "搞笑"
+    },
+    {
+     "title": "自己喂的猪，才有这个家乡味，这大油，这肥膘，这颜色",
+     "url": "https://www.bilibili.com/BV1XWpM6MECx",
+     "extra": "日常"
+    },
+    {
+     "title": "太懂收视率：美国将全球直播列队枪决极端分子",
+     "url": "https://www.bilibili.com/BV1wTpg6ZEUu",
+     "extra": "社科·法律·心理"
     }
    ]
   },
   {
    "key": "itzhijia",
    "name": "IT之家",
-   "fetchedAt": "2026-10-01T03:30:22.000Z",
+   "fetchedAt": "2026-10-12T05:30:22.000Z",
    "items": [
     {
-     "title": "余承东预热华为 Mate 90 系列旗舰新机：大家一次次选择我们，我们就得一次次拿出进步",
-     "url": "https://www.ithome.com/1/008/903.htm",
+     "title": "京东预约超 200 万人：苹果 iPhone Duo 折叠屏手机 15999 元起倒数 5 天预售",
+     "url": "https://www.ithome.com/1/011/645.htm",
      "extra": ""
     },
     {
-     "title": "徐直军 10 月 1 日起当值华为轮值董事长",
-     "url": "https://www.ithome.com/1/008/701.htm",
+     "title": "长城汽车魏牌 CEO 赵永坡：最大的豪华不是沙发，是刹车",
+     "url": "https://www.ithome.com/1/011/600.htm",
      "extra": ""
     },
     {
-     "title": "特朗普签署行政令把 AI 改叫 SI，推出美国政府对话式问答网站",
-     "url": "https://www.ithome.com/1/008/693.htm",
+     "title": "四部门为汽车安全划定红线：明确汽车设计可靠性验证试验管理，研发测试要包含两冬一夏",
+     "url": "https://www.ithome.com/1/011/637.htm",
      "extra": ""
     },
     {
-     "title": "被罗永浩炮轰后东方甄选回应溜溜凳事件：退双倍货款不退货",
-     "url": "https://www.ithome.com/1/008/726.htm",
+     "title": "消息称 OLED 屏新款 iPad mini 售价将大幅上涨，或接近 799 美元",
+     "url": "https://www.ithome.com/1/011/713.htm",
      "extra": ""
     },
     {
-     "title": "vivo X500 手机新增 16GB+512GB 版本，6499 元",
-     "url": "https://www.ithome.com/1/008/761.htm",
+     "title": "星闪国家推荐标准发布，2027 年 4 月 1 日起正式实施",
+     "url": "https://www.ithome.com/1/011/607.htm",
      "extra": ""
     },
     {
-     "title": "微软 Win11 27H2 前瞻：预计将基于全新 Strontium 平台，Win12 仍难现身",
-     "url": "https://www.ithome.com/1/008/943.htm",
+     "title": "360 创始人周鸿祎攀岩受伤：左膝粉碎性骨折，未来两三个月取消出差",
+     "url": "https://www.ithome.com/1/011/719.htm",
      "extra": ""
     },
     {
-     "title": "江淮汽车：公司与华为Stellantis 三方确有沟洽合作意向",
-     "url": "https://www.ithome.com/1/008/919.htm",
+     "title": "邓承浩：本次行业掀起重视安全反对速成车  伪创新的大讨论和反思，深蓝汽车举双手赞成和拥护",
+     "url": "https://www.ithome.com/1/011/644.htm",
      "extra": ""
     },
     {
-     "title": "古尔曼：苹果计划于 10 月 13 日大举进军智能家居市场，首发家庭控制中枢及 2027 款 Apple TVHomePod mini",
-     "url": "https://www.ithome.com/1/008/882.htm",
+     "title": "库克分享卸任苹果 CEO 后首次来华最新动态：与苏炳添喝早茶聊天同 Xmind 思维导图开发者交流等",
+     "url": "https://www.ithome.com/1/011/734.htm",
      "extra": ""
     },
     {
-     "title": "苹果 iPad Mini 8 前瞻：首次支持 IP 防水，A20 Pro 芯片OLED 屏12GB 内存",
-     "url": "https://www.ithome.com/1/008/958.htm",
+     "title": "上市 1 月京东直降：小米 NAS 智能存储 2699  2384 元 4 年质保",
+     "url": "https://www.ithome.com/1/011/704.htm",
      "extra": ""
     },
     {
-     "title": "止步 26H2：Windows 11 下一个主要版本将放弃支持高通骁龙 850 处理器",
-     "url": "https://www.ithome.com/1/008/653.htm",
+     "title": "李杰回应一加 16 不支持全局 185Hz：产品追求体验优先，屏幕暂时做不到",
+     "url": "https://www.ithome.com/1/011/715.htm",
      "extra": ""
     },
     {
-     "title": "小米门窗传感器 3 上架：升级隧道磁阻传感器3 年长续航，众筹价 44 元",
-     "url": "https://www.ithome.com/1/008/634.htm",
+     "title": "华为申请注册“星芒”商标：网传是最新子品牌命名，涵盖手机电脑等分类",
+     "url": "https://www.ithome.com/1/011/726.htm",
      "extra": ""
     },
     {
-     "title": "荣耀年底新机曝光：700 Pro 系列有原生背屏X 新品主打 7 英寸大屏 + 超万级大电池，阔折叠加速中",
-     "url": "https://www.ithome.com/1/008/788.htm",
+     "title": "全球首款逻辑折叠芯片  麒麟 9050 Pro 线下展出，“真身”亮相华为终端创新技术沟通会",
+     "url": "https://www.ithome.com/1/011/756.htm",
      "extra": ""
     }
    ]
@@ -713,91 +1768,96 @@
   {
    "key": "zhongguancun",
    "name": "中关村在线",
-   "fetchedAt": "2026-10-01T03:30:22.000Z",
+   "fetchedAt": "2026-10-12T04:00:18.000Z",
    "items": [
     {
-     "title": "企业文件销毁找什么机构守护信息安全选合规销毁中心",
-     "url": "//news.zol.com.cn/1255/12551068.html",
+     "title": "微软更新Windows Update数字证书，2027年两批证书将陆续到期",
+     "url": "//news.zol.com.cn/1259/12594480.html",
      "extra": ""
     },
     {
-     "title": "ViP+Tandem首次“上手腕”维信诺供货荣耀智能手表6 Pro",
-     "url": "//news.zol.com.cn/1254/12548736.html",
+     "title": "前顽皮狗开发者推崇68小时精炼游戏体验，质疑3A体量膨胀趋势",
+     "url": "//news.zol.com.cn/1258/12584238.html",
      "extra": ""
     },
     {
-     "title": "微软推Windows 11 26H2更新，建议暂缓升级待稳定",
-     "url": "//news.zol.com.cn/1254/12549605.html",
+     "title": "皇牌空战8凯特·伊凡成叙事核心，沉稳队长人气悄然超越塔莎",
+     "url": "//news.zol.com.cn/1258/12584237.html",
      "extra": ""
     },
     {
-     "title": "新专利曝光：CPU或将集成MicroLED实现自发光可视化交互",
-     "url": "//news.zol.com.cn/1254/12549604.html",
+     "title": "先马先锋极简机箱发布：M-ATX紧凑设计，149元高性价比散热方案",
+     "url": "//news.zol.com.cn/1258/12582328.html",
      "extra": ""
     },
     {
-     "title": "携程推无理由事假激励：员工请假1天，团队获600元团建经费",
-     "url": "//news.zol.com.cn/1254/12546916.html",
+     "title": "安卓播放器哪个品牌音质好六款高口碑机型实测",
+     "url": "//news.zol.com.cn/1258/12583616.html",
      "extra": ""
     },
     {
-     "title": "邦耀机器人落地益海嘉里 赋能化工本质安全智能巡检",
-     "url": "//news.zol.com.cn/1254/12549188.html",
+     "title": "00后专科生三年直播切片带货获700万佣金，但非净利润且行业红利已消退",
+     "url": "//news.zol.com.cn/1258/12583201.html",
      "extra": ""
     },
     {
-     "title": "乐高×东映首推龙珠成人收藏套装神龙与悟空，2026年11月4日全球发售",
-     "url": "//news.zol.com.cn/1254/12549653.html",
+     "title": "星闪无线通信系统系列国标获批，2027年4月实施",
+     "url": "//news.zol.com.cn/1258/12584152.html",
      "extra": ""
     },
     {
-     "title": "太平鸟男装旗舰店羽绒服限时特惠，低至267元起",
-     "url": "//news.zol.com.cn/1255/12551165.html",
+     "title": "苹果宣布中国超95%产线用绿电，加码2.12亿美元投建风电项目",
+     "url": "//news.zol.com.cn/1258/12583791.html",
      "extra": ""
     },
     {
-     "title": "荣耀Magic9 Pro Max发布，众星齐聚深圳湾见证影像旗舰登场",
-     "url": "//news.zol.com.cn/1255/12551552.html",
+     "title": "GTA6杰森淋浴镜头引热议：含蓄呈现沉浸设计与分级边界的行业讨论",
+     "url": "//news.zol.com.cn/1258/12584206.html",
      "extra": ""
     },
     {
-     "title": "2026电竞椅品牌排行：千元档第一的永艺沃克300Pro+值得买吗",
-     "url": "//news.zol.com.cn/1254/12546800.html",
+     "title": "法国车手德比斯雨战夺季军，助张雪机车锁定WSBK WorldSSP年度亚军",
+     "url": "//news.zol.com.cn/1258/12585209.html",
      "extra": ""
     },
     {
-     "title": "2026空气净化器选购指南及要点：新房装修后急住全周期解析",
-     "url": "//news.zol.com.cn/1255/12550148.html",
+     "title": "大疆双十一大促启动：全系影像与智能硬件最高直降3200元",
+     "url": "//news.zol.com.cn/1258/12585186.html",
      "extra": ""
     },
     {
-     "title": "空调推荐柜机省电制冷效果好：五款3匹柜机FAQ",
-     "url": "//news.zol.com.cn/1254/12548083.html",
+     "title": "名侦探柯南第1065集平次和叶正式告白，大阪全城联动庆祝",
+     "url": "//news.zol.com.cn/1258/12584239.html",
      "extra": ""
     },
     {
-     "title": "Excel颠覆一格一值传统：支持单元格内多值存储与独立筛选计算",
-     "url": "//news.zol.com.cn/1254/12548825.html",
+     "title": "AMD Athlon XP问世25周年：性能评级系统终结主频至上时代",
+     "url": "//news.zol.com.cn/1257/12578285.html",
      "extra": ""
     },
     {
-     "title": "26年国内空调销量第一的品牌：美的空调，结论与依据一次说清",
-     "url": "//news.zol.com.cn/1254/12549084.html",
+     "title": "一加16将于10月12日发布，首发自研游戏助手，专为手游玩家深度优化",
+     "url": "//news.zol.com.cn/1258/12584207.html",
      "extra": ""
     },
     {
-     "title": "质量好的扫地机器人怎么验：iRobot Roomba 睿宝 615 的一份过关清单",
-     "url": "//news.zol.com.cn/1255/12550126.html",
+     "title": "利民PA120 VISION MAX ARGB黑风冷上市：5英寸屏+六热管+磁吸快拆",
+     "url": "//news.zol.com.cn/1259/12594483.html",
      "extra": ""
     },
     {
-     "title": "星舰试飞现蓝色光带引UFO猜测，专家称缺乏证据难证外星母舰",
-     "url": "//news.zol.com.cn/1255/12551539.html",
+     "title": "Windows 11 26H2正式推送，内存优化显著但官方建议暂缓升级",
+     "url": "//news.zol.com.cn/1257/12571294.html",
      "extra": ""
     },
     {
-     "title": "小屏顶配2026年六千价位手机横评：vivo X500 Pro 小屏影像",
-     "url": "//news.zol.com.cn/1255/12550132.html",
+     "title": "AMD FSR 4.1.1优化版发布：4K游戏性能提升26%，兼容AMDNVIDIA显卡",
+     "url": "//news.zol.com.cn/1257/12579037.html",
+     "extra": ""
+    },
+    {
+     "title": "海外玩家为老款Metabox笔记本加装360mm水冷，CPUGPU满载温度骤降60",
+     "url": "//news.zol.com.cn/1259/12594309.html",
      "extra": ""
     }
    ]
@@ -805,208 +1865,258 @@
   {
    "key": "aifaner",
    "name": "爱范儿",
-   "fetchedAt": "2026-10-01T01:00:37.000Z",
+   "fetchedAt": "2026-10-12T01:00:37.000Z",
    "items": [
     {
-     "title": "早报曝苹果10月13日发布家庭中枢豆包接入机票和火车票预订东方甄选溜溜凳双倍退款",
-     "url": "https://www.ifanr.com/1682780",
+     "title": "早报我们跟库克聊了聊iPhone Duo继QClaw后，腾讯再关停一个AgentSpaceXAI改名SpaceXSI",
+     "url": "https://www.ifanr.com/1683302",
      "extra": "早报"
     },
     {
-     "title": "Gemini 4 正式发布，我们终于有了一个写作强于代码的前沿模型",
-     "url": "https://www.ifanr.com/1682765",
-     "extra": "产品"
-    },
-    {
-     "title": "突发！苹果全新产品线曝光，Siri AI 进家门",
-     "url": "https://www.ifanr.com/1682750",
-     "extra": "产品"
-    },
-    {
-     "title": "iQOO 16 体验：可能是今年最卷的性能旗舰",
-     "url": "https://www.ifanr.com/1682609",
-     "extra": "产品"
-    },
-    {
-     "title": "问界新 M8 预售 38.98 万元，自行主导后，赛力斯迎来第一场实战",
-     "url": "https://www.ifanr.com/1682703",
-     "extra": "董车会"
-    },
-    {
-     "title": "宝马新一代 3 系亮相！内外全换新，顶配还有 3.0T 六缸",
-     "url": "https://www.ifanr.com/1682682",
-     "extra": "董车会"
-    },
-    {
-     "title": "ChatGPT 一夜抄完半个 AI 圈，现场演示频频翻车",
-     "url": "https://www.ifanr.com/1682644",
+     "title": "DDR4 内存重出江湖，PC 终于癫成我不认识的样子",
+     "url": "https://www.ifanr.com/1683529",
      "extra": "公司"
     },
     {
-     "title": "早报曝苹果新CEO想更快发产品华为Mate 90真机进店GPT6.1 Sol推出，价格仅Astra的五分之一",
-     "url": "https://www.ifanr.com/1682554",
+     "title": "AMD YES！老哥给老车插上显卡，手搓真智驾",
+     "url": "https://www.ifanr.com/1683790",
+     "extra": "董车会"
+    },
+    {
+     "title": "早报曝苹果iPhone Duo加单30%四部门拟禁全隐藏式车门把手长鑫首款服务器产品或年底推出",
+     "url": "https://www.ifanr.com/1683829",
      "extra": "早报"
     },
     {
-     "title": "OpenAI 年度发布会最全总结：25 个新品很夯，但额度减半拉爆了",
-     "url": "https://www.ifanr.com/1682571",
+     "title": "17.98 万元起，银河战舰 700 上市，三电机千匹马力，装进家用方盒子",
+     "url": "https://www.ifanr.com/1683809",
+     "extra": "董车会"
+    },
+    {
+     "title": "华为 Mate 90 Pro Max 深度体验：Mate 系列新高峰",
+     "url": "https://www.ifanr.com/1683673",
      "extra": "产品"
     },
     {
-     "title": "DeepSeek Harness桌面版实测：更像个人助理，还给你送钱",
-     "url": "https://www.ifanr.com/1682532",
+     "title": "24 天估值暴涨 37 倍，这就是 AI 圈年度爽文",
+     "url": "https://www.ifanr.com/1683674",
      "extra": "软件"
     },
     {
-     "title": "9.99 万元起！现代艾尼氪 V 上市，十万级最先锋的设计来了",
-     "url": "https://www.ifanr.com/1682479",
-     "extra": "董车会"
-    },
-    {
-     "title": "AI 圈杀出新顶流，神秘太空兔能用涂鸦做网站",
-     "url": "https://www.ifanr.com/1682401",
-     "extra": "软件"
-    },
-    {
-     "title": "Muse 帮我卖键盘，顺便把我家地址也卖了",
-     "url": "https://www.ifanr.com/1682462",
+     "title": "这届 AI PC，太烧心了",
+     "url": "https://www.ifanr.com/1683688",
      "extra": "产品"
     },
     {
-     "title": "苏姿丰550亿元买下李飞飞世界模型，AI 圈两位女王联手了",
-     "url": "https://www.ifanr.com/1682291",
+     "title": "森海 Momentum 5 真无线降噪耳机体验：升级无线传输与空间音频，它依然是那个正统 森海味",
+     "url": "https://www.ifanr.com/1683383",
+     "extra": "产品"
+    },
+    {
+     "title": "这三个摄影 App， 配得上你全新的 iPhone 18 Pro",
+     "url": "https://www.ifanr.com/1683596",
      "extra": "公司"
     },
     {
-     "title": "对话一目科技：机器人还缺失的手感，我们用光来搞定丨多样性公司",
-     "url": "https://www.ifanr.com/1682314",
-     "extra": "爱范儿"
+     "title": "为什么 ChatGPT 总爱在标题里塞色情赌博小广告",
+     "url": "https://www.ifanr.com/1683545",
+     "extra": "产品"
     },
     {
-     "title": "5000 吨的星舰入轨，人类最大的火箭开始送快递了",
-     "url": "https://www.ifanr.com/1682333",
-     "extra": "公司"
-    },
-    {
-     "title": "早报苹果修复iPhone 18 Pro面容ID卡死重启AMD收购李飞飞世界模型智界RX上市，余承东：鸿蒙智行最好开的车",
-     "url": "https://www.ifanr.com/1682292",
+     "title": "早报供应链回应iPhone 18 Pro砍单传闻小米华为手机同日调价山姆拟限制亲友卡换绑",
+     "url": "https://www.ifanr.com/1683465",
      "extra": "早报"
     },
     {
-     "title": "余承东：鸿蒙智行最好开的车来了！智界 RX 上市，25.98 万元起",
-     "url": "https://www.ifanr.com/1682272",
+     "title": "停产一年，宝马带着 iX4 重回溜背市场，海外售价 53 万元起",
+     "url": "https://www.ifanr.com/1683421",
      "extra": "董车会"
     },
     {
-     "title": "豆包输入法大更新，AI 最自然的入口回到了键盘",
-     "url": "https://www.ifanr.com/1682232",
+     "title": "陶哲轩转发抵制声明，数学界和OpenAI彻底撕破脸",
+     "url": "https://www.ifanr.com/1683401",
      "extra": "公司"
+    },
+    {
+     "title": "新款理想 i6 六项升级公布，旗舰配置下放，要做全球爆款！",
+     "url": "https://www.ifanr.com/1683385",
+     "extra": "董车会"
+    },
+    {
+     "title": "全球最大独立 AI 原生影视公司，要打造AI 版 Disney",
+     "url": "https://www.ifanr.com/1683309",
+     "extra": "产品"
+    },
+    {
+     "title": "早报苹果定档10月13日发布新品三星手机业务或减产30%保时捷计划削减9000个岗位",
+     "url": "https://www.ifanr.com/1683244",
+     "extra": "早报"
+    },
+    {
+     "title": "苹果 CEO 最爱的汽车品牌，要推出新超跑了",
+     "url": "https://www.ifanr.com/1683229",
+     "extra": "董车会"
+    },
+    {
+     "title": "和过往的捷豹说再见吧：Type 01 发布，用千匹动力迎接一批新买家",
+     "url": "https://www.ifanr.com/1683214",
+     "extra": "董车会"
     }
    ]
   },
   {
    "key": "csdn",
    "name": "CSDN",
-   "fetchedAt": "2026-10-01T02:00:58.000Z",
+   "fetchedAt": "2026-10-12T06:00:58.000Z",
    "items": [
     {
-     "title": "AI大模型接入SDKChatSDK：CMake构建静态库完整实现",
-     "url": "https://blog.csdn.net/2401_89899187/article/details/166853485",
+     "title": "语音 AI 怎样边听边答：实时对话系统的工作原理",
+     "url": "https://blog.csdn.net/weixin_74809706/article/details/167222468",
      "extra": ""
     },
     {
-     "title": "把模型切换交给平台：用蓝耘智能路由搭建商品评论分析工具",
-     "url": "https://blog.csdn.net/2401_87629362/article/details/166845663",
+     "title": "AI大模型接入SDKChatServer 整体初始化概述",
+     "url": "https://blog.csdn.net/2401_89899187/article/details/167040430",
      "extra": ""
     },
     {
-     "title": "Qt 界面开发必会：四大 Layout 布局管理器与 Spacer 弹簧机制详解",
-     "url": "https://blog.csdn.net/yhrxh_ymq/article/details/166644885",
+     "title": "linux（11）信号",
+     "url": "https://blog.csdn.net/2601_96394870/article/details/167573445",
      "extra": ""
     },
     {
-     "title": "SpringBoot+Vue3 企业主数据设计：客户供应商合同与财务如何共用一套身份",
-     "url": "https://blog.csdn.net/zhouzhongyan/article/details/166493716",
+     "title": "AI智能体Langchain 工具调用实战操作详解",
+     "url": "https://blog.csdn.net/congge_study/article/details/165243374",
      "extra": ""
     },
     {
-     "title": "AI智能体Codex 数据分析与处理实战项目操作详解",
-     "url": "https://blog.csdn.net/zhangcongyi420/article/details/163704437",
+     "title": "REA：AI 逆向工程的新范式——项目架构核心用途开源生态竞品分析与未来前景",
+     "url": "https://blog.csdn.net/AngelCryToo/article/details/167470864",
      "extra": ""
     },
     {
-     "title": "GPT-6.1 Sol 发布：性能接近 Astra，价格只要五分之一",
-     "url": "https://blog.csdn.net/aidoudoulong/article/details/166886053",
+     "title": "从0开始学习计算机网络| 认识IO多路复用，selectpollepoll",
+     "url": "https://blog.csdn.net/2503_94545876/article/details/167399231",
      "extra": ""
     },
     {
-     "title": "从只写接口到独立交付前后端，飞算JavaAI能给Java后端工程师多少溢价",
-     "url": "https://blog.csdn.net/beautifulmemory/article/details/166776519",
+     "title": "鸿蒙设备远控电脑实测：ToDesk蓝牙键鼠双模式鼠标跨端剪贴板，远控电脑更顺手了",
+     "url": "https://blog.csdn.net/2401_87629362/article/details/167284266",
      "extra": ""
     },
     {
-     "title": "HarmonyOS 7 新特性2：音频编创——轻音台里的降噪环绕与格式转换",
-     "url": "https://blog.csdn.net/sjw890821sjw/article/details/166786362",
+     "title": "PBAP规范精讲4: 蓝牙PBAP协议核心能力拆解——电话本访问的功能体系与实现要求",
+     "url": "https://blog.csdn.net/weixin_37800531/article/details/167175110",
      "extra": ""
     },
     {
-     "title": "飞牛 OS 部署 Calibre-Web：Docker 整理电子书库上传 PDF 到固定公网访问",
-     "url": "https://blog.csdn.net/qq_51601665/article/details/166785369",
+     "title": "生命过程的分子语言：AI 解析范式与场景应用全景研究（下）",
+     "url": "https://blog.csdn.net/kkiron/article/details/167587273",
      "extra": ""
     },
     {
-     "title": "TransformerBERT_双向预训练语言模型的开端",
-     "url": "https://blog.csdn.net/2302_78391795/article/details/166773688",
+     "title": "仓颉语言实现强大的Modbus调试工具Modbus Poll：cj-tauri项目介绍与实战",
+     "url": "https://blog.csdn.net/qq8864/article/details/167587486",
      "extra": ""
     },
     {
-     "title": "日志散在多台服务器怎么查用 Promtail + Loki + Grafana 搭一套集中检索平台",
-     "url": "https://blog.csdn.net/qq_61024956/article/details/166849158",
+     "title": "一个实打实的数据分析SKILL是如何诞生的",
+     "url": "https://blog.csdn.net/l1028386804/article/details/167595748",
      "extra": ""
     },
     {
-     "title": "Chatwoot私有化部署实战：Docker搭建客服后台，cpolar公网访问与网页SDK集成",
-     "url": "https://blog.csdn.net/m0_73879806/article/details/166794082",
+     "title": "Bond-DBCheck 邦德智能巡检平台助力 DBA",
+     "url": "https://blog.csdn.net/weixin_41645135/article/details/167586237",
      "extra": ""
     },
     {
-     "title": "我让它复刻 Linear 官网，它把背景色 #08090a 都抄得一字不差——Seed-2.1-pro-0915 看图写码实测",
-     "url": "https://blog.csdn.net/2401_86326742/article/details/166850694",
+     "title": "OpenClaw Windows部署：自定义模型接入Gateway远程访问与设备配对",
+     "url": "https://blog.csdn.net/liu_chen_yang/article/details/167683164",
      "extra": ""
     },
     {
-     "title": "从零写一个CAD 03三个 double 值得单独一个类吗：把视图变换抽成 View",
-     "url": "https://blog.csdn.net/2302_80177460/article/details/166794640",
+     "title": "Open-Lovable网页转React：Windows部署E2B与Firecrawl配置及源码验证方法",
+     "url": "https://blog.csdn.net/Mrxiao_bo/article/details/167394767",
      "extra": ""
     },
     {
-     "title": "C++ string 深度使用详解（模块细分 + 可行性分析）",
-     "url": "https://blog.csdn.net/chenbingjie_c/article/details/166738820",
+     "title": "云原生存储进阶：CSI 演进与 AI 工作负载的存储架构设计",
+     "url": "https://blog.csdn.net/vipxieliang/article/details/167579790",
      "extra": ""
     },
     {
-     "title": "MaxCompute中加密与解密函数",
-     "url": "https://blog.csdn.net/weixin_44624117/article/details/166738445",
+     "title": "轻量级 AI 代码生成平台搭建实战：Ollama 本地模型 + Continue.dev + Open Code Review 的低成本方案",
+     "url": "https://blog.csdn.net/BADAO_LIUMANG_QIZHI/article/details/167494629",
      "extra": ""
     },
     {
-     "title": "《游戏引擎原理与实践：聊聊游戏引擎的前世今生》阅读笔记与心得",
-     "url": "https://blog.csdn.net/2503_92624912/article/details/166795535",
+     "title": "花雕学编程Arduino BLDC 之多传感器融合与机器人步态相位驱动的阻抗切换",
+     "url": "https://blog.csdn.net/weixin_41659040/article/details/167496216",
      "extra": ""
     },
     {
-     "title": "传统电气岗位与AI的适配度：一次设计现场运维算法分别看",
-     "url": "https://blog.csdn.net/2601_96154681/article/details/166850540",
+     "title": "Berkeley Humanoid Lite——开源易获取且可定制的3D打印小人形：5000美刀成本下的模块化设计摆线关节可行走可VR遥操",
+     "url": "https://blog.csdn.net/v_JULY_v/article/details/167573431",
      "extra": ""
     },
     {
-     "title": "deepseekharness在对话中，有四种模式，分别是极简PTC创造和标准模式，每种模式下挂载的插件skill等数量不一样",
-     "url": "https://blog.csdn.net/skywalk8163/article/details/166850561",
+     "title": "开源评测openaimath 深度拆解：722 份 AI 数学手稿与 Lean 形式化的工程真相",
+     "url": "https://blog.csdn.net/TunerT_TQ/article/details/167396987",
      "extra": ""
     },
     {
-     "title": "CentOS 7 部署 mysqld_exporter：MySQL 指标采集Prometheus 告警与远程监控",
-     "url": "https://blog.csdn.net/2401_87848736/article/details/166895296",
+     "title": "电子书越存越乱我用Calibre-Web把飞牛NAS整理成了私人书库",
+     "url": "https://blog.csdn.net/lrq13965748542/article/details/167385663",
+     "extra": ""
+    },
+    {
+     "title": "Penpot自托管设计协作：Docker部署MCP接入与Codex生成UI实操记录",
+     "url": "https://blog.csdn.net/Pocker_Spades_A/article/details/167496676",
+     "extra": ""
+    },
+    {
+     "title": "LinuxShell 命令以及运行原理+权限管理",
+     "url": "https://blog.csdn.net/2603_95853495/article/details/167492296",
+     "extra": ""
+    },
+    {
+     "title": "基于连续与断续导通模式统一分析框架的高增益双向DC-DC变换器闭环控制与硬件实现研究（MatlabSimulinkPSCD）",
+     "url": "https://blog.csdn.net/weixin_46039719/article/details/167590084",
+     "extra": ""
+    },
+    {
+     "title": "CSS - 盒模型计算：box-sizing 的 content 与 border 盒模型",
+     "url": "https://blog.csdn.net/qq_41187124/article/details/157723277",
+     "extra": ""
+    },
+    {
+     "title": "deepseek - CED揭秘：100万 token 时，KV 缓存是所有存储问题的焦点",
+     "url": "https://blog.csdn.net/qq_38998213/article/details/167667593",
+     "extra": ""
+    },
+    {
+     "title": "多 Agent 协作架构：黑板模式——共享内存与自主读写",
+     "url": "https://blog.csdn.net/sinat_41617212/article/details/167389325",
+     "extra": ""
+    },
+    {
+     "title": "通关打怪之MySQL数据库第一篇--库的操作和表的操作",
+     "url": "https://blog.csdn.net/2501_93392325/article/details/159618490",
+     "extra": ""
+    },
+    {
+     "title": "数据库兼容模式排查：客户端能连上，但 SQL 没执行",
+     "url": "https://blog.csdn.net/augen1355/article/details/167652502",
+     "extra": ""
+    },
+    {
+     "title": "7亿Token算力账本：全生态AI编程工具日志解析与TokenBurn去水折算实战",
+     "url": "https://blog.csdn.net/qq_46987323/article/details/167589153",
+     "extra": ""
+    },
+    {
+     "title": "MySQL 8.0新特性解读：提升查询性能与开发效率的关键特性",
+     "url": "https://blog.csdn.net/qq_41840843/article/details/167578094",
      "extra": ""
     }
    ]
@@ -1014,211 +2124,226 @@
   {
    "key": "huxiu",
    "name": "虎嗅",
-   "fetchedAt": "2026-10-01T03:00:45.000Z",
+   "fetchedAt": "2026-10-12T06:00:49.000Z",
    "items": [
     {
-     "title": "大海中比梭子蟹还菜的东西不多了",
-     "url": "https://www.huxiu.com/article/4894118.html",
-     "extra": "45秒前"
+     "title": "现在还有一些人没有参保，这些人到底在哪儿",
+     "url": "https://www.huxiu.com/article/4896783.html",
+     "extra": "6分钟前"
     },
     {
-     "title": "我们盘点了30款出海的AI+游戏产品，发现钱都流向了生产管线",
-     "url": "https://www.huxiu.com/article/4894996.html",
-     "extra": "8分钟前"
+     "title": "亲日派的这笔旧账，韩国这次能清算完吗",
+     "url": "https://www.huxiu.com/article/4896781.html",
+     "extra": "18分钟前"
     },
     {
-     "title": "当副驾驶劫机",
-     "url": "https://www.huxiu.com/article/4894995.html",
-     "extra": "10分钟前"
+     "title": "雅典归来：我在鲁比奥深情演讲背后看见了什么",
+     "url": "https://www.huxiu.com/article/4896780.html",
+     "extra": "21分钟前"
     },
     {
-     "title": "判了，良品铺子“一女二嫁”案一审：杨红春方赔500万元，广州国资收购梦碎",
-     "url": "https://www.huxiu.com/article/4894994.html",
-     "extra": "11分钟前"
+     "title": "30亿美金，美国大学历史上最大捐赠，押注4大未来方向",
+     "url": "https://www.huxiu.com/article/4896779.html",
+     "extra": "22分钟前"
     },
     {
-     "title": "举报式采访，媒体今夕何夕",
-     "url": "https://www.huxiu.com/article/4894992.html",
-     "extra": "17分钟前"
+     "title": "朝鲜电影平壤餐厅和艺术展，正在莫斯科“日常化”",
+     "url": "https://www.huxiu.com/article/4896778.html",
+     "extra": "24分钟前"
     },
     {
-     "title": "上市5个月，大普微又要IPO了",
-     "url": "https://www.huxiu.com/article/4894991.html",
-     "extra": "23分钟前"
+     "title": "明知双汇出事，为什么还有人买",
+     "url": "https://www.huxiu.com/article/4896775.html",
+     "extra": "30分钟前"
     },
     {
-     "title": "2岁幼童吃银鳕鱼吃到汞超标，鳕鱼命名乱是不好，可宝妈也不无辜",
-     "url": "https://www.huxiu.com/article/4894987.html",
-     "extra": "33分钟前"
+     "title": "深度被叫停的收购，为什么让Manus更贵了",
+     "url": "https://www.huxiu.com/article/4896772.html",
+     "extra": "35分钟前"
     },
     {
-     "title": "70亿流量之后，中国摩托还缺什么",
-     "url": "https://www.huxiu.com/article/4894985.html",
-     "extra": "37分钟前"
+     "title": "光模块大卖，为何光谷众企干不过中际旭创",
+     "url": "https://www.huxiu.com/article/4896774.html",
+     "extra": "38分钟前"
     },
     {
-     "title": "150万，把楼市地图切成了两个部分",
-     "url": "https://www.huxiu.com/article/4894984.html",
-     "extra": "40分钟前"
+     "title": "全网2.11亿个主播账号，是“赛博工厂”里的新蓝领",
+     "url": "https://www.huxiu.com/article/4896773.html",
+     "extra": "39分钟前"
     },
     {
-     "title": "陈思诚小沈阳小猪佩奇，谁能撑起国庆档",
-     "url": "https://www.huxiu.com/article/4894982.html",
-     "extra": "49分钟前"
-    },
-    {
-     "title": "板前模式，还能火多久",
-     "url": "https://www.huxiu.com/article/4894981.html",
-     "extra": "50分钟前"
-    },
-    {
-     "title": "阶跃星辰“第一梯队”，是“自嗨”吗",
-     "url": "https://www.huxiu.com/article/4894980.html",
-     "extra": "52分钟前"
-    },
-    {
-     "title": "40万家汽修厂只有2%敢修电车三电，而电车保有量才13%：维修高峰，其实还没到",
-     "url": "https://www.huxiu.com/article/4894977.html",
+     "title": "具身智能下一轮洗牌：大脑终局不超5家，谁的百亿估值站得住",
+     "url": "https://www.huxiu.com/article/4896758.html",
      "extra": "53分钟前"
     },
     {
-     "title": "特朗普宣布推出AI政府门户网站：America.gov",
-     "url": "https://www.huxiu.com/article/4894974.html",
+     "title": "李录最新访谈：AI浪潮中国转型与全球秩序",
+     "url": "https://www.huxiu.com/article/4896732.html",
+     "extra": "59分钟前"
+    },
+    {
+     "title": "AI 办公大战，盯上了企业的人力预算",
+     "url": "https://www.huxiu.com/article/4896769.html",
      "extra": "1小时前"
     },
     {
-     "title": "首次三连跌国庆档的观众去哪了",
-     "url": "https://www.huxiu.com/article/4894971.html",
+     "title": "尊界换刹车方案出炉，大定用户：不要了，5万定金不退也不要了",
+     "url": "https://www.huxiu.com/article/4896768.html",
      "extra": "1小时前"
     },
     {
-     "title": "3亿老人，550万护理员缺口：养老产业最大的问题不是“不够”，是“不对”",
-     "url": "https://www.huxiu.com/article/4894969.html",
+     "title": "反对Agent，反对RSI，杨立昆新模型反对当下一切AI叙事",
+     "url": "https://www.huxiu.com/article/4896763.html",
+     "extra": "1小时前"
+    },
+    {
+     "title": "内娱进入“大确诊时代”，明星争当“病人”观众越看越烦",
+     "url": "https://www.huxiu.com/article/4896709.html",
+     "extra": "1小时前"
+    },
+    {
+     "title": "预制菜，速成车，我们到底忙啥呢",
+     "url": "https://www.huxiu.com/article/4896761.html",
+     "extra": "1小时前"
+    },
+    {
+     "title": "互联网巨头大战办公AI",
+     "url": "https://www.huxiu.com/article/4896760.html",
      "extra": "2小时前"
     },
     {
-     "title": "大聪明：RSI 时代的命运与意义",
-     "url": "https://www.huxiu.com/article/4894970.html",
+     "title": "先学后付变先学后债：4880元分12期，一节没上也要还",
+     "url": "https://www.huxiu.com/article/4896756.html",
      "extra": "2小时前"
     },
     {
-     "title": "未来五年，最紧缺的AI人才之一：FDE",
-     "url": "https://www.huxiu.com/article/4894968.html",
+     "title": "从“奇葩险”到运费险：生活里的小麻烦，怎么成了大生意",
+     "url": "https://www.huxiu.com/article/4896757.html",
      "extra": "2小时前"
     },
     {
-     "title": "给邪恶领导当妈，是这届打工人的究极形态",
-     "url": "https://www.huxiu.com/article/4894611.html",
+     "title": "数字员工“AI大机遇”的另一面",
+     "url": "https://www.huxiu.com/article/4896754.html",
      "extra": "2小时前"
     },
     {
-     "title": "演了几百场脱口秀，我重新理解了文化空间",
-     "url": "https://www.huxiu.com/article/4894966.html",
-     "extra": "3小时前"
+     "title": "年轻人为什么开始讨厌办婚礼",
+     "url": "https://www.huxiu.com/article/4895808.html",
+     "extra": "2小时前"
+    },
+    {
+     "title": "你买的司美格鲁肽，可能是“回流药”",
+     "url": "https://www.huxiu.com/article/4896746.html",
+     "extra": "2小时前"
     }
    ]
   },
   {
    "key": "zhidemai",
    "name": "值得买3小时热门",
-   "fetchedAt": "2026-10-01T03:30:14.000Z",
+   "fetchedAt": "2026-10-12T06:00:26.000Z",
    "items": [
     {
-     "title": "天猫超市 搜索惊喜口令“鸿运当头”  抽大额猫超卡",
-     "url": "https://www.smzdm.com/p/153744186/",
-     "extra": "天猫超市"
-    },
-    {
-     "title": "今日必买：草原宏宝 GB2707真原切！内蒙古手把羔羊肉（6月龄）净重5斤装",
-     "url": "https://www.smzdm.com/p/183155390/",
+     "title": "每日可领：京东外卖满15减10叠加满5减4神券，最高抽20元餐补券",
+     "url": "https://www.smzdm.com/p/156784271/",
      "extra": "京东"
     },
     {
-     "title": "鲜京采 上次卖爆2.5cm厚切！澳洲Coles原切谷饲上脑牛排 净重1kg",
-     "url": "https://www.smzdm.com/p/182969140/",
+     "title": "美团外卖 大额外卖福利天天领 超多福利汇总",
+     "url": "https://www.smzdm.com/p/155019333/",
+     "extra": "美团外卖"
+    },
+    {
+     "title": "含购买方案：淘宝闪购 88会员每日5折红包 满28减1420减10，果蔬超市12减12，55减21等外卖红包",
+     "url": "https://www.smzdm.com/p/159854323/",
+     "extra": "淘宝闪购"
+    },
+    {
+     "title": "美团到店 大牌嗨吃567 美食团购满300-30200-20100-10等神券",
+     "url": "https://www.smzdm.com/p/161616968/",
+     "extra": "美团到店"
+    },
+    {
+     "title": "美团外卖 甄选好店 满29-1438-1748-1958-20优惠专享大额券",
+     "url": "https://www.smzdm.com/p/174492951/",
+     "extra": "美团外卖"
+    },
+    {
+     "title": "淘金币可用今日必买：绪日鲜 挪威进口冰鲜三文鱼 上佳中段200g+鱼腩200g",
+     "url": "https://www.smzdm.com/p/183713580/",
+     "extra": "天猫精选"
+    },
+    {
+     "title": "阳澄·江南 去绳足重死蟹包赔！大闸蟹公4.0-4.3两母2.5-2.8两4对8只",
+     "url": "https://www.smzdm.com/p/183739886/",
      "extra": "京东"
     },
     {
-     "title": "今日必买：科尔沁 上次卖爆每斤12元！原切牛脖骨段 净重6斤",
-     "url": "https://www.smzdm.com/p/183172117/",
-     "extra": "京东"
-    },
-    {
-     "title": "今日必买：京东超市 超大厄瓜多尔白虾3斤(2030) 30-45只盒",
-     "url": "https://www.smzdm.com/p/183164784/",
-     "extra": "京东"
-    },
-    {
-     "title": "今日必买：卓宸 新西兰草饲原切牛腱子1kg",
-     "url": "https://www.smzdm.com/p/183209518/",
-     "extra": "京东"
-    },
-    {
-     "title": "趣尝鲜 原切带骨牛肋排 2kg",
-     "url": "https://www.smzdm.com/p/183209684/",
-     "extra": "京东"
-    },
-    {
-     "title": "隆上記 去绳净重死蟹包赔！隆上记大闸蟹鲜活现货 公4.5-4.8两 母3.5-3.8两 8只",
-     "url": "https://www.smzdm.com/p/183226816/",
-     "extra": "京东"
-    },
-    {
-     "title": "涝河桥 供港宁夏滩羊原切羊肉卷羊肉片 480g袋",
-     "url": "https://www.smzdm.com/p/183208372/",
-     "extra": "京东"
-    },
-    {
-     "title": "大希地 GB2707！原切熟成眼肉牛排（厚约2cm）净重3.4斤（另有厚切上脑羊排等）",
-     "url": "https://www.smzdm.com/p/183205782/",
-     "extra": "京东"
-    },
-    {
-     "title": "草原宏宝 烧烤必备 原切内蒙古羔羊排（6月龄） 净重3.6斤",
-     "url": "https://www.smzdm.com/p/183212185/",
-     "extra": "京东"
-    },
-    {
-     "title": "百亿补贴：佳农 泰国香水椰青 新鲜椰子 9粒装 单果900g以上",
-     "url": "https://www.smzdm.com/p/183260173/",
+     "title": "百亿补贴：酷态科 10号SE手机充电器套装120W氮化镓充电头快充适用于苹果小米18",
+     "url": "https://www.smzdm.com/p/183825699/",
      "extra": "拼多多"
     },
     {
-     "title": "京鲜生 柿一家 山东串收樱桃番茄净重450g2盒",
-     "url": "https://www.smzdm.com/p/183207268/",
+     "title": "值友专享今日必买：九阳 太空舱 FN-PL1G01 4L IH电饭煲",
+     "url": "https://www.smzdm.com/p/183728692/",
      "extra": "京东"
     },
     {
-     "title": "今日必买：边塞风 宁夏盐池滩羊手抓羊肉 净重2斤（赠送洗车卡）",
-     "url": "https://www.smzdm.com/p/183209035/",
+     "title": "值友专享：护舒宝 液体卫生巾日用270mm16片 拍2件赠液体270mm8片",
+     "url": "https://www.smzdm.com/p/183664876/",
      "extra": "京东"
     },
     {
-     "title": "天顺源 原切羔羊脖骨羊蝎子 2斤",
-     "url": "https://www.smzdm.com/p/183207365/",
+     "title": "今日必买：美团闪购 冰品节 超市便利 领券满45-1239减10元79减30元神券 水果满69-25券",
+     "url": "https://www.smzdm.com/p/178341827/",
+     "extra": "美团闪购"
+    },
+    {
+     "title": "今日必买：美团闪购 时令水果专场 领59-2069-2599-30神券",
+     "url": "https://www.smzdm.com/p/170440989/",
+     "extra": "美团闪购"
+    },
+    {
+     "title": "20点开始国家补贴新品尝鲜：P30 Pro 扫拖一体机 自动上下水版",
+     "url": "https://www.smzdm.com/p/183608835/",
      "extra": "京东"
     },
     {
-     "title": "PLUS会员：隆上記 去绳净重死蟹包赔！隆上记大闸蟹鲜活现货 全母3.5-3.8两8只",
-     "url": "https://www.smzdm.com/p/183227430/",
-     "extra": "京东"
+     "title": "88VIP今日必买：阳澄格调 精品大闸蟹 全母2.8-3.1两 8只",
+     "url": "https://www.smzdm.com/p/183713396/",
+     "extra": "天猫超市"
     },
     {
-     "title": "Seamix 鲜冻黑虎虾2kg 大规格21-25只kg 超大号！",
-     "url": "https://www.smzdm.com/p/183206636/",
-     "extra": "京东"
+     "title": "淘金币999.22元今日必买：国窖1573 一鹿领先 52度 浓香型白酒",
+     "url": "https://www.smzdm.com/p/183675664/",
+     "extra": "天猫超市"
     },
     {
-     "title": "得力 六边形战士 双珠ST头速干中性笔  0.5mm 黑色 5支盒 SA620",
-     "url": "https://www.smzdm.com/p/183234146/",
-     "extra": "京东"
+     "title": "值友专享：AHC B5系列男士洁面乳 140ml",
+     "url": "https://www.smzdm.com/p/183645975/",
+     "extra": "京东全球购"
+    },
+    {
+     "title": "康巴赫 CFD32A2 炒锅 32cm",
+     "url": "https://www.smzdm.com/p/183790669/",
+     "extra": "天猫超市"
+    },
+    {
+     "title": "国家补贴88VIP：卡罗特 不锈钢双耳汤锅 无涂层 24cm",
+     "url": "https://www.smzdm.com/p/183781716/",
+     "extra": "天猫超市"
+    },
+    {
+     "title": "淘金币1403.04元：国窖1573 泸州老窖国窖1573 书香门第生命中的那坛酒 55%vol1L1白酒含礼袋",
+     "url": "https://www.smzdm.com/p/183674110/",
+     "extra": "天猫超市"
     }
    ]
   },
   {
    "key": "juejin",
    "name": "掘金",
-   "fetchedAt": "2026-09-29T10:00:28.000Z",
+   "fetchedAt": "2026-10-10T09:30:11.000Z",
    "items": [
     {
      "title": "Cursor 转 Codex 大半个月，聊聊我的真实感受",
@@ -1231,43 +2356,38 @@
      "extra": ""
     },
     {
+     "title": "公司从 400 多人缩减到 100 多人，我开始重新思考程序员的未来",
+     "url": "https://juejin.cn/post/7694835192107860009",
+     "extra": ""
+    },
+    {
+     "title": "一个人+AI做情侣食谱小程序，30天纯赚",
+     "url": "https://juejin.cn/post/7691030977348108351",
+     "extra": ""
+    },
+    {
+     "title": "Spring AI Alibaba已停更了，Java还有希望吗",
+     "url": "https://juejin.cn/post/7693821701955567670",
+     "extra": ""
+    },
+    {
+     "title": "为什么不推荐走Agent开发",
+     "url": "https://juejin.cn/post/7683457864929329204",
+     "extra": ""
+    },
+    {
+     "title": "2026年金九银十，我面了22个前端",
+     "url": "https://juejin.cn/post/7691154454523576354",
+     "extra": ""
+    },
+    {
      "title": "从codex转战workbuddy使用一周的感受",
      "url": "https://juejin.cn/post/7684460980934049807",
      "extra": ""
     },
     {
-     "title": "为什么越来越多的大厂抛弃MCP，转向CLI",
-     "url": "https://juejin.cn/post/7656202263124000810",
-     "extra": ""
-    },
-    {
-     "title": "突发！字节内部大调整，QA直接转研发了",
-     "url": "https://juejin.cn/post/7689818941397778478",
-     "extra": ""
-    },
-    {
-     "title": "从夯到拉，锐评 39 个前端技术！",
-     "url": "https://juejin.cn/post/7591346773826732058",
-     "extra": ""
-    },
-    {
-     "title": "漫话大模型：7 家中国公司被点名蒸馏，他们到底偷走了什么",
-     "url": "https://juejin.cn/post/7690769804492341298",
-     "extra": ""
-    },
-    {
-     "title": "被吹上天的 JWT，为什么主流网站一个都不用",
-     "url": "https://juejin.cn/post/7684261460002701338",
-     "extra": ""
-    },
-    {
-     "title": "AI写长篇小说为什么30章必崩",
-     "url": "https://juejin.cn/post/7674372498315460658",
-     "extra": ""
-    },
-    {
-     "title": "天天 AI Coding 的你，如果出去面试，你的竞争力是什么",
-     "url": "https://juejin.cn/post/7670094721701445672",
+     "title": "副业搞起来，小说，漫画，漫剧的成本优化思路",
+     "url": "https://juejin.cn/post/7692440533922971667",
      "extra": ""
     },
     {
@@ -1276,48 +2396,53 @@
      "extra": ""
     },
     {
-     "title": "用了一个月 WorkBuddy，聊聊我的真实感受",
-     "url": "https://juejin.cn/post/7686407614478237748",
-     "extra": ""
-    },
-    {
-     "title": "我把《天龙八部》喂给了 AI，问它\"段誉会什么武功\"答案让我惊呆了",
-     "url": "https://juejin.cn/post/7671078538116546575",
-     "extra": ""
-    },
-    {
-     "title": "一个人，4个岗位，20天：我用Cursor+Codex上线了一款微信小游戏",
-     "url": "https://juejin.cn/post/7681286465168769067",
-     "extra": ""
-    },
-    {
      "title": "三年了，为什么 AI 应用还没爆发",
      "url": "https://juejin.cn/post/7659709059810705462",
      "extra": ""
     },
     {
-     "title": "两个半月的时间如何赚到 3000 块钱。",
-     "url": "https://juejin.cn/post/7677842844808052776",
+     "title": "大环境或许真的恶劣了起来，打工人你焦虑吗",
+     "url": "https://juejin.cn/post/7683049897088843816",
      "extra": ""
     },
     {
-     "title": "我把 Cursor 接到了蓝湖上，设计师再也不用追着我问\"还原了吗\"",
-     "url": "https://juejin.cn/post/7688644921475924010",
+     "title": "高级前端开发职业规划（2026—2035）",
+     "url": "https://juejin.cn/post/7674794074013024310",
      "extra": ""
     },
     {
-     "title": "给Codex配上Jev，直接起飞。",
-     "url": "https://juejin.cn/post/7688401277182066738",
+     "title": "朋友面试谈薪报价2w，HR非得压到1.9，还反问他：你就差这1000块钱后来背调时问了他前同事十几个问题，对方最后直接挂了",
+     "url": "https://juejin.cn/post/7694185019602812968",
      "extra": ""
     },
     {
-     "title": "WorkBuddy 最值得落地的 10 个技能，效率直接翻倍",
-     "url": "https://juejin.cn/post/7686407614478893108",
+     "title": "再见 Superpowers！很多 Skill 真的可以扔掉了。",
+     "url": "https://juejin.cn/post/7665897866712858674",
      "extra": ""
     },
     {
-     "title": "为什么市面上的 coding agent 大多数都基于Nodejs",
-     "url": "https://juejin.cn/post/7683481485497188403",
+     "title": "每天白嫖 WorkBuddy 100 积分，我让WorkBuddy自己领",
+     "url": "https://juejin.cn/post/7683353819855077412",
+     "extra": ""
+    },
+    {
+     "title": "2026 了，前端转 AI 全栈我是这么学的",
+     "url": "https://juejin.cn/post/7667503991685857290",
+     "extra": ""
+    },
+    {
+     "title": "用了一个月 WorkBuddy，聊聊我的真实感受",
+     "url": "https://juejin.cn/post/7686407614478237748",
+     "extra": ""
+    },
+    {
+     "title": "31岁罗福莉，晋升小米最高职级22级",
+     "url": "https://juejin.cn/post/7691227873460125734",
+     "extra": ""
+    },
+    {
+     "title": "被吹上天的 JWT，为什么主流网站一个都不用",
+     "url": "https://juejin.cn/post/7684261460002701338",
      "extra": ""
     }
    ]
