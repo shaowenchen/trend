@@ -15,7 +15,7 @@ import {
   parseFlatYamlList, bestAiderRows, normalizeEval, compact, num, table, esc, rankBadge, bar,
   normalizePaper, rankPapers, rankRepos, flattenModelsDev, fmtCost,
   rankSweBench, sweBoardNames, applyBoardState, groupOptions, controlsHtml,
-  cardGrid, detailFromCols, detailRow,
+  cardList,
   openrouterBoard, openrouterNames, openrouterLabel, attachPanel,
   growthPct, rankClimbing, rankAuthors, rankPerformance, rankAa, rankApps, flattenMedia,
   fetchAllEvalPages, evalBackoffMs, evalRetryWaitMs, EVAL_FETCH,
@@ -486,55 +486,71 @@ t('sweBoardNames：只取名字，过滤空值', () => {
   assert.deepEqual(sweBoardNames(null), []);
 });
 
-/* ---------------- 卡片与详情 ---------------- */
+/* ---------------- 榜单列表（前 N 行） ---------------- */
 
 const CARD_ROWS = [
   { __rank: 1, model: 'A/big', score: 79.2 },
   { __rank: 2, model: '<img src=x>', score: 50 },
 ];
 
-t('cardGrid：每张卡片是一颗 <button>（键盘可用），带名次与序号', () => {
-  const html = cardGrid(CARD_ROWS, {
+t('cardList：有地址的行是整行 <a>（新标签、rel 齐全），带名次', () => {
+  const html = cardList(CARD_ROWS, {
     title: (r) => esc(r.model),
     value: (r) => `${r.score}%`,
     meta: (r) => `<span class="tag">x</span>`,
+    link: (r) => `https://example.com/${r.model}`,
   });
-  assert.equal((html.match(/<button class="card"/g) || []).length, 2);
-  // data-card 是索引，点击时用它回查数据行
-  assert.match(html, /data-card="0"/);
-  assert.match(html, /data-card="1"/);
-  assert.match(html, /class="rank r1"/, '名次徽章没进卡片');
+  assert.equal((html.match(/<a class="li"/g) || []).length, 2);
+  assert.equal((html.match(/target="_blank"/g) || []).length, 2);
+  assert.equal((html.match(/rel="noopener noreferrer"/g) || []).length, 2);
+  assert.match(html, /class="rank r1"/, '名次没进列表行');
 });
 
-t('★ cardGrid：标题必须由调用方转义 —— 不转义的 HTML 会被当结构执行', () => {
+t('★ cardList：没有地址的行不产出 <a>（不可点的行不该看着可点）', () => {
+  // 5 个榜单整个没有 link（aider / newmodels / swebench / orAuthors / orPerf）
+  const noLink = cardList(CARD_ROWS, { title: (r) => esc(r.model), value: (r) => `${r.score}%` });
+  assert.ok(!noLink.includes('<a '), '没有 link 却产出了链接');
+  assert.equal((noLink.match(/<span class="li"/g) || []).length, 2);
+
+  // ★ 逐行判：link 存在但**这一行**取到空值时也必须回落到不可点 ——
+  //   `orApps` 给的就是 `link: (r) => r.url`，而个别行的 url 就是空。
+  //   按榜判会产出 `<a href="">`，一点跳回当前页。
+  const perRow = cardList(CARD_ROWS, {
+    title: (r) => esc(r.model),
+    link: (r) => (r.__rank === 1 ? 'https://example.com/a' : ''),
+  });
+  assert.equal((perRow.match(/<a class="li"/g) || []).length, 1, '空 url 的行不该产出链接');
+  assert.equal((perRow.match(/<span class="li"/g) || []).length, 1);
+  assert.ok(!perRow.includes('href=""'), '产出了空 href');
+});
+
+t('★ cardList：地址进的是属性位，必须转义（带引号的 url 会闭合属性）', () => {
+  const html = cardList([{ __rank: 1, name: 'X' }], {
+    title: (r) => esc(r.name),
+    link: () => 'https://x/?a="><img src=x>',
+  });
+  assert.ok(!html.includes('<img'), '地址里的 HTML 被当结构执行了');
+  assert.ok(html.includes('&quot;'), '引号没被转义');
+});
+
+t('★ cardList：整行链接里不再套一层 <a>（本站踩过 <a> 套 <a> 撑坏版面）', () => {
+  const html = cardList(CARD_ROWS, {
+    title: (r) => esc(r.model),
+    link: (r) => `https://example.com/${r.model}`,
+  });
+  // 每行恰好一个 <a>：行本身。title / value / meta 一律不得产出 <a>
+  assert.equal((html.match(/<a /g) || []).length, CARD_ROWS.length);
+});
+
+t('★ cardList：标题必须由调用方转义 —— 不转义的 HTML 会被当结构执行', () => {
   // 第二行的 model 是 <img src=x>，调用方规范用 esc() 包一层
-  const html = cardGrid(CARD_ROWS, { title: (r) => esc(r.model), value: () => '', meta: () => '' });
-  assert.ok(!html.includes('<img'), '卡片里出现了未转义的 HTML');
+  const html = cardList(CARD_ROWS, { title: (r) => esc(r.model), value: () => '', meta: () => '' });
+  assert.ok(!html.includes('<img'), '列表里出现了未转义的 HTML');
   assert.ok(html.includes('&lt;img'));
 });
 
-t('cardGrid：空数据给一句空态，不是空白', () => {
-  assert.match(cardGrid([], { title: () => '', value: () => '', meta: () => '' }), /没有数据/);
-});
-
-t('detailRow：空值不产出空行（免得详情里一排"—/无"）', () => {
-  assert.equal(detailRow('参数', null), '');
-  assert.equal(detailRow('参数', undefined), '');
-  assert.equal(detailRow('参数', ''), '');
-  assert.match(detailRow('参数', '7.2B'), /7\.2B/);
-  assert.match(detailRow('参数', '7.2B'), /<dt>参数<\/dt>/);
-});
-
-t('★ detailFromCols：详情字段与表格列同源，且跳过名次列', () => {
-  const cols = [
-    { label: '#', cell: (r) => r.rank },
-    { label: '模型', cell: (r) => esc(r.model) },
-    { label: '分数', num: true, cell: (r) => r.score },
-  ];
-  const body = detailFromCols(cols, { rank: 1, model: 'A', score: 9 });
-  assert.ok(!body.includes('<dt>#</dt>'), '详情里不该有名次那一行');
-  assert.match(body, /<dt>模型<\/dt>/);
-  assert.match(body, /<dt>分数<\/dt>/);
+t('cardList：空数据给一句空态，不是空白', () => {
+  assert.match(cardList([], { title: () => '', value: () => '', meta: () => '' }), /没有数据/);
 });
 
 /* ---------------- OpenRouter 用量榜 ---------------- */
@@ -740,40 +756,40 @@ t('flattenMedia：空输入不炸', () => {
   assert.deepEqual(flattenMedia({ data: [] }), []);
 });
 
-/* ---------------- cardGrid 的可选字段（真实故障复现） ---------------- */
+/* ---------------- cardList 的可选字段（真实故障复现） ---------------- */
 
 /**
- * ★ 这一组对着一次真实故障：`cfg.meta` 没给的榜单（aaBench）在渲染卡片时
+ * ★ 这一组对着一次真实故障：`cfg.meta` 没给的榜单（aaBench）在渲染时
  * 抛 `cfg.meta is not a function`，整块面板变成"读取失败"。
  *
  * 成因是一个看着像判空、其实先调用了的写法：`cfg.value(r) ? … : ''`
- * —— `cfg.meta(r)` 在 `?` 之前就执行了。而 mountBoard 的详情路径用的是
+ * —— `cfg.meta(r)` 在 `?` 之前就执行了。而详情路径（当时还在）用的是
  * `cfg.card.meta ? … : ''`（先判存在），两处语义不一致，于是"省略 meta"
- * 在详情里没事、在卡片上崩。
+ * 在一处没事、在另一处崩。
  */
-t('★ cardGrid：没有 meta 时不能抛错（它就是那个真实故障）', () => {
-  const html = cardGrid([{ __rank: 1, name: 'X' }], {
+t('★ cardList：没有 meta 时不能抛错（它就是那个真实故障）', () => {
+  const html = cardList([{ __rank: 1, name: 'X' }], {
     title: (r) => esc(r.name),
     value: (r) => r.name,
     // 故意不给 meta —— 这正是 aaBench 原来的样子
   });
-  assert.ok(html.includes('X'), '卡片没渲染出来');
-  assert.ok(!html.includes('card-meta'), '没有 meta 就不该产出那块 DOM');
+  assert.ok(html.includes('X'), '列表没渲染出来');
+  assert.ok(!html.includes('li-meta'), '没有 meta 就不该产出那块 DOM');
 });
 
-t('★ cardGrid：没有 value 时也不能抛错', () => {
-  const html = cardGrid([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name) });
+t('★ cardList：没有 value 时也不能抛错', () => {
+  const html = cardList([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name) });
   assert.ok(html.includes('X'));
-  assert.ok(!html.includes('card-value'));
+  assert.ok(!html.includes('li-val'));
 });
 
-t('cardGrid：title 是必需的（缺了就该炸，而不是渲染一张空卡）', () => {
-  assert.throws(() => cardGrid([{ name: 'X' }], {}), /is not a function/);
+t('cardList：title 是必需的（缺了就该炸，而不是渲染一行空白）', () => {
+  assert.throws(() => cardList([{ name: 'X' }], {}), /is not a function/);
 });
 
-t('cardGrid：meta 返回空串时不产出那块 DOM（空标签会占位但没内容）', () => {
-  const html = cardGrid([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name), meta: () => '' });
-  assert.ok(!html.includes('card-meta'));
+t('cardList：meta 返回空串时不产出那块 DOM（空标签会占位但没内容）', () => {
+  const html = cardList([{ __rank: 1, name: 'X' }], { title: (r) => esc(r.name), meta: () => '' });
+  assert.ok(!html.includes('li-meta'));
 });
 
 /* ---------------- 面板挂载：同 id 必须原地替换 ---------------- */
@@ -869,6 +885,31 @@ t('★ panel() 只能经由 attachPanel 挂载（改回 appendChild 会让切子
     /(panelsRoot|root)\.(appendChild|insertAdjacent|innerHTML)/,
     'panel() 里出现了绕过 attachPanel 的直接挂载'
   );
+});
+
+/* ---------------- 源码级门禁：详情层已删除 ---------------- */
+
+/*
+ * 2026-10-12 第八轮把"卡片 → 点开详情浮层"改成了"列表行 → 直达来源"，
+ * 于是 `openDetail` / `detailFromCols` / `detailRow` 与 `[data-card]` 点击绑定
+ * 全部删掉，`site.css` 里的 `.detail*` 也一并删了。
+ *
+ * 这一条钉住"别再长回来"：单独一个 `<dialog id="detail">` 与一段点击绑定
+ * 各自都能"看起来像个小功能"被加回来，但那样就同时出现了两个打开原始页面的
+ * 入口（行 + 浮层），而浮层里的字段与列表行是同一份数据 —— 两处维护必然漂移。
+ * 真要再加，应当是**显式的产品决定**并同步改这几条断言与 README，而不是顺手加回来。
+ */
+t('★ 详情层已删除：trend.js 里不该再有 openDetail / detailFromCols / data-card', () => {
+  const src = readFileSync(new URL('./trend.js', import.meta.url), 'utf8');
+  // 只看**代码**：注释里出现这些名字是合法的（说明"这东西为什么被删掉"本来就该
+  // 写进注释），所以先把块注释与整行 // 注释剥掉再断言。
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+  assert.doesNotMatch(code, /\bopenDetail\b/, 'openDetail 又回来了（列表行已直达来源，不需要浮层）');
+  assert.doesNotMatch(code, /\bdetailFromCols\b/, 'detailFromCols 又回来了');
+  assert.doesNotMatch(code, /\bdetailRow\b/, 'detailRow 又回来了');
+  assert.doesNotMatch(code, /data-card/, 'data-card 点击绑定又回来了（行本身现在带 href）');
+  // 反证：剥注释这一步没把文件剥空（正则写错时上面几条会"永远通过"）
+  assert.ok(code.includes('export function cardList'), '剥注释后找不到 cardList —— 上面的正则大概写错了');
 });
 
 /* ---------------- 评测榜取数节奏（退避 / 重试 / 限速，fetch 用桩） ---------------- */
