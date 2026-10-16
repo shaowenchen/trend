@@ -6,7 +6,7 @@
 <title>{{BRAND}}</title>
 <meta name="description" content="{{BRAND}} 是一个 AI 趋势大盘：把各家平台的模型榜单与开源生态热度收进一个页面。">
 <!--
-  单页站：34 个榜单全部在这一页上铺开（按主题六类分段），没有二级页面。
+  单页站：37 个榜单全部在这一页上铺开（按主题六类分段），没有二级页面。
 
   页面里刻意**没有** canonical / og:url / 站长验证这类标记：它们的地址必须是
   **绝对 URL**，而本站不写死域名（路径全用相对，见下）。GTM 与它们不同 ——
@@ -25,6 +25,11 @@
   （这里刻意不写出占位符的字面量：注入是朴素的字符串替换，写在注释里也会被撑开。）
 -->
 <base href="./">
+<!-- ★ 主题引导：必须在**样式表之前**、且是同步内联脚本（不是 module）。
+     摆在样式表之后就会先按默认暗色画一帧再翻成亮色 ——"先白后黑"就是这么来的。
+     正文由构建期落值（src/site/theme-boot.js → assets/theme.js 的 bootSnippet()），
+     所以 localStorage 的键与"什么算合法值"只有一处真值。 -->
+{{THEME_BOOT}}
 <link rel="stylesheet" href="site.css">
 <!-- Google Tag Manager：容器 ID 的唯一来源是 src/site/gtm.js，构建期落成真值。
      放在 head 靠前的位置（早于页面绘制开始上报），与 Google 的建议一致。 -->
@@ -46,8 +51,8 @@
        的既有约定写在这里（面板名与主题名才走 i18n.js）。 -->
   <h1 class="home-title">AI 趋势大盘</h1>
 
-  <!-- 粘性索引条：主题筛选（点一下只看一类）+ 34 个面板的跳转索引 + 刷新按钮。
-       它摆在正文之前、吸顶，因为一页装下 34 个面板之后"怎么找"必须先回答。 -->
+  <!-- 粘性索引条：主题筛选（点一下只看一类）+ 37 个面板的跳转索引 + 刷新按钮。
+       它摆在正文之前、吸顶，因为一页装下 37 个面板之后"怎么找"必须先回答。 -->
   {{BOARD_INDEX}}
 
   <!-- 六个主题分段（模型榜 / 评测榜 / 社区生态 / 平台洞察 / 资讯 / 中文热榜）。
@@ -59,5 +64,6 @@
 </main>
 <script src="assets/trend.js" type="module"></script>
 <script src="assets/ui.js" type="module"></script>
+<script src="assets/theme.js" type="module"></script>
 </body>
 </html>

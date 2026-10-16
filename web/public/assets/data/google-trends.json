@@ -1,0 +1,876 @@
+{
+ "fetchedAt": "2026-10-16T02:24:28.404Z",
+ "skipped": [],
+ "sources": [
+  {
+   "key": "US",
+   "name": "美国",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "sydney sweeney",
+     "url": "https://trends.google.com/trends/explore?q=sydney%20sweeney&geo=US",
+     "extra": "2000+",
+     "newsTitle": "Sydney Sweeney ditches signature blonde locks for unrecognizable new look",
+     "newsUrl": "https://www.foxnews.com/entertainment/sydney-sweeney-ditches-signature-blonde-locks-unrecognizable-new-look",
+     "newsSource": "Fox News"
+    },
+    {
+     "title": "mookie betts",
+     "url": "https://trends.google.com/trends/explore?q=mookie%20betts&geo=US",
+     "extra": "1000+",
+     "newsTitle": "Pendulum swings towards Red Sox as Mookie Betts' regression makes his Dodgers contract look scary",
+     "newsUrl": "https://bosoxinjection.com/pendulum-swings-towards-red-sox-as-mookie-betts-regression-makes-his-dodgers-contract-look-scary",
+     "newsSource": "BoSox Injection"
+    },
+    {
+     "title": "detroit red wings",
+     "url": "https://trends.google.com/trends/explore?q=detroit%20red%20wings&geo=US",
+     "extra": "1000+",
+     "newsTitle": "Chris Ilitch says he understands Wings fans' frustration: 'I share it'",
+     "newsUrl": "https://www.detroitnews.com/story/sports/nhl/red-wings/2026/10/15/chris-ilitch-says-he-understands-red-wings-fans-frustration/92271825007/",
+     "newsSource": "The Detroit News"
+    },
+    {
+     "title": "sydney sweeney sports ad",
+     "url": "https://trends.google.com/trends/explore?q=sydney%20sweeney%20sports%20ad&geo=US",
+     "extra": "2000+",
+     "newsTitle": "Dodgers player says MLB broadcasts are airing 'soft porn ads'",
+     "newsUrl": "https://www.usatoday.com/story/sports/mlb/2026/10/14/alex-call-dodgers-broadcast-soft-porn/92257759007/",
+     "newsSource": "USA Today"
+    },
+    {
+     "title": "4th amendment",
+     "url": "https://trends.google.com/trends/explore?q=4th%20amendment&geo=US",
+     "extra": "500+",
+     "newsTitle": "Immigrants Sue ICE for Allegedly Withholding Passports and Other Documents",
+     "newsUrl": "https://www.wsj.com/us-news/law/immigrants-sue-ice-for-allegedly-withholding-passports-and-other-documents-269be813",
+     "newsSource": "WSJ"
+    },
+    {
+     "title": "okc",
+     "url": "https://trends.google.com/trends/explore?q=okc&geo=US",
+     "extra": "500+",
+     "newsTitle": "Lightning suspected in Oklahoma City house fire causing $150,000 in damage",
+     "newsUrl": "https://www.news9.com/oklahoma-city-news/lightning-suspected-oklahoma-city-house-fire",
+     "newsSource": "News 9"
+    },
+    {
+     "title": "garrett mitchell",
+     "url": "https://trends.google.com/trends/explore?q=garrett%20mitchell&geo=US",
+     "extra": "5000+",
+     "newsTitle": "The glue that’s been holding it all together: Garrett Mitchell",
+     "newsUrl": "https://www.brewcrewball.com/milwaukee-brewers-analysis/91510/the-glue-thats-been-holding-it-all-together-garrett-mitchell",
+     "newsSource": "Brew Crew Ball"
+    },
+    {
+     "title": "law and order",
+     "url": "https://trends.google.com/trends/explore?q=law%20and%20order&geo=US",
+     "extra": "2000+",
+     "newsTitle": "‘Law & Order’ Season 26 Release Schedule: What Time Do Episodes Come Out?",
+     "newsUrl": "https://people.com/law-and-order-season-26-release-schedule-12174244",
+     "newsSource": "People.com"
+    },
+    {
+     "title": "reid scott",
+     "url": "https://trends.google.com/trends/explore?q=reid%20scott&geo=US",
+     "extra": "1000+",
+     "newsTitle": "Get a sneak peek at James Badge Dale’s ‘Law & Order’ debut (exclusive)",
+     "newsUrl": "https://ew.com/get-a-sneak-peek-at-james-badge-dale-law-and-order-debut-exclusive-12175487",
+     "newsSource": "Entertainment Weekly"
+    },
+    {
+     "title": "rockets",
+     "url": "https://trends.google.com/trends/explore?q=rockets&geo=US",
+     "extra": "2000+",
+     "newsTitle": "Rockets battle Thunder In Final Preseason Game",
+     "newsUrl": "https://sports.yahoo.com/articles/rockets-battle-thunder-final-preseason-223000284.html",
+     "newsSource": "Yahoo Sports"
+    }
+   ]
+  },
+  {
+   "key": "GB",
+   "name": "英国",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "tesla stock",
+     "url": "https://trends.google.com/trends/explore?q=tesla%20stock&geo=GB",
+     "extra": "100+",
+     "newsTitle": "The 1 Thing I'd Want Elon Musk to Answer on Tesla's Oct. 21 Call",
+     "newsUrl": "https://finance.yahoo.com/markets/stocks/articles/1-thing-id-want-elon-080402629.html",
+     "newsSource": "Yahoo Finance"
+    },
+    {
+     "title": "dodgers",
+     "url": "https://trends.google.com/trends/explore?q=dodgers&geo=GB",
+     "extra": "100+",
+     "newsTitle": "Back to basics: Ohtani returns to leadoff spot for NLCS Game 4",
+     "newsUrl": "https://www.mlb.com/news/shohei-ohtani-leading-off-in-game-4-of-2026-nlcs-vs-brewers",
+     "newsSource": "MLB.com"
+    },
+    {
+     "title": "estudiantes vs flamengo",
+     "url": "https://trends.google.com/trends/explore?q=estudiantes%20vs%20flamengo&geo=GB",
+     "extra": "100+",
+     "newsTitle": "Flamengo se entrena en Argentina antes del duelo decisivo ante Estudiantes",
+     "newsUrl": "https://onefootball.com/es/noticias/flamengo-se-entrena-en-argentina-antes-del-duelo-decisivo-ante-estudiantes-43619237",
+     "newsSource": "OneFootball"
+    },
+    {
+     "title": "seattle seahawks",
+     "url": "https://trends.google.com/trends/explore?q=seattle%20seahawks&geo=GB",
+     "extra": "200+",
+     "newsTitle": "How to bet Seahawks-Broncos: Analysis, tips and top prop plays",
+     "newsUrl": "https://www.espn.co.uk/espn/betting/story/_/id/50167970/nfl-week-6-odds-betting-tips-picks-seahawks-broncos",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "nhl",
+     "url": "https://trends.google.com/trends/explore?q=nhl&geo=GB",
+     "extra": "200+",
+     "newsTitle": "Blackhawks Patrick Kane sets NHL assist record for U.S.-born players with a helper on Bedard's goal",
+     "newsUrl": "https://www.washingtonpost.com/sports/nhl/2026/10/15/patrick-kane-blackhawks-us-assists/60dcf5b4-c901-11f1-aefb-abe4112d087e_story.html",
+     "newsSource": "The Washington Post"
+    },
+    {
+     "title": "white",
+     "url": "https://trends.google.com/trends/explore?q=white&geo=GB",
+     "extra": "100+",
+     "newsTitle": "White House defends new press secretary over her legal credentials",
+     "newsUrl": "https://www.bbc.co.uk/news/articles/ckqxne2evqreo",
+     "newsSource": "BBC"
+    },
+    {
+     "title": "dodgers vs brewers",
+     "url": "https://trends.google.com/trends/explore?q=dodgers%20vs%20brewers&geo=GB",
+     "extra": "200+",
+     "newsTitle": "Brewers go one win from World Series as back-to-back homers sink Dodgers",
+     "newsUrl": "https://www.theguardian.com/sport/2026/oct/14/brewers-dodgers-nlcs-game-3-bauers-mitchell-home-runs",
+     "newsSource": "The Guardian"
+    },
+    {
+     "title": "flamengo",
+     "url": "https://trends.google.com/trends/explore?q=flamengo&geo=GB",
+     "extra": "100+",
+     "newsTitle": "Estudiantes x Flamengo: onde assistir ao vivo, horário e escalações",
+     "newsUrl": "https://ge.globo.com/futebol/times/flamengo/noticia/2026/10/15/estudiantes-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+     "newsSource": "ge"
+    },
+    {
+     "title": "housewife tate mcrae",
+     "url": "https://trends.google.com/trends/explore?q=housewife%20tate%20mcrae&geo=GB",
+     "extra": "200+",
+     "newsTitle": "Tate McRae Isn’t Your ‘Housewife’ in Stunning New Visual: Watch",
+     "newsUrl": "https://www.billboard.com/music/pop/tate-mcrae-housewife-single-video-1236361592/",
+     "newsSource": "Billboard"
+    },
+    {
+     "title": "broncos vs seahawks",
+     "url": "https://trends.google.com/trends/explore?q=broncos%20vs%20seahawks&geo=GB",
+     "extra": "1000+",
+     "newsTitle": "Seahawks vs. Broncos (16 Oct, 2026) Live Score",
+     "newsUrl": "https://www.espn.co.uk/nfl/game?gameId=401872995",
+     "newsSource": "ESPN"
+    }
+   ]
+  },
+  {
+   "key": "JP",
+   "name": "日本",
+   "fetchedAt": "2026-10-16T02:00:00.000Z",
+   "items": [
+    {
+     "title": "山里 亮太",
+     "url": "https://trends.google.com/trends/explore?q=%E5%B1%B1%E9%87%8C%20%E4%BA%AE%E5%A4%AA&geo=JP",
+     "extra": "500+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "ジョジョ・ロメロ",
+     "url": "https://trends.google.com/trends/explore?q=%E3%82%B8%E3%83%A7%E3%82%B8%E3%83%A7%E3%83%BB%E3%83%AD%E3%83%A1%E3%83%AD&geo=JP",
+     "extra": "200+",
+     "newsTitle": "Licensable picture: A trump supporter appears to attack a protester wearing a “Release the Epstein Files’’ T-shirt during President Donald Trump’s",
+     "newsUrl": "https://www.reutersconnect.com/item/a-trump-supporter-appears-to-attack-a-protester-wearing-a-release-the-epstein-files-t-shirt-during-president-donald-trumps/dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX01UMVVTQVRPREFZMzAwNzI0NTU",
+     "newsSource": "Reuters Connect"
+    },
+    {
+     "title": "東北大会 高校野球",
+     "url": "https://trends.google.com/trends/explore?q=%E6%9D%B1%E5%8C%97%E5%A4%A7%E4%BC%9A%20%E9%AB%98%E6%A0%A1%E9%87%8E%E7%90%83&geo=JP",
+     "extra": "1000+",
+     "newsTitle": "負ければセンバツ絶望的、注目の一戦・花巻東vs仙台育英はどちらもエースが先発（高校野球ドットコム）",
+     "newsUrl": "https://news.yahoo.co.jp/articles/e5f09b3ad233162a008cfef5fd7b3e53aedc4e66",
+     "newsSource": "Yahoo!ニュース"
+    },
+    {
+     "title": "クライマックスシリーズ・ファーストステージ",
+     "url": "https://trends.google.com/trends/explore?q=%E3%82%AF%E3%83%A9%E3%82%A4%E3%83%9E%E3%83%83%E3%82%AF%E3%82%B9%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA%E3%83%BB%E3%83%95%E3%82%A1%E3%83%BC%E3%82%B9%E3%83%88%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B8&geo=JP",
+     "extra": "200+",
+     "newsTitle": "なぜ西武はCSで勝てないのか？ 9連敗を含む2勝12敗 采配で気になる「いつもの…」（AERA DIGITAL）",
+     "newsUrl": "https://news.yahoo.co.jp/articles/376f618139d6d3b861ae0f45fa53b9d9c540811a",
+     "newsSource": "Yahoo!ニュース"
+    },
+    {
+     "title": "大韓航空",
+     "url": "https://trends.google.com/trends/explore?q=%E5%A4%A7%E9%9F%93%E8%88%AA%E7%A9%BA&geo=JP",
+     "extra": "200+",
+     "newsTitle": "離陸直後にエンジン異常…146人を乗せた大韓航空機が引き返す（中央日報日本語版）",
+     "newsUrl": "https://news.yahoo.co.jp/articles/c49a08f688e07ac1fc2da4c96d95edf78e7d5317",
+     "newsSource": "Yahoo!ニュース"
+    },
+    {
+     "title": "studio",
+     "url": "https://trends.google.com/trends/explore?q=studio&geo=JP",
+     "extra": "500+",
+     "newsTitle": "Meta and Apple, Longtime Foes, Team Up to Put Open-Weight AI on Macs",
+     "newsUrl": "https://www.wsj.com/tech/ai/meta-and-apple-longtime-foes-team-up-to-put-open-weight-ai-on-macs-a28fde11",
+     "newsSource": "WSJ"
+    },
+    {
+     "title": "テスラ ロードスター",
+     "url": "https://trends.google.com/trends/explore?q=%E3%83%86%E3%82%B9%E3%83%A9%20%E3%83%AD%E3%83%BC%E3%83%89%E3%82%B9%E3%82%BF%E3%83%BC&geo=JP",
+     "extra": "500+",
+     "newsTitle": "テスラの新型ロードスターは期待に応えるか",
+     "newsUrl": "https://courrier.jp/wsj/462577/",
+     "newsSource": "クーリエ・ジャポン"
+    },
+    {
+     "title": "tesla roadster",
+     "url": "https://trends.google.com/trends/explore?q=tesla%20roadster&geo=JP",
+     "extra": "500+",
+     "newsTitle": "Tesla plans next-generation Roadster reveal after almost a decade of delays",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/tesla-roadster-reveal-what-to-know-about-the-delayed-ev.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "go",
+     "url": "https://trends.google.com/trends/explore?q=go&geo=JP",
+     "extra": "100+",
+     "newsTitle": "Petey Halpin HR puts Guardians past Rays in ALCS Game 3",
+     "newsUrl": "https://www.espn.com/mlb/story/_/id/50191465/petey-halpin-hr-puts-guardians-rays-alcs-game-3",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "ドジャース 速報 今日",
+     "url": "https://trends.google.com/trends/explore?q=%E3%83%89%E3%82%B8%E3%83%A3%E3%83%BC%E3%82%B9%20%E9%80%9F%E5%A0%B1%20%E4%BB%8A%E6%97%A5&geo=JP",
+     "extra": "50000+",
+     "newsTitle": "まさかの試合前…ド軍本拠地で目撃された“光景” ファン悲鳴「これは屈辱的」（Full-Count）",
+     "newsUrl": "https://news.yahoo.co.jp/articles/eb3be5678e54e7fa47e411c35727d5cda9426c4a",
+     "newsSource": "Yahoo!ニュース"
+    }
+   ]
+  },
+  {
+   "key": "HK",
+   "name": "中国香港",
+   "fetchedAt": "2026-10-16T01:30:00.000Z",
+   "items": [
+    {
+     "title": "何詩蓓",
+     "url": "https://trends.google.com/trends/explore?q=%E4%BD%95%E8%A9%A9%E8%93%93&geo=HK",
+     "extra": "100+",
+     "newsTitle": "何詩蓓世盃泳賽阿斯塔納站 200自游出佳績仍屈居一人之後",
+     "newsUrl": "https://hk.on.cc/hk/bkn/cnt/sport/20261015/bkn-20261015231437613-1015_00882_001.html",
+     "newsSource": "on.cc東網"
+    },
+    {
+     "title": "tesla roadster",
+     "url": "https://trends.google.com/trends/explore?q=tesla%20roadster&geo=HK",
+     "extra": "1000+",
+     "newsTitle": "Tesla plans next-generation Roadster reveal after almost a decade of delays",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/tesla-roadster-reveal-what-to-know-about-the-delayed-ev.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "dodgers",
+     "url": "https://trends.google.com/trends/explore?q=dodgers&geo=HK",
+     "extra": "100+",
+     "newsTitle": "Dodgers move Shohei Ohtani to leadoff spot for NLCS Game 4",
+     "newsUrl": "https://www.espn.com/mlb/story/_/id/50192041/dodgers-move-shohei-ohtani-leadoff-spot-nlcs-game-4",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "mlb",
+     "url": "https://trends.google.com/trends/explore?q=mlb&geo=HK",
+     "extra": "500+",
+     "newsTitle": "MLB playoffs: NLCS Game 4 updates, ALCS Game 3 takeaways",
+     "newsUrl": "https://www.espn.com/mlb/story/_/id/50186625/playoffs-nlcs-game-4-dodgers-brewers-alcs-game-3-guardians-rays",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "超級市場",
+     "url": "https://trends.google.com/trends/explore?q=%E8%B6%85%E7%B4%9A%E5%B8%82%E5%A0%B4&geo=HK",
+     "extra": "200+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "coreweave",
+     "url": "https://trends.google.com/trends/explore?q=coreweave&geo=HK",
+     "extra": "100+",
+     "newsTitle": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/coreweave-credit-default-swaps-hit-distress-levels-as-investors-sour-on-ai-debt.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "台日電梯",
+     "url": "https://trends.google.com/trends/explore?q=%E5%8F%B0%E6%97%A5%E9%9B%BB%E6%A2%AF&geo=HK",
+     "extra": "100+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "貓",
+     "url": "https://trends.google.com/trends/explore?q=%E8%B2%93&geo=HK",
+     "extra": "500+",
+     "newsTitle": "跑馬地貓店長惹被盜疑雲 證灣仔遭車輾斷魂",
+     "newsUrl": "https://orientaldaily.on.cc/content/%E8%A6%81%E8%81%9E%E6%B8%AF%E8%81%9E/odn-20261016-1016_00176_241/%E8%B7%91%E9%A6%AC%E5%9C%B0%E8%B2%93%E5%BA%97%E9%95%B7%E6%83%B9%E8%A2%AB%E7%9B%9C%E7%96%91%E9%9B%B2--%E8%AD%89%E7%81%A3%E4%BB%94%E9%81%AD%E8%BB%8A%E8%BC%BE%E6%96%B7%E9%AD%82",
+     "newsSource": "東方日報"
+    },
+    {
+     "title": "李澤欣",
+     "url": "https://trends.google.com/trends/explore?q=%E6%9D%8E%E6%BE%A4%E6%AC%A3&geo=HK",
+     "extra": "200+",
+     "newsTitle": "港姐季军李泽欣成为新一代东张女神 当选仅46天火速上位受力捧",
+     "newsUrl": "https://global.hk01.com/%E5%8D%B3%E6%97%B6%E5%A8%B1%E4%B9%90/60400235/%E6%B8%AF%E5%A7%90%E5%AD%A3%E5%86%9B%E6%9D%8E%E6%B3%BD%E6%AC%A3%E6%88%90%E4%B8%BA%E6%96%B0%E4%B8%80%E4%BB%A3%E4%B8%9C%E5%BC%A0%E5%A5%B3%E7%A5%9E-%E5%BD%93%E9%80%89%E4%BB%8546%E5%A4%A9%E7%81%AB%E9%80%9F%E4%B8%8A%E4%BD%8D%E5%8F%97%E5%8A%9B%E6%8D%A7",
+     "newsSource": "香港01"
+    },
+    {
+     "title": "storm",
+     "url": "https://trends.google.com/trends/explore?q=storm&geo=HK",
+     "extra": "1000+",
+     "newsTitle": "HK unlikely to be hit as Typhoon Champi gathers strength",
+     "newsUrl": "https://www.thestandard.com.hk/news/article/345592/HK-unlikely-to-be-hit-as-Typhoon-Champi-gathers-strength",
+     "newsSource": "The Standard (HK)"
+    }
+   ]
+  },
+  {
+   "key": "TW",
+   "name": "中国台湾",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "福 德 隧道",
+     "url": "https://trends.google.com/trends/explore?q=%E7%A6%8F%20%E5%BE%B7%20%E9%9A%A7%E9%81%93&geo=TW",
+     "extra": "100+",
+     "newsTitle": "快訊／國道嚴重事故！「福德隧道」3車追撞、占2道…現場一片凌亂",
+     "newsUrl": "https://tw.news.yahoo.com/%E5%BF%AB%E8%A8%8A-%E5%9C%8B%E9%81%93%E5%9A%B4%E9%87%8D%E4%BA%8B%E6%95%85-%E7%A6%8F%E5%BE%B7%E9%9A%A7%E9%81%93-3%E8%BB%8A%E8%BF%BD%E6%92%9E-%E5%8D%A02%E9%81%93-222900637.html",
+     "newsSource": "Yahoo新聞"
+    },
+    {
+     "title": "到期",
+     "url": "https://trends.google.com/trends/explore?q=%E5%88%B0%E6%9C%9F&geo=TW",
+     "extra": "200+",
+     "newsTitle": "三年合約到期後，王柏融下一張合約值多少？ - 中職 - 棒球",
+     "newsUrl": "https://www.sportsv.net/articles/129068",
+     "newsSource": "運動視界Sports Vision"
+    },
+    {
+     "title": "00919",
+     "url": "https://trends.google.com/trends/explore?q=00919&geo=TW",
+     "extra": "2000+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "台塑化",
+     "url": "https://trends.google.com/trends/explore?q=%E5%8F%B0%E5%A1%91%E5%8C%96&geo=TW",
+     "extra": "1000+",
+     "newsTitle": "焦點股》台塑化：昨遭空軍擊落 今挑戰漲停",
+     "newsUrl": "https://ec.ltn.com.tw/article/breakingnews/5607996",
+     "newsSource": "自由財經"
+    },
+    {
+     "title": "郭婷筠",
+     "url": "https://trends.google.com/trends/explore?q=%E9%83%AD%E5%A9%B7%E7%AD%A0&geo=TW",
+     "extra": "100+",
+     "newsTitle": "長相、身材全被批！台語女歌手心碎發聲不忍了：上輩子踩到你們祖墳？",
+     "newsUrl": "https://tw.news.yahoo.com/%E9%95%B7%E7%9B%B8-%E8%BA%AB%E6%9D%90%E5%85%A8%E8%A2%AB%E6%89%B9-%E5%8F%B0%E8%AA%9E%E5%A5%B3%E6%AD%8C%E6%89%8B%E5%BF%83%E7%A2%8E%E7%99%BC%E8%81%B2%E4%B8%8D%E5%BF%8D%E4%BA%86-%E4%B8%8A%E8%BC%A9%E5%AD%90%E8%B8%A9%E5%88%B0%E4%BD%A0%E5%80%91%E7%A5%96%E5%A2%B3-002500843.html",
+     "newsSource": "Yahoo新聞"
+    },
+    {
+     "title": "富喬",
+     "url": "https://trends.google.com/trends/explore?q=%E5%AF%8C%E5%96%AC&geo=TW",
+     "extra": "200+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "2330 股價",
+     "url": "https://trends.google.com/trends/explore?q=2330%20%E8%82%A1%E5%83%B9&geo=TW",
+     "extra": "200+",
+     "newsTitle": "看好科技發展卻怕買太多！大學生每月3.8萬布局台美「這一籃ETF」 網建議：狂存0050即可",
+     "newsUrl": "https://tw.stock.yahoo.com/news/%E7%9C%8B%E5%A5%BD%E7%A7%91%E6%8A%80%E7%99%BC%E5%B1%95%E5%8D%BB%E6%80%95%E8%B2%B7%E5%A4%AA%E5%A4%9A-%E5%A4%A7%E5%AD%B8%E7%94%9F%E6%AF%8F%E6%9C%883-8%E8%90%AC%E5%B8%83%E5%B1%80%E5%8F%B0%E7%BE%8E-%E9%80%99-%E7%B1%83etf-223500268.html",
+     "newsSource": "Yahoo股市"
+    },
+    {
+     "title": "tsla",
+     "url": "https://trends.google.com/trends/explore?q=tsla&geo=TW",
+     "extra": "200+",
+     "newsTitle": "Tesla Stock Has a Huge Valuation. Here’s What It Would Take to Justify It",
+     "newsUrl": "https://247wallst.com/investing/2026/10/15/tesla-stock-has-a-huge-valuation-heres-what-it-would-take-to-justify-it/",
+     "newsSource": "24/7 Wall St."
+    },
+    {
+     "title": "南亞科",
+     "url": "https://trends.google.com/trends/explore?q=%E5%8D%97%E4%BA%9E%E7%A7%91&geo=TW",
+     "extra": "500+",
+     "newsTitle": "記憶體行情旺卻連4跌！南亞科重挫17.39%登弱勢股榜首 Q3營收年增611.7%創新高",
+     "newsUrl": "https://tw.stock.yahoo.com/news/%E8%A8%98%E6%86%B6%E9%AB%94%E8%A1%8C%E6%83%85%E6%97%BA%E5%8D%BB%E9%80%A34%E8%B7%8C-%E5%8D%97%E4%BA%9E%E7%A7%91%E9%87%8D%E6%8C%AB17-39-%E7%99%BB%E5%BC%B1%E5%8B%A2%E8%82%A1%E6%A6%9C%E9%A6%96-q3%E7%87%9F%E6%94%B6%E5%B9%B4%E5%A2%9E611-143000990.html",
+     "newsSource": "Yahoo股市"
+    },
+    {
+     "title": "台幣匯率",
+     "url": "https://trends.google.com/trends/explore?q=%E5%8F%B0%E5%B9%A3%E5%8C%AF%E7%8E%87&geo=TW",
+     "extra": "500+",
+     "newsTitle": "股匯脫鉤！新台幣貶1.6角跌破32.4關卡 3個月盤中最低價",
+     "newsUrl": "https://tw.stock.yahoo.com/news/%E8%82%A1%E5%8C%AF%E8%84%AB%E9%89%A4%EF%BC%81%E6%96%B0%E5%8F%B0%E5%B9%A3%E8%B2%B616%E8%A7%92%E8%B7%8C%E7%A0%B4324%E9%97%9C%E5%8D%A1-3%E5%80%8B%E6%9C%88%E7%9B%A4%E4%B8%AD%E6%9C%80%E4%BD%8E%E5%83%B9-013712299.html",
+     "newsSource": "Yahoo股市"
+    }
+   ]
+  },
+  {
+   "key": "SG",
+   "name": "新加坡",
+   "fetchedAt": "2026-10-16T01:20:00.000Z",
+   "items": [
+    {
+     "title": "estudiantes vs flamengo",
+     "url": "https://trends.google.com/trends/explore?q=estudiantes%20vs%20flamengo&geo=SG",
+     "extra": "100+",
+     "newsTitle": "Semifinales de Libertadores: Mancuso se PIERDE la más clara del partido",
+     "newsUrl": "https://onefootball.com/es/noticias/semifinales-de-libertadores-mancuso-se-pierde-la-mas-clara-del-partido-43619016",
+     "newsSource": "OneFootball"
+    },
+    {
+     "title": "dodgers",
+     "url": "https://trends.google.com/trends/explore?q=dodgers&geo=SG",
+     "extra": "100+",
+     "newsTitle": "As Shohei Ohtani struggles, Dodgers will discuss benching superstar in Game 3 - The Athletic",
+     "newsUrl": "https://www.nytimes.com/athletic/7685422/2026/10/12/shohei-ohtani-playing-benching-dodgers-brewers-mlb-playoffs/",
+     "newsSource": "The New York Times"
+    },
+    {
+     "title": "tesla roadster",
+     "url": "https://trends.google.com/trends/explore?q=tesla%20roadster&geo=SG",
+     "extra": "500+",
+     "newsTitle": "Tesla Readies Flying Car Demo to Pump Up Sluggish Auto Business",
+     "newsUrl": "https://www.bloomberg.com/news/articles/2026-10-15/tesla-readies-flying-car-demo-to-pump-up-sluggish-auto-business",
+     "newsSource": "Bloomberg.com"
+    },
+    {
+     "title": "kups vs trabzonspor",
+     "url": "https://trends.google.com/trends/explore?q=kups%20vs%20trabzonspor&geo=SG",
+     "extra": "200+",
+     "newsTitle": "\"That's beyond frustrating\" - BVB star admits defensive mistakes in Werder Bremen draw",
+     "newsUrl": "https://bvbbuzz.com/that-s-beyond-frustrating-bvb-star-admits-defensive-mistakes-in-werder-bremen-draw-01m4ta99sjb2",
+     "newsSource": "BVB Buzz"
+    },
+    {
+     "title": "dodgers vs brewers",
+     "url": "https://trends.google.com/trends/explore?q=dodgers%20vs%20brewers&geo=SG",
+     "extra": "200+",
+     "newsTitle": "Brewers push Dodgers to brink, homer their way to 3-0 lead in NLCS",
+     "newsUrl": "https://sports.yahoo.com/mlb/live/dodgers-brewers-box-score-live-updates-lineups-starting-pitchers-news-highlights-where-to-watch-game-3-nlcs-223000172.html",
+     "newsSource": "Yahoo Sports"
+    },
+    {
+     "title": "coreweave",
+     "url": "https://trends.google.com/trends/explore?q=coreweave&geo=SG",
+     "extra": "100+",
+     "newsTitle": "CoreWeave credit default swaps hit distress levels as investors sour on AI debt",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/coreweave-credit-default-swaps-hit-distress-levels-as-investors-sour-on-ai-debt.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "iphone duo",
+     "url": "https://trends.google.com/trends/explore?q=iphone%20duo&geo=SG",
+     "extra": "200+",
+     "newsTitle": "アップル初の折りたたみスマホ「iPhone Duo」は市場を席巻できるのか",
+     "newsUrl": "https://k-tai.watch.impress.co.jp/docs/column/congress/2148092.html",
+     "newsSource": "ケータイ Watch"
+    },
+    {
+     "title": "nea",
+     "url": "https://trends.google.com/trends/explore?q=nea&geo=SG",
+     "extra": "200+",
+     "newsTitle": "NEA lifts heavy rain warning",
+     "newsUrl": "https://www.straitstimes.com/singapore/avoid-areas-in-bartley-upper-paya-lebar-due-to-risk-of-flash-floods-pub",
+     "newsSource": "The Straits Times"
+    },
+    {
+     "title": "psi",
+     "url": "https://trends.google.com/trends/explore?q=psi&geo=SG",
+     "extra": "5000+",
+     "newsTitle": "Singapore looking into which companies responsible for haze-causing fires, may take legal action: PM Wong",
+     "newsUrl": "https://www.channelnewsasia.com/singapore/haze-singapore-indonesia-companies-fires-legal-action-pm-wong-6463101",
+     "newsSource": "CNA"
+    },
+    {
+     "title": "林慧俐",
+     "url": "https://trends.google.com/trends/explore?q=%E6%9E%97%E6%85%A7%E4%BF%90&geo=SG",
+     "extra": "100+",
+     "newsTitle": "偷名表刷爆卡还无照酒驾 富豪林荣福女儿公司亲信认罪",
+     "newsUrl": "https://www.zaobao.com.sg/news/singapore/story20261015-9842238",
+     "newsSource": "联合早报"
+    }
+   ]
+  },
+  {
+   "key": "DE",
+   "name": "德国",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "e",
+     "url": "https://trends.google.com/trends/explore?q=e&geo=DE",
+     "extra": "100+",
+     "newsTitle": "Amar'e Stoudemire graduates from Miami Dade law enforcement academy",
+     "newsUrl": "https://www.espn.com/nba/story/_/id/50189623/amare-stoudemire-law-enforcement-academy-police",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "broncos – seahawks",
+     "url": "https://trends.google.com/trends/explore?q=broncos%20%E2%80%93%20seahawks&geo=DE",
+     "extra": "1000+",
+     "newsTitle": "Seahawks vs. Broncos preview: Kick-off time, prediction and how to watch live on DAZN",
+     "newsUrl": "https://www.dazn.com/en-GB/news/american-football/seahawks-broncos-nfl-watch-week-6-news-kickoff-time-date-prediction/1vn0jnxxy1co31778jdufjt25o",
+     "newsSource": "DAZN"
+    },
+    {
+     "title": "fortnite shop",
+     "url": "https://trends.google.com/trends/explore?q=fortnite%20shop&geo=DE",
+     "extra": "200+",
+     "newsTitle": "The new Epic Games Launcher is finally here in Preview",
+     "newsUrl": "https://store.epicgames.com/news/epic-games-launcher-preview",
+     "newsSource": "Epic Games"
+    },
+    {
+     "title": "politik",
+     "url": "https://trends.google.com/trends/explore?q=politik&geo=DE",
+     "extra": "2000+",
+     "newsTitle": "„Die Brandmauer ist gescheitert“, sagt dieser CDU-Abgeordnete in Sachsen-Anhalt",
+     "newsUrl": "https://www.welt.de/politik/deutschland/plus6acf922585ec8093bcfbe2f1/union-und-afd-die-brandmauer-ist-gescheitert-sagt-dieser-cdu-abgeordnete-in-sachsen-anhalt.html",
+     "newsSource": "WELT"
+    },
+    {
+     "title": "notlandung",
+     "url": "https://trends.google.com/trends/explore?q=notlandung&geo=DE",
+     "extra": "500+",
+     "newsTitle": "Notfall auf 38.000 Fuß: A320 dreht über Niedersachsen vom Kurs ab – Notlandung in Hamburg",
+     "newsUrl": "https://www.kreiszeitung.de/lokales/hamburg/notfall-auf-38-000-fuss-a320-dreht-ueber-niedersachsen-vom-kurs-ab-notlandung-in-hamburg-94543370.html",
+     "newsSource": "Kreiszeitung"
+    },
+    {
+     "title": "tukur",
+     "url": "https://trends.google.com/trends/explore?q=tukur&geo=DE",
+     "extra": "500+",
+     "newsTitle": "$1bn military arms was never paid into private accounts – Buratai",
+     "newsUrl": "https://www.vanguardngr.com/2026/10/1bn-military-arms-was-never-paid-into-private-accounts-buratai/",
+     "newsSource": "Vanguard News"
+    },
+    {
+     "title": "fourth wing cast",
+     "url": "https://trends.google.com/trends/explore?q=fourth%20wing%20cast&geo=DE",
+     "extra": "2000+",
+     "newsTitle": "‘Fourth Wing’ Finds Its Violet & Xaden: Esther McGregor & Emilio Sakraya To Lead Prime Video Series",
+     "newsUrl": "https://deadline.com/2026/10/xaden-violet-fourth-wing-cast-leads-prime-video-adaptation-1237156221/",
+     "newsSource": "Deadline"
+    },
+    {
+     "title": "quantencomputer",
+     "url": "https://trends.google.com/trends/explore?q=quantencomputer&geo=DE",
+     "extra": "500+",
+     "newsTitle": "Google gelingt Quanten-Durchbruch: Was bedeutet das jetzt für Bitcoin?",
+     "newsUrl": "https://www.blocktrainer.de/blog/google-gelingt-quanten-durchbruch-was-bedeutet-das-jetzt-fuer-bitcoin",
+     "newsSource": "Blocktrainer"
+    },
+    {
+     "title": "iphone duo",
+     "url": "https://trends.google.com/trends/explore?q=iphone%20duo&geo=DE",
+     "extra": "500+",
+     "newsTitle": "",
+     "newsUrl": "",
+     "newsSource": ""
+    },
+    {
+     "title": "lisandro martínez",
+     "url": "https://trends.google.com/trends/explore?q=lisandro%20mart%C3%ADnez&geo=DE",
+     "extra": "1000+",
+     "newsTitle": "El Manchester United multa a Lisandro por su ‘rajada’",
+     "newsUrl": "https://as.com/futbol/internacional/el-manchester-united-multa-a-lisandro-por-su-rajada-f202610-n/",
+     "newsSource": "Diario AS"
+    }
+   ]
+  },
+  {
+   "key": "FR",
+   "name": "法国",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "rockstar games gta vi",
+     "url": "https://trends.google.com/trends/explore?q=rockstar%20games%20gta%20vi&geo=FR",
+     "extra": "500+",
+     "newsTitle": "Pour son retour, « GTA » s’offre une bande-son « made in France »",
+     "newsUrl": "https://www.huffingtonpost.fr/culture/article/gta-vi-a-fait-appel-au-duo-justice-embleme-de-la-french-touch-pour-sa-bande-son_340331.html",
+     "newsSource": "Le HuffPost"
+    },
+    {
+     "title": "tesla",
+     "url": "https://trends.google.com/trends/explore?q=tesla&geo=FR",
+     "extra": "200+",
+     "newsTitle": "Tesla plans next-generation Roadster reveal after almost a decade of delays",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/tesla-roadster-reveal-what-to-know-about-the-delayed-ev.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "abattement fiscal retraités",
+     "url": "https://trends.google.com/trends/explore?q=abattement%20fiscal%20retrait%C3%A9s&geo=FR",
+     "extra": "1000+",
+     "newsTitle": "Budget 2027 : l’Assemblée nationale rejette le plafonnement d’un abattement fiscal des retraités",
+     "newsUrl": "https://www.lemonde.fr/politique/article/2026/10/15/budget-2027-l-assemblee-nationale-rejette-le-plafonnement-d-un-abattement-fiscal-des-retraites_6794431_823448.html",
+     "newsSource": "Le Monde.fr"
+    },
+    {
+     "title": "flamengo",
+     "url": "https://trends.google.com/trends/explore?q=flamengo&geo=FR",
+     "extra": "100+",
+     "newsTitle": "Flamengo virou o temido Boca de Riquelme na Libertadores? Veja o que argentinos pensam",
+     "newsUrl": "https://ge.globo.com/futebol/times/flamengo/noticia/2026/10/15/flamengo-virou-o-temido-boca-de-riquelme-na-libertadores-veja-o-que-argentinos-pensam.ghtml",
+     "newsSource": "ge"
+    },
+    {
+     "title": "veillée funèbre",
+     "url": "https://trends.google.com/trends/explore?q=veill%C3%A9e%20fun%C3%A8bre&geo=FR",
+     "extra": "200+",
+     "newsTitle": "Ses parents la croyaient morte, elle se réveille pendant sa veillée funèbre",
+     "newsUrl": "https://www.20minutes.fr/monde/4254002-20261013-guatemala-parents-croyaient-morte-adolescente-reveille-cercueil",
+     "newsSource": "20 Minutes"
+    },
+    {
+     "title": "ozempic",
+     "url": "https://trends.google.com/trends/explore?q=ozempic&geo=FR",
+     "extra": "100+",
+     "newsTitle": "Man claims he went blind after taking Ozempic, shares warning for other users",
+     "newsUrl": "https://www.foxnews.com/health/man-claims-went-blind-after-taking-ozempic-shares-warning-other-users",
+     "newsSource": "Fox News"
+    },
+    {
+     "title": "play in worlds 2026",
+     "url": "https://trends.google.com/trends/explore?q=play%20in%20worlds%202026&geo=FR",
+     "extra": "100+",
+     "newsTitle": "Aux Worlds de League of Legends, la Karmine Corp aux portes de son « rêve »",
+     "newsUrl": "https://www.lequipe.fr/Esport/Actualites/Aux-worlds-de-league-of-legends-la-karmine-corp-frappe-a-la-porte-de-son-reve/1735912",
+     "newsSource": "L'Équipe"
+    },
+    {
+     "title": "vent",
+     "url": "https://trends.google.com/trends/explore?q=vent&geo=FR",
+     "extra": "500+",
+     "newsTitle": "Un véritable ouragan pour la mi-octobre avec des vents à plus de 200 km/h ! 15/10/2026",
+     "newsUrl": "https://www.meteo-paris.com/actualites/des-vents-a-plus-de-200-km-h-un-peu-apres-la-mi-octobre",
+     "newsSource": "Meteo-Paris.com"
+    },
+    {
+     "title": "worlds lol",
+     "url": "https://trends.google.com/trends/explore?q=worlds%20lol&geo=FR",
+     "extra": "500+",
+     "newsTitle": "Sources: Joblife plan to compete in Project Blender with Hoody, Sevire, runneR, WanZeru, and soulcas",
+     "newsUrl": "https://www.sheepesports.com/en/articles/sources-joblife-plan-to-play-project-blender-with-hoody-sevire-runner-wanzeru-soulcas/en",
+     "newsSource": "Sheep Esports"
+    },
+    {
+     "title": "anthropic",
+     "url": "https://trends.google.com/trends/explore?q=anthropic&geo=FR",
+     "extra": "500+",
+     "newsTitle": "Anthropic tells investors quarterly revenue up nearly 50% to $16.8bn ahead of IPO",
+     "newsUrl": "https://www.ft.com/content/11632d03-358c-454b-af95-d06d4072932b?syn-25a6b1a6=1",
+     "newsSource": "Financial Times"
+    }
+   ]
+  },
+  {
+   "key": "IN",
+   "name": "印度",
+   "fetchedAt": "2026-10-16T02:10:00.000Z",
+   "items": [
+    {
+     "title": "पेट्रोल",
+     "url": "https://trends.google.com/trends/explore?q=%E0%A4%AA%E0%A5%87%E0%A4%9F%E0%A5%8D%E0%A4%B0%E0%A5%8B%E0%A4%B2&geo=IN",
+     "extra": "500+",
+     "newsTitle": "पेट्रोल-डीजल पर देर रात सरकार का बड़ा फैसला, पेट्रोल पर विंडफॉल टैक्स आज से ₹2.50, Business Hindi News",
+     "newsUrl": "https://www.livehindustan.com/business/modi-government-s-big-decision-late-night-on-petrol-diesel-windfall-tax-on-petrol-from-today-rs-2-50-201792112089230.html",
+     "newsSource": "Hindustan"
+    },
+    {
+     "title": "tesla roadster",
+     "url": "https://trends.google.com/trends/explore?q=tesla%20roadster&geo=IN",
+     "extra": "200+",
+     "newsTitle": "Tesla’s Roadster Arrives, After Nearly a Decade and Five-Figure Deposits",
+     "newsUrl": "https://www.wsj.com/business/autos/tesla-roadster-elon-musk-530c8e78",
+     "newsSource": "WSJ"
+    },
+    {
+     "title": "துரைமுருகன்",
+     "url": "https://trends.google.com/trends/explore?q=%E0%AE%A4%E0%AF%81%E0%AE%B0%E0%AF%88%E0%AE%AE%E0%AF%81%E0%AE%B0%E0%AF%81%E0%AE%95%E0%AE%A9%E0%AF%8D&geo=IN",
+     "extra": "100+",
+     "newsTitle": "கோதாவரி - காவிரி இணைப்பால் தமிழ்நாட்டுக்கு என்ன பலன்? விஜய் - சந்திரபாபு நாயுடு பேச்சுவார்த்தையின் பின்னணி",
+     "newsUrl": "https://www.bbc.com/tamil/articles/cmn5vywq22d2o",
+     "newsSource": "BBC"
+    },
+    {
+     "title": "మేయర్",
+     "url": "https://trends.google.com/trends/explore?q=%E0%B0%AE%E0%B1%87%E0%B0%AF%E0%B0%B0%E0%B1%8D&geo=IN",
+     "extra": "100+",
+     "newsTitle": "YSRCP: ఏడుగురు మేయర్, 20మంది ఛైర్మన్‌ అభ్యర్థులతో వైకాపా తొలి జాబితా",
+     "newsUrl": "https://www.eenadu.net/telugu-news/andhra-pradesh/ysrcp-first-candidates-list-for-municipal-polls/1799/126187618",
+     "newsSource": "Eenadu"
+    },
+    {
+     "title": "west indies cricket",
+     "url": "https://trends.google.com/trends/explore?q=west%20indies%20cricket&geo=IN",
+     "extra": "2000+",
+     "newsTitle": "Unstoppable Hope is India's immovable object yet again",
+     "newsUrl": "https://www.cricinfo.com/story/ind-vs-wi-4th-t20i-unstoppable-shai-hope-is-india-s-immovable-object-yet-again-1558513",
+     "newsSource": "Cricinfo"
+    },
+    {
+     "title": "today rain",
+     "url": "https://trends.google.com/trends/explore?q=today%20rain&geo=IN",
+     "extra": "100+",
+     "newsTitle": "Today's weather (October 16th): Heavy rain has decreased, with only afternoon showers in some areas.",
+     "newsUrl": "https://www.vietnam.vn/en/thoi-tiet-hom-nay-16-10-mua-to-giam-vai-noi-chi-con-mua-chieu",
+     "newsSource": "Vietnam.vn"
+    },
+    {
+     "title": "ইমরান খান",
+     "url": "https://trends.google.com/trends/explore?q=%E0%A6%87%E0%A6%AE%E0%A6%B0%E0%A6%BE%E0%A6%A8%20%E0%A6%96%E0%A6%BE%E0%A6%A8&geo=IN",
+     "extra": "100+",
+     "newsTitle": "মার্কিন নাগরিক হয়েও আন্দোলনে, ভারত ছাড়ার নোটিস ইমরান খানকে! পাল্টা চ্যালেঞ্জ জানিয়ে কোন পদক্ষেপ করলেন আমির খানের ভাগ্নে?",
+     "newsUrl": "https://www.anandabazar.com/entertainment/imran-khan-to-move-to-bombay-high-court-after-receiving-notice-to-leave-the-country-dgtl/cid/1719890",
+     "newsSource": "Anandabazar Patrika"
+    },
+    {
+     "title": "new zealand national cricket team vs india national cricket team players",
+     "url": "https://trends.google.com/trends/explore?q=new%20zealand%20national%20cricket%20team%20vs%20india%20national%20cricket%20team%20players&geo=IN",
+     "extra": "100+",
+     "newsTitle": "Ashwin says Bhuvneshwar's recall rewards success, not a reward he chased",
+     "newsUrl": "https://www.business-standard.com/cricket/news/ashwin-says-bhuvneshwar-s-recall-rewards-success-not-a-reward-he-chased-126101300807_1.html",
+     "newsSource": "Business Standard"
+    },
+    {
+     "title": "aaj ka mausam kaisa rahega",
+     "url": "https://trends.google.com/trends/explore?q=aaj%20ka%20mausam%20kaisa%20rahega&geo=IN",
+     "extra": "500+",
+     "newsTitle": "राजस्थान में मौसम बदला, 4 जिलों में बरसात: भरतपुर में चली धूल भरी आंधी; दिल्ली से 4 फ्लाइट जयपुर डायवर्ट",
+     "newsUrl": "https://www.bhaskar.com/local/rajasthan/jaipur/news/rajasthan-weather-rain-alert-jaipur-bikaner-bharatpur-forecast-139366271.html",
+     "newsSource": "Dainik Bhaskar"
+    },
+    {
+     "title": "കോക്രോച്ച് ജനതാ പാര്ട്ടി",
+     "url": "https://trends.google.com/trends/explore?q=%E0%B4%95%E0%B5%8B%E0%B4%95%E0%B5%8D%E0%B4%B0%E0%B5%8B%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B5%8D%20%E0%B4%9C%E0%B4%A8%E0%B4%A4%E0%B4%BE%20%E0%B4%AA%E0%B4%BE%E0%B4%B0%E0%B5%8D%E0%B4%9F%E0%B5%8D%E0%B4%9F%E0%B4%BF&geo=IN",
+     "extra": "200+",
+     "newsTitle": "ഡൽഹിയിൽ പ്രതിഷേധം തുടരുന്നു; യൂത്ത് കോൺഗ്രസ് പ്രവർത്തകർ പൊലീസ് സ്റ്റേഷനു മുന്നിൽ",
+     "newsUrl": "https://www.manoramaonline.com/news/latest-news/2026/10/14/gyanesh-kumar-delhi-protest-updates.html",
+     "newsSource": "Manorama Online"
+    }
+   ]
+  },
+  {
+   "key": "KR",
+   "name": "韩国",
+   "fetchedAt": "2026-10-16T01:20:00.000Z",
+   "items": [
+    {
+     "title": "chat gpt",
+     "url": "https://trends.google.com/trends/explore?q=chat%20gpt&geo=KR",
+     "extra": "10000+",
+     "newsTitle": "OpenAI sued by 8 states over ChatGPT safety concerns",
+     "newsUrl": "https://www.cnbc.com/2026/10/14/openai-sued-by-8-states-over-chatgpt-safety-concerns-.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "여행",
+     "url": "https://trends.google.com/trends/explore?q=%EC%97%AC%ED%96%89&geo=KR",
+     "extra": "2000+",
+     "newsTitle": "\"카자흐스탄 가볼까\" 전현무 멘트도 대본이었다...조작 논란 '재점화' - 머니투데이",
+     "newsUrl": "https://www.mt.co.kr/society/2026/10/16/2026101607132321995",
+     "newsSource": "머니투데이"
+    },
+    {
+     "title": "경기도교육청",
+     "url": "https://trends.google.com/trends/explore?q=%EA%B2%BD%EA%B8%B0%EB%8F%84%EA%B5%90%EC%9C%A1%EC%B2%AD&geo=KR",
+     "extra": "100+",
+     "newsTitle": "경기도교육청, 17일 교권보호전담관 실무 워크숍 개최",
+     "newsUrl": "https://www.news1.kr/local/gyeonggi/6322179",
+     "newsSource": "뉴스1"
+    },
+    {
+     "title": "lcp",
+     "url": "https://trends.google.com/trends/explore?q=lcp&geo=KR",
+     "extra": "100+",
+     "newsTitle": "MVK Gury: \"I'll show Tatu who's the real Ronaldo\"",
+     "newsUrl": "https://www.sheepesports.com/en/articles/mvk-gury-i-ll-show-tatu-who-s-the-real-ronaldo-worlds-2026/en",
+     "newsSource": "Sheep Esports"
+    },
+    {
+     "title": "오타니 쇼헤이",
+     "url": "https://trends.google.com/trends/explore?q=%EC%98%A4%ED%83%80%EB%8B%88%20%EC%87%BC%ED%97%A4%EC%9D%B4&geo=KR",
+     "extra": "1000+",
+     "newsTitle": "100타석 넘도록 '0홈런'‥오타니, 부진의 이유는?",
+     "newsUrl": "https://imnews.imbc.com/replay/2026/nwdesk/article/6858300_37004.html",
+     "newsSource": "MBC 뉴스"
+    },
+    {
+     "title": "tesla",
+     "url": "https://trends.google.com/trends/explore?q=tesla&geo=KR",
+     "extra": "1000+",
+     "newsTitle": "Tesla plans next-generation Roadster reveal after almost a decade of delays",
+     "newsUrl": "https://www.cnbc.com/2026/10/15/tesla-roadster-reveal-what-to-know-about-the-delayed-ev.html",
+     "newsSource": "CNBC"
+    },
+    {
+     "title": "박정",
+     "url": "https://trends.google.com/trends/explore?q=%EB%B0%95%EC%A0%95&geo=KR",
+     "extra": "200+",
+     "newsTitle": "박정 의원, \"산재 재심, 처리기간 길어지고, 패소율 증가\"",
+     "newsUrl": "https://www.ggoverallnews.co.kr/news/articleView.html?idxno=125768",
+     "newsSource": "경기종합뉴스"
+    },
+    {
+     "title": "독도",
+     "url": "https://trends.google.com/trends/explore?q=%EB%8F%85%EB%8F%84&geo=KR",
+     "extra": "200+",
+     "newsTitle": "‘독도의 날’ 온라인 축제…사진·숏폼·메타버스로 만난다",
+     "newsUrl": "https://www.newsis.com/view/NISX20261016_0003828563",
+     "newsSource": "뉴시스"
+    },
+    {
+     "title": "brewers vs dodgers",
+     "url": "https://trends.google.com/trends/explore?q=brewers%20vs%20dodgers&geo=KR",
+     "extra": "100+",
+     "newsTitle": "Brewers vs. Dodgers (Oct 15, 2026) Live Score",
+     "newsUrl": "https://www.espn.com/mlb/game/_/gameId/401908033/brewers-dodgers",
+     "newsSource": "ESPN"
+    },
+    {
+     "title": "카드뉴스",
+     "url": "https://trends.google.com/trends/explore?q=%EC%B9%B4%EB%93%9C%EB%89%B4%EC%8A%A4&geo=KR",
+     "extra": "200+",
+     "newsTitle": "[카드뉴스] 건강한 디지털 세상, 미디어 시민과 함께",
+     "newsUrl": "https://www.kihoilbo.co.kr/news/articleView.html?idxno=3037690",
+     "newsSource": "기호일보"
+    }
+   ]
+  }
+ ]
+}

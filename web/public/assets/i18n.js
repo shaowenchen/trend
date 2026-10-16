@@ -132,6 +132,14 @@ const zh = {
   'p.swebench.title': 'SWE-bench（真实代码修复）',
   'p.swebench.hint': '数据较大（约 4MB），进页面即加载',
 
+  // ── 2026-10-16 新增三张榜 ──
+  'p.hnTop.title': 'Hacker News 首页',
+  'p.hnTop.hint': '技术社区此刻在顶什么（与「AI 新闻」里的 HN 源口径不同：那个按 AI 关键词搜，这个就是整个首页）',
+  'p.wikiAttention.title': '维基百科 AI 词条关注度',
+  'p.wikiAttention.hint': '8 个语种维基里 AI 词条的真实浏览量 —— 全站唯一的大众注意力口径，不是技术圈热度',
+  'p.googleTrends.title': 'Google 搜索趋势',
+  'p.googleTrends.hint': '10 个区域的每日搜索热词（Google 官方日榜，每区 10 条）',
+
   // ── 标签（`boards.js` 的 slug → 面向访客的文字）──
   // slug 进地址（`tag.html?t=models`，两种语言共用）；这里只放**显示文字**，
   // 所以中文站显示"模型榜"、英文站显示"Models"，而地址始终是同一个。
@@ -151,6 +159,11 @@ const zh = {
   'tag.swe-bench': 'SWE-bench',
   // 资讯两张榜都是多源聚合，没有单一来源方 —— 单独一个来源标签
   'tag.aggregator': '多源聚合',
+  // HN 首页实况是单一来源（Hacker News 自己）
+  'tag.hackernews': 'Hacker News',
+  // 大众注意力两榜的来源
+  'tag.wikipedia': '维基百科',
+  'tag.google': 'Google',
   // 13 个中文热榜各自的平台（点它筛出该平台那一个榜）
   'tag.zhihu': '知乎',
   'tag.csdn': 'CSDN',
@@ -208,6 +221,12 @@ const zh = {
   'col.source': '来源',
   'col.hot': '热度',
   'col.starsToday': '今日新增星',
+  // 2026-10-16 新增三张榜的列
+  'col.comments': '评论',
+  'col.views': '浏览量',
+  'col.keyword': '热搜词',
+  'col.news': '相关新闻',
+  'col.wikiTrend': '7 日走势',
   'col.desc': '描述',
   'col.modality': '模态',
   'col.gained': '本期新增',
@@ -233,6 +252,11 @@ const zh = {
   'ui.searchModelsOrgs': '按模型或机构搜索…',
   'ui.searchRepos': '按仓库名或描述搜索…',
   'ui.searchNews': '按标题或来源搜索…',
+  // HN 首页：区分外链与自帖（Ask/Show HN 没有外部地址，落点是讨论页）
+  'ui.hnExternal': '外链',
+  'ui.hnDiscuss': '讨论',
+  // Google 趋势：中国大陆没有这个区域（geo=CN 实测 400），说明一句免得读者以为漏了
+  'ui.geoNote': 'Google 趋势没有中国大陆区域（端点对 geo=CN 返回 400），中文内容看中国香港 / 中国台湾 / 新加坡',
   'ui.allSources': '全部来源',
   'ui.allGroups': '全部分组',
   'ui.allTasks': '全部任务',
@@ -246,17 +270,23 @@ const zh = {
   'ui.boardNav': '切换面板',
   'ui.boardTags': '本页标签：',
   'ui.refresh': '刷新数据',
-  'ui.close': '关闭',
-  'ui.openSource': '打开原始页面',
   'ui.sortHint': '点击排序',
   'ui.free': '免费',
+
+  // ── 主题切换（页头那个按钮的三态）──
+  // 三态而不是两态：见 assets/theme.js 顶部 —— "跟随系统"必须是一个能回去的
+  // 状态，不是"没选过"的残留。
+  'theme.name': '主题',
+  'theme.system': '跟随系统',
+  'theme.light': '亮色',
+  'theme.dark': '暗色',
+  'theme.hint': '主题：{next}（点一下切换）',
 
   // ── 列表与状态 ──
   'ui.count': '{n} 条',
   'ui.countFiltered': '{n} / {total} 条',
   'ui.fullList': '完整列表（{n} 条，可点列头排序）',
-  'ui.moreInList': '还有 {n} 条在下面的完整列表里',
-  'ui.top10': '前 {n}',
+  'ui.moreInList': '下面完整列表里还有 {n} 条',
   'ui.cached': '已缓存 {n} 个 · 抓取于 {time}（10 分钟内不重复拉取）',
   'ui.loaded': '{n} 个',
 
@@ -276,6 +306,10 @@ const zh = {
   'st.aiNewsSnap': '构建期快照 · 最老来源抓取于 {time}',
   'st.pressSkipped': '观察项：{names}',
   'st.hotSnap': '构建期快照 · 抓取于 {time} · 条目链接指向原平台',
+  // 2026-10-16 新增三张榜的快照声明（与其它快照榜同一套句式）
+  'st.hnSnap': '构建期快照 · 抓取于 {time} · 来源 news.ycombinator.com 首页',
+  'st.wikiSnap': '构建期快照 · 数据日期 {time} · 来源 wikimedia pageviews（浏览量是 UTC 前一日）',
+  'st.googleSnap': '构建期快照 · 抓取于 {time} · 来源 Google 每日搜索趋势',
   'st.failed': '读取失败：{msg}',
   'st.bigDataHint': '点击下方按钮加载（该源数据较大，避免进页面就拉）',
   'st.loadingBig': '正在拉取 {size} 数据…',
@@ -417,6 +451,14 @@ const en = {
   'p.swebench.title': 'SWE-bench (real code fixes)',
   'p.swebench.hint': 'large payload (~4MB), loads on page open',
 
+  // ── Three boards added 2026-10-16 ──
+  'p.hnTop.title': 'Hacker News front page',
+  'p.hnTop.hint': 'what the tech community is upvoting right now (a different cut from the HN source inside AI news: that one searches AI keywords, this is the whole front page)',
+  'p.wikiAttention.title': 'Wikipedia attention on AI topics',
+  'p.wikiAttention.hint': 'real pageviews of AI articles across 8 Wikipedia languages — the only general-public attention signal on this site, not tech-community heat',
+  'p.googleTrends.title': 'Google search trends',
+  'p.googleTrends.hint': "daily search trends for 10 regions (Google's official daily list, 10 terms per region)",
+
   // ── Tag labels (slug → what the visitor reads; see the zh block above) ──
   'tag.models': 'Models',
   'tag.benchmarks': 'Benchmarks',
@@ -432,6 +474,11 @@ const en = {
   'tag.artificial-analysis': 'Artificial Analysis',
   'tag.swe-bench': 'SWE-bench',
   'tag.aggregator': 'Multi-source',
+  // HN front page is a single source (Hacker News itself)
+  'tag.hackernews': 'Hacker News',
+  // The two general-public attention boards
+  'tag.wikipedia': 'Wikipedia',
+  'tag.google': 'Google',
   'tag.zhihu': 'Zhihu',
   'tag.csdn': 'CSDN',
   'tag.juejin': 'Juejin',
@@ -487,6 +534,12 @@ const en = {
   'col.source': 'Source',
   'col.hot': 'Score',
   'col.starsToday': 'Stars today',
+  // Columns for the three boards added 2026-10-16
+  'col.comments': 'Comments',
+  'col.views': 'Views',
+  'col.keyword': 'Search term',
+  'col.news': 'Related news',
+  'col.wikiTrend': '7-day trend',
   'col.desc': 'Description',
   'col.modality': 'Modality',
   'col.gained': 'Gained',
@@ -510,6 +563,13 @@ const en = {
   'ui.searchModelsOrgs': 'Search models or orgs…',
   'ui.searchRepos': 'Search repo name or description…',
   'ui.searchNews': 'Search headlines or sources…',
+  // HN front page: tell external links from self-posts (Ask/Show HN have no
+  // external URL, so the row points at the discussion page)
+  'ui.hnExternal': 'Link',
+  'ui.hnDiscuss': 'Discussion',
+  // Google Trends: mainland China has no region here (geo=CN returns 400),
+  // say so instead of letting readers think we simply missed it
+  'ui.geoNote': 'Google Trends has no mainland-China region (the endpoint returns 400 for geo=CN); for Chinese content use Hong Kong / Taiwan / Singapore',
   'ui.allSources': 'All sources',
   'ui.allGroups': 'All groups',
   'ui.allTasks': 'All tasks',
@@ -523,16 +583,20 @@ const en = {
   'ui.boardNav': 'Switch board',
   'ui.boardTags': 'Tags on this board:',
   'ui.refresh': 'Refresh',
-  'ui.close': 'Close',
-  'ui.openSource': 'Open original page',
   'ui.sortHint': 'Click to sort',
   'ui.free': 'Free',
+
+  // Theme toggle (three states on the header button)
+  'theme.name': 'Theme',
+  'theme.system': 'system',
+  'theme.light': 'light',
+  'theme.dark': 'dark',
+  'theme.hint': 'Theme: {next} (click to switch)',
 
   'ui.count': '{n} rows',
   'ui.countFiltered': '{n} / {total} rows',
   'ui.fullList': 'Full list ({n} rows, click a column to sort)',
   'ui.moreInList': '{n} more in the full list below',
-  'ui.top10': 'Top {n}',
   'ui.cached': 'Cached {n} models · fetched {time} (no refetch for 10 minutes)',
   'ui.loaded': '{n} models',
 
@@ -551,6 +615,10 @@ const en = {
   'st.aiNewsSnap': 'build-time snapshot · oldest source fetched {time}',
   'st.pressSkipped': 'watch list: {names}',
   'st.hotSnap': 'build-time snapshot · fetched {time} · items link to the original platforms',
+  // Snapshot notices for the three boards added 2026-10-16
+  'st.hnSnap': 'build-time snapshot · fetched {time} · source: news.ycombinator.com front page',
+  'st.wikiSnap': 'build-time snapshot · data date {time} · source: wikimedia pageviews (views are the previous UTC day)',
+  'st.googleSnap': 'build-time snapshot · fetched {time} · source: Google daily search trends',
   'st.failed': 'Failed: {msg}',
   'st.bigDataHint': 'Click the button below to load (large payload — kept out of first paint)',
   'st.loadingBig': 'Fetching {size}…',

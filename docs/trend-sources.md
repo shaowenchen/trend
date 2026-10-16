@@ -33,6 +33,9 @@
 | 📣 AI 官方要闻（8 家一手） | openai.com/news 等 7 家 RSS | 全 200 | 无（快照） | 📸 **构建期快照**（见 §10）；The Decoder ❌ 域名挂牌出售（观察项） |
 | 🔥 科技热榜 | `momoyu.cc/api/hot/list`（8 榜子集） | 200 JSON | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
 | 🀄 中文热榜 | `momoyu.cc/api/hot/list`（4 榜子集） | 200 JSON | **无** | ❌ 无 CORS → **构建期快照**（见 §9） |
+| 📰 Hacker News 首页 | `hn.algolia.com/api/v1/search?tags=front_page` | 200 JSON | ✅ 回显 Origin | ✅ 可直连；**仍走构建期快照**（见 §11，理由不是 CORS） |
+| 👀 维基百科 AI 关注度 | `wikimedia.org/api/rest_v1/metrics/pageviews/{top,per-article}/…` | 200 JSON | `*` | ⚠️ CORS 通，但要求带联系方式的 **User-Agent**（浏览器设不了这个 forbidden header，无 UA 实测 403）→ **构建期快照**（见 §12） |
+| 🔍 Google 搜索趋势 | `trends.google.com/trending/rss?geo=<区域>` | 200 **RSS** | **无** | ❌ 无 CORS（且 `cross-origin-resource-policy: same-site`）→ **构建期快照**（见 §13） |
 | ❌ LMArena 官方榜 | 无可用的公开 JSON；`lmarena.ai/*` | — | **无** | ❌ **做不了**（见 §3） |
 | 🔢 OpenRouter 用量榜 | `openrouter.ai/api/frontend/v1/rankings/models` + `openrouter.ai/api/v1/models`（名字） | 200 JSON | `*` | ✅ 可直连（见 §4；上一版曾误判为"没有排名"） |
 | ❌ Artificial Analysis | 猜测端点 | 401 | 无 | ❌ 需要 API key |
@@ -345,6 +348,102 @@ top.json 拦截、VentureBeat 稳定 429、smol.ai /rss 404。
 | ❌ The Decoder | `thedecoder.com`（/feed、/rss、/rss.xml 全试） | 200**壳** | 0 | **域名已挂牌出售**：114B 停靠跳转页 307 → `forsale.godaddy.com/forsale/thedecoder.com`（GoDaddy/Afternic）→ **观察项**，如实显示在面板上，不硬上 |
 
 口径：每源前 20 条，按时间倒序混合，条目标来源；官方 RSS 没有统一的热度
-口径，**不硬造一列**（面板不带热度列，卡片主数值是发布时间）。
+口径，**不硬造一列**（面板不带热度列，列表主数值是发布时间）。
 失败语义与 §9 相同（逐源回退、全失败不提交）；观察项清单（`PRESS_OBSERVED`）
 跟着快照走，页面显示"观察项：The Decoder"。
+
+---
+
+## 11. Hacker News 首页（2026-10-16 新增，构建期快照）
+
+`hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=50` —— HN 官方首页。
+
+- **CORS 实测是通的**（`access-control-allow-origin` 回显 Origin）。之所以仍然
+  走构建期快照，**不是为了绕过 CORS**，而是三条工程理由：
+  ① 一次构建期请求对 Algolia 最友好 —— 这是他们的公开测试端点，不该被每个访客打；
+  ② "抓取于 …"的标注与站内其它快照榜一致；
+  ③ 首页排名变化慢（几十分钟量级），≤24h 的时效损失如实标注即可。
+  **要改成浏览器直连只需两步**：删掉快照、让 `trend.js` 直接 fetch 同一个 URL
+  （`normalizeHn` 可以直接复用）。这是站内唯一"能直连却选择快照"的源，
+  所以这里写清楚，免得后人以为判断错了。
+- 实测一次返回 **30 条**（首页本身约 30 条）。
+- ★ **自帖没有 `url`**：Ask HN / Show HN 这类条目的 `url` 是 `null`，
+  正确地址是 HN 讨论页（`news.ycombinator.com/item?id=<objectID>`）。
+  不处理的话页面上会出现一个"看着能点、点了跳回本页"的空链接。
+  页面给这类行标「讨论」、外链标「外链」，读者一眼知道点过去是评论区还是原文。
+- ★ **`points` / `num_comments` 可能是 `null`**（新条目还没算出来）——
+  保留为 `null` 而不是填 0：0 分与"还没统计"在榜上是两件事。
+  空值排序由 `applyBoardState` 统一处理（空的恒排最后）。
+- 与 §9 的 `aiNews` 里那个 HN 源**不是同一件事**：那个是
+  `search_by_date?query=AI OR LLM OR GPT&numericFilters=points>10`（按 AI 关键词搜），
+  这一张是**整个首页**。两者会重叠，但回答的问题不同（"AI 圈在聊什么" vs
+  "技术社区今天在聊什么"）。
+
+## 12. 维基百科 AI 词条关注度（2026-10-16 新增，构建期快照）
+
+`wikimedia.org/api/rest_v1/metrics/pageviews/…` —— 两个端点合起来用。
+
+- **CORS 是 `*`（实测通）**，但这条路仍然走不通浏览器直连：wikimedia 要求一个
+  **带联系方式的 `User-Agent`**，而 `User-Agent` 是浏览器的 forbidden header
+  （`fetch` 里设不了）。实测无 UA 请求 → **403**。所以必须构建期抓。
+- 两个端点：
+  | 端点 | 给什么 | 用途 |
+  |---|---|---|
+  | `top/<proj>/all-access/<Y>/<M>/<D>` | 该语种**当日 top1000**（约 55KB） | 拿到 AI 词条的绝对浏览量 |
+  | `per-article/<proj>/all-access/user/<article>/daily/<from>/<to>` | 单条目按天序列 | 只对**白名单条目**算 7 日走势 |
+- ★ **数据是 T+1 的**：当日取不到（实测 404），所以脚本从"昨天"往前退最多 3 天
+  （`fetchTop` 的 `backDays`），各语种可能落到不同的日子 —— 快照里 `dates` 如实
+  列出全部日期，页面标"数据日期 2026-10-14 / 2026-10-15"，**不假装是同一个今天**。
+- **8 个语种**（`PROJECTS`：en/zh/ja/de/fr/es/ru/ko）：只取英文会把非英语世界的
+  注意力整块丢掉 —— 中文维基看的是 Claude / 人工智能，日文看 Anthropic。
+- 口径：
+  - `views` 是**绝对浏览量**（UTC 前一日）；
+  - `trend` 是"最近 7 日均值 ÷ 前 7 日均值"，**两边都有数据**才给，否则 `null`
+    （页面显示 `—`，不拿 1.0 冒充"持平"）。
+- ★ **AI 判据踩过三类误报**（`isAiArticle` 用词根匹配就必须排掉它们）：
+  ① `Claude_Nougaro`（fr，法国歌手）、`Claude_Monet`（画家）—— 人名；
+  ② `Mai_68`（fr，五月风暴）—— "ai" 子串误伤；
+  ③ `Искусственный`（ru，单独的形容词"人造的"，实为消歧义页）与
+     `Порнография,_сгенерированная_искусственным_интеллектом`（AI 词根在**逗号
+     之后的限定从句**里，主题不是 AI）。
+  处理：词根只匹配**第一个逗号之前**那段 + 一张精确的排除表 + 每语种一份白名单。
+  `newboards.test.js` 有断言把这三类钉住（同时断言真 AI 词条不被误伤）。
+- 每语种一份白名单（`AI_ARTICLES`）是**手列**的，不做跨语言映射：维基条目名不通用
+  （中文「人工智能」/ 日文「人工知能」/ 俄文西里尔），猜映射必错。
+
+## 13. Google 搜索趋势（2026-10-16 新增，构建期快照）
+
+`trends.google.com/trending/rss?geo=<区域>` —— Google 官方**每日搜索趋势**。
+用户点名要的"google 关键字"就是它。
+
+- **无 CORS**：响应里没有任何 `access-control-*` 头，且带
+  `cross-origin-resource-policy: same-site` → 浏览器直连必被拦。构建期快照。
+- 实测三个事实：
+  - `?geo=<区域码>` 取该区域日榜，**一次给 10 条**（Google 就只给 10 条，没有分页）；
+  - 热度在**命名空间标签** `<ht:approx_traffic>` 里，形如 `2000+` / `100K+` ——
+    **粗粒度字符串**，不是精确数字。保留原文，**不解析成数字**（解析了就是假装精确：
+    我们只知道"至少 2000"）；
+  - **`geo=CN` → 400**：Google 趋势没有中国大陆区域。中文内容用 HK / TW / SG
+    （实测这三区的内容确实是中文的）。面板上写明了这件事，读者找不到 CN 时有答案。
+- **10 个区域**（`REGIONS`：US/GB/JP/HK/TW/SG/DE/FR/IN/KR），做成子视图可切。
+- 条目**没有条目级原文地址**（feed 的 `<link>` 是这份 feed 自己）—— 落点用
+  "在 Google 上搜这个词"（`trends.google.com/trends/explore?q=<词>&geo=<区>`），
+  那正是读者点进去想做的事。相关新闻取第一条（`<ht:news_item_*>`）。
+- **不做 AI 过滤**：这张榜的价值就是"大众在搜什么"，硬套 AI 关键词会把 90% 的条目
+  筛掉、剩下的反而不是真实趋势。想看哪个地区由读者切。
+
+### 实测落选（同日）
+
+| 候选 | 结果 |
+|---|---|
+| 抖音热榜 | 无可用公开接口：`douyin.com/aweme/v1/...` 连接失败；vvhan / tenapi / oioweb / cenguigui / xingzhige / 52vmy / pearktrue 等聚合 API 全部**连接失败或返回 HTML 壳**；RSSHub 公共实例连不上 |
+| 小红书 | 同上（`xiaoapi.cn` 404、其余连接失败） |
+| 微信视频号 | 无任何公开接口（腾讯未开放，第三方也无可用镜像） |
+| OpenAlex 高引论文 | 200 且 CORS `*`，但 `concepts.id` 过滤返回的是噪声（Environmental Science、IEEE TMI 之类），**不可靠** → 不做 |
+| Semantic Scholar | 429（无 key 时限流极严） → 不做 |
+| GitHub 新星榜 | **已存在**：`repos` 面板的"本周"视图就是 `created:>7天前` 按星标排，不重复做 |
+| 今日头条 | **已存在**：13 个中文热榜里的 `toutiao` |
+
+> 抖音 / 小红书 / 视频号这三家是**用户点名**的。结论是"做不了"，原因是它们
+> 都没有公开接口、而第三方聚合镜像要么挂了要么返回 HTML —— 这不是取舍，
+> 是没有可用的数据通路。若将来出现稳定镜像，接法与 §9 的 13 个热榜完全相同。

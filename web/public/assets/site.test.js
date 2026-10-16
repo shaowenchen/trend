@@ -537,11 +537,16 @@ await test('语言切换链接带地球图标，与普通导航项有区分的�
 /**
  * 页头导航是**构建期**生成的，所以它自己的性质要单独盯住。
  *
- * 它只有**两样**：左边「首页」（指向本语言的首页），右边语言切换。
+ * 它只有**两样**链接：左边「首页」（指向本语言的首页），右边语言切换。
  * 原来的「标签」入口随 `tags.html` / `tag.html` 一起删掉了（标签现在是页内筛选，
  * 由索引条承担）。这里盯它的**组成**：页头不许再长出别的链接。
+ *
+ * 2026-10-16 加了主题切换按钮 —— 它是页头里第一个**不是链接**的元素，
+ * 所以下面数 href 的那条仍然成立（按钮没有 href）。但"页头只有两种东西"
+ * 这句话已经不准确了：现在是**一个链接 + 一个按钮**。按钮由上面几条
+ * （`id="theme-toggle"` / 是 `<button>` / 文案本地化）单独盯着。
  */
-await test('★ 页头导航只有「首页」与语言切换两项，且首页指向本语言的首页', async () => {
+await test('★ 页头导航只有「首页」与语言切换两个**链接**，且首页指向本语言的首页', async () => {
   const bad = [];
   for (const rel of ALL_PAGES) {
     const html = await distRead(rel);
@@ -588,6 +593,71 @@ await test('★ 导航里没有残留的占位符，且语言切换仍是链接'
     assert.doesNotMatch(html, /\{\{SITE_NAV\}\}/, `${rel} 的导航占位符没被替换`);
     assert.doesNotMatch(html, /\{\{BOARD_(INDEX|TOPICS)\}\}/, `${rel} 的正文占位符没被替换`);
     assert.match(html, /<a class="lang" href="[^"]+"/, `${rel} 的语言切换不是链接`);
+  }
+});
+
+/* ---------------- 主题切换 ---------------- */
+
+/**
+ * 这三条**只能对着发布物**测：内联引导脚本是构建期落进 HTML 的，
+ * 源页面里只有一个 `{{THEME_BOOT}}` 占位符 —— 在源码上看不出它最终
+ * 摆在样式表之前还是之后、是不是 module。而这两个"摆法"错了的表现都是
+ * **只看得见的一闪**（选了亮色的读者每次打开先看到一帧深色），
+ * 本地跑测试、跑构建都完全正常。
+ */
+await test('★ 主题引导脚本在发布物里、且在样式表**之前**（晚了就会先画一帧深色）', async () => {
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    const bootAt = html.indexOf('trend-theme');
+    const cssAt = html.search(/<link[^>]+rel="stylesheet"/);
+    if (bootAt < 0) { bad.push(`${rel}: 发布物里没有主题引导脚本`); continue; }
+    if (cssAt < 0) { bad.push(`${rel}: 没找到样式表`); continue; }
+    if (bootAt > cssAt) bad.push(`${rel}: 引导脚本排在样式表之后`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 引导脚本是同步内联（不是 module / 不带 defer·async）—— 否则等于没写', async () => {
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    // 取含 trend-theme 的那个 <script ...> 开标签
+    const tag = html.match(/<script[^>]*>(?=[^<]*trend-theme)/)?.[0];
+    if (!tag) { bad.push(`${rel}: 没找到引导脚本的开标签`); continue; }
+    if (/type\s*=\s*"module"/.test(tag)) bad.push(`${rel}: 引导脚本被标成了 module`);
+    if (/\b(defer|async)\b/.test(tag)) bad.push(`${rel}: 引导脚本带了 defer/async`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 页头有主题切换按钮，且它是 <button> 不是链接（点了不换地址）', async () => {
+  const bad = [];
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    const header = html.match(/<div class="wrap header-inner">([\s\S]*?)<\/div>/)?.[1] ?? '';
+    if (!header) { bad.push(`${rel}: 没找到页头`); continue; }
+    if (!/id="theme-toggle"/.test(header)) bad.push(`${rel}: 页头没有主题切换按钮`);
+    if (!/<button[^>]*id="theme-toggle"/.test(header)) bad.push(`${rel}: 主题切换不是 <button>`);
+  }
+  assert.deepEqual(bad, [], bad.join('\n      '));
+});
+
+await test('★ 主题模块在发布集合里、且页面引了它（否则按钮是个死键）', async () => {
+  assert.ok(built.files.includes('assets/theme.js'), 'assets/theme.js 没被发布');
+  for (const rel of ALL_PAGES) {
+    const html = await distRead(rel);
+    assert.match(html, /assets\/theme\.js/, `${rel} 没有引入 theme.js`);
+  }
+});
+
+await test('★ 主题按钮的文案是本地化的（不是写死的两个字）', async () => {
+  for (const [rel, locale] of [['index.html', 'zh'], ['en/index.html', 'en']]) {
+    const html = await distRead(rel);
+    const btn = html.match(/<button[^>]*id="theme-toggle"[^>]*>/)?.[0] ?? '';
+    const label = btn.match(/aria-label="([^"]*)"/)?.[1] ?? '';
+    assert.ok(label.length > 0, `${rel} 的主题按钮没有 aria-label`);
+    assert.ok(label.includes(t(locale, 'theme.name')), `${rel} 的按钮文案不是 ${locale} 的：${label}`);
   }
 });
 

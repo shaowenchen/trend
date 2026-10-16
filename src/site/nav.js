@@ -44,6 +44,8 @@ const NAV_TEXT = {
     label: '站点导航',
     toggle: '切换语言：',
     switchTo: 'English',
+    themeName: '主题',
+    themeHint: '主题：{name}（点一下切换）',
     indexLabel: '榜单索引',
     allTopics: '全部',
     sources: '来源',
@@ -54,6 +56,8 @@ const NAV_TEXT = {
     label: 'Site navigation',
     toggle: 'Switch language: ',
     switchTo: '中文',
+    themeName: 'Theme',
+    themeHint: 'Theme: {name} (click to switch)',
     indexLabel: 'Board index',
     allTopics: 'All',
     sources: 'Source',
@@ -111,8 +115,24 @@ export function renderNav(lang, prefix, boardId = null) {
   // 所以它恒是"当前页"，带 `aria-current`（读屏器播报"当前页"）。
   const homeCurrent = ' aria-current="page"';
 
+  // 主题切换：一个按钮，放在语言切换**左边**（语言是"换一个地址"，主题是
+  // "同一页换套配色"—— 前者更"出门"，所以靠外）。图标由 `assets/theme.js`
+  // 在运行时按当前状态回填，这里先落一个**跟随系统**的图标与文案：
+  // 无 JS 时看到的就是那个默认态，与实际配色（`:root` 暗色 + 系统偏好）一致。
+  //
+  // ★ 它是 `<button>` 而不是 `<a>`：点了不换地址，只是就地改配色。
+  //   用 `<a href="#">` 会污染历史记录、也会让"当前页"的语义变模糊。
+  //   状态（aria-label / title / 图标）由 `theme.js` 负责更新，
+  //   这里只保证**无 JS 时也说得通**。
+  const themeName = text.themeName;
+  const themeBtn =
+    `<button class="icon-btn theme-btn" type="button" id="theme-toggle" ` +
+    `aria-label="${escHtml(themeName)}" title="${escHtml(themeName)}">` +
+    `<span class="ic" data-icon="monitor"></span></button>`;
+
   return `<a class="nav-home" href="${prefix}index.html"${homeCurrent}>${escHtml(text.home)}</a>
     <nav class="site-nav" aria-label="${escHtml(text.label)}">
+      ${themeBtn}
       <a class="lang" href="${otherHref}" hreflang="${otherTag}" lang="${otherTag}"><span class="ic" data-icon="globe"><span class="sr-only">${escHtml(text.toggle)}</span></span>${escHtml(text.switchTo)}</a>
     </nav>`;
 }

@@ -470,98 +470,64 @@ export function table(cols, rows, sort = null) {
 }
 
 /* ================================================================== */
-/* 卡片 + 详情层                                                        */
+/* 榜单列表（前 N 名）                                                  */
 /* ================================================================== */
 
 /**
- * 卡片：一屏只放前 N 个（默认 10），点进去看详情。
+ * 榜单列表：一屏放前 N 个（默认 20），**一行一条，照 momoyu.cc 的形态**。
  *
- * 为什么卡片和表格都要有（而不是互相取代）：
- *   · 卡片回答"现在最靠前的是谁" —— 数字大、标题大，扫一眼就够，适合手机；
- *   · 表格回答"第 47 名是谁 / 按成本排一下" —— 需要筛选、排序、看全量。
- * 两者解决的不是同一个问题，所以卡片在上、表格在下（表格可折叠）。
- */
-/**
- * 卡片栅格。
+ * 为什么不再用卡片栅格：卡片是"卡中卡"—— 面板本身已经是一张带背景的卡，
+ * 里面再放一圈描边圆角的小卡，一页 34 个面板时整版的视觉重量全在"框"上，
+ * 而卡里能放下的标题只占一小块。momoyu.cc 那一版是**单列无框列表**：
+ * 名次 / 标题 / 数值三列 + 12px 行距，行高本身就是分隔，信息密度高得多。
  *
- * ## ★ value / meta 是**可选**的，判空必须在调用之前
- * 早先这里写的是 `cfg.value(r) ? … : ''` ——看着像判空，其实**先调了再判**：
+ * ## 行什么时候是链接
+ * **逐行判**（不是整榜判一次）：`cfg.link` 给了、且**这一行**取到非空地址 → 整行是
+ * `<a target="_blank">`；否则是不可点的 `<span>`。两个理由：
+ *   · 有 5 个榜（aider / newmodels / swebench / orAuthors / orPerf）在数据里拿不到
+ *     一个体面的原始页地址 —— 这些榜整体没有 `link`；
+ *   · 而 `orApps` 给的是 `link: (r) => r.url`，**个别行**的 url 就是空。
+ * 按榜判会在第二种情况里产出 `<a href="">`：看着能点，一点跳回本页。
+ * 宁可少一个链接，也不要一个假的。
+ *
+ * ## ★ `href` 必须 esc —— 它进的是**属性**位置
+ * 以前链接只出现在 `openDetail` 的文案与 `<a href>` 里，走的是 `esc(link)`；
+ * 现在它由上游原始 URL 直接来（`r.url` / `r.html_url` 不过 `encodeURI`），
+ * 带一个 `"` 就能闭合属性、往行里插标签。所以这里**无条件 `esc(href)`**。
+ *
+ * ## ★ value / meta 仍是**可选**的，判空必须在调用之前
+ * 早先这里写的是 `cfg.value(r) ? … : ''` —— 看着像判空，其实**先调了再判**：
  * `meta` 没给的榜单会在这里直接抛 `cfg.meta is not a function`，整块面板变成
- * "读取失败"。而 `mountBoard` 的详情路径用的是 `cfg.card.meta ? … : ''`
- * （先判存在再调），两处语义不一致，于是"省略 meta"在详情里没事、在卡片上崩。
- * 现在两边一致：**先判函数是否存在，再调**。
+ * "读取失败"（aaBench 那次）。现在两边一致：**先判函数是否存在，再调**。
  *
- * `title` 仍是必需的 —— 没有标题的卡片没有意义，缺了就该在开发时炸，
- * 而不是渲染一张空卡。
+ * `title` 仍是必需的 —— 没有标题的行没有意义，缺了就该在开发时炸，
+ * 而不是渲染一行空白。
+ *
+ * ## 转义责任在调用方（与 table() 同一条约定）
+ * `title` / `value` / `meta` 的产物原样落进 HTML，各 loader 已经用 `esc()` 包好。
+ * 这里**不再包一层**：包了会把配置里刻意留的 `<span class="v-num">` 也转义掉。
+ * 一条活约束随之而来：这三个函数的产物里**不许出现 `<a>`**（本站曾因 `<a>` 套 `<a>`
+ * 把整片栅格撑坏），所以整行是链接时不会再嵌一层。
  */
-export function cardGrid(rows, cfg) {
+export function cardList(rows, cfg) {
   if (!rows.length) return `<p class="empty">${L('ui.noData')}</p>`;
-  const cards = rows
+  const items = rows
     .map((r, i) => {
       const value = cfg.value ? cfg.value(r) : '';
       const meta = cfg.meta ? cfg.meta(r) : '';
-      return (
-        `<button class="card" type="button" data-card="${i}">` +
-        `<span class="card-rank">${rankBadge(r.__rank ?? i + 1)}</span>` +
-        `<span class="card-main">` +
-        `<span class="card-title">${cfg.title(r)}</span>` +
-        (value ? `<span class="card-value">${value}</span>` : '') +
-        `</span>` +
-        (meta ? `<span class="card-meta">${meta}</span>` : '') +
-        `</button>`
-      );
+      const inner =
+        rankBadge(r.__rank ?? i + 1) +
+        `<span class="li-title">${cfg.title(r)}</span>` +
+        (value ? `<span class="li-val">${value}</span>` : '') +
+        (meta ? `<span class="li-meta">${meta}</span>` : '');
+      const href = cfg.link ? cfg.link(r) : null;
+      // 空串 / null / undefined 一律回落到不可点的 <span>
+      return href
+        ? `<li><a class="li" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${inner}</a></li>`
+        : `<li><span class="li">${inner}</span></li>`;
     })
     .join('');
-  return `<div class="cards">${cards}</div>`;
-}
-
-/**
- * 详情层：用**原生 `<dialog>`**。
- *
- * 为什么不用自己拼的浮层：原生 dialog 自带三件很难做对的事 ——
- * Esc 关闭、焦点陷阱（Tab 不会跑到背后的页面）、以及 inert 背景
- * （读屏器不会念到背后的内容）。自己实现这三件，通常只做对第一件。
- */
-export function openDetail({ title, meta = '', body = '', link = null, linkLabel = '' }) {
-  let dlg = document.getElementById('detail');
-  if (!dlg) {
-    dlg = document.createElement('dialog');
-    dlg.id = 'detail';
-    dlg.className = 'detail';
-    document.body.appendChild(dlg);
-  }
-  dlg.innerHTML =
-    '<form method="dialog" class="detail-close-wrap">' +
-    `<button class="icon-btn detail-close" type="submit" aria-label="${L('ui.close')}">` +
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
-    '<path d="M6 6l12 12M18 6L6 18"/></svg></button></form>' +
-    `<h2>${title}</h2>` +
-    (meta ? `<p class="detail-meta">${meta}</p>` : '') +
-    `<div class="detail-body">${body}</div>` +
-    (link ? `<p class="detail-link"><a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(linkLabel || link)} ↗</a></p>` : '');
-
-  // showModal 在极老的浏览器上没有 —— 那种情况下退化成"直接新窗口打开链接"，
-  // 总比点了没反应好
-  if (typeof dlg.showModal === 'function') dlg.showModal();
-  else if (link) window.open(link, '_blank', 'noopener');
-}
-
-/** 详情里的一行"标签 / 值" */
-export function detailRow(label, value) {
-  if (value === null || value === undefined || value === '') return '';
-  return `<div class="detail-row"><dt>${esc(label)}</dt><dd>${value}</dd></div>`;
-}
-
-/**
- * 把 cols 定义的列转成"详情表"用的一行行。
- * 复用它，是为了详情里的字段与表格里的列**永远一致** ——
- * 否则加了一列却忘了加进详情（或反过来），是最容易发生的漂移。
- */
-export function detailFromCols(cols, row) {
-  return cols
-    .filter((c) => c.label !== '#')
-    .map((c) => detailRow(c.label, c.cell(row)))
-    .join('');
+  return `<ul class="card-list">${items}</ul>`;
 }
 
 /**
@@ -663,24 +629,35 @@ function mountBoard(p, cfg) {
     if (cfg.transform) rows = cfg.transform(rows);
     const shown = cfg.limit ? rows.slice(0, cfg.limit) : rows;
     const groups = cfg.groupField ? groupOptions(baseRows, cfg.groupField) : null;
-    const total = baseRows.length;
-    const base = rows.length !== total ? L('ui.countFiltered', { n: rows.length, total }) : L('ui.count', { n: total });
+    // 前 20 行（原来 10）。行比卡片矮得多，一屏能装下的信息量因此翻了一倍多。
+    const limit = cfg.cardLimit ?? 20;
+    // ★ "这一屏/这张表到底有多少条"有三个不同的数，别让它们互相矛盾：
+    //   total    —— 过滤之后的条数（与原始数不同时用 countFiltered 显示）
+    //   tableCap —— 这张表**真正显示**的条数：`cfg.limit` 是刻意收口的
+    //               （swebench 收了 89 条只展示前 40、orCatalog 60、eval 50…），
+    //               所以下面每条说明行都要用它，否则会出现"完整列表（89 条）"
+    //               而展开后只有 40 行的自相矛盾。
+    //   limit    —— 上层列表显示几行。
+    const tableCap = shown.length; // 表格实际会有这么多行（`cfg.limit` 已经切过）
+    const total = rows.length;
+    const base = total !== baseRows.length
+      ? L('ui.countFiltered', { n: total, total: baseRows.length })
+      : L('ui.count', { n: total });
     const note = cfg.note ? `${base} · ${cfg.note}` : base;
-    const limit = cfg.cardLimit ?? 10;
 
-    // ── 卡片区：只放前 N 个，点进去看详情 ──
-    // 卡片在**过滤/排序之后**取，所以搜索"gemini"时看到的就是命中的那几个。
-    const cards = cfg.card ? cardGrid(shown.slice(0, limit), cfg.card) : '';
-    const moreCount = rows.length - Math.min(rows.length, limit);
-    const cardsHtml = cards
-      ? cards +
+    // ── 列表区：只放前 N 行 ──
+    // 列表在**过滤/排序之后**取，所以搜索"gemini"时看到的就是命中的那几个。
+    const list = cfg.card ? cardList(shown.slice(0, limit), cfg.card) : '';
+    const moreCount = tableCap - Math.min(tableCap, limit);
+    const listHtml = list
+      ? list +
         (moreCount > 0
-          ? `<p class="cards-more">${L('ui.moreInList', { n: moreCount })}</p>`
+          ? `<p class="list-more">${L('ui.moreInList', { n: moreCount })}</p>`
           : '')
       : '';
 
     // ── 完整列表：放在折叠区里 ──
-    // 为什么表格不删：卡片回答"最靠前的是谁"，表格回答"第 47 名是谁 / 按成本排一下"。
+    // 为什么表格不删：列表回答"最靠前的是谁"，表格回答"第 47 名是谁 / 按成本排一下"。
     // 两者不是同一个问题，所以保留，但收起来不占首屏。
     //
     // ★ 表格**延后到展开时才建**：扁平页把 34 个面板放进一页，而 `eval` 的完整表
@@ -688,10 +665,10 @@ function mountBoard(p, cfg) {
     //   `<details>` 默认都是收起的，先把它们全建出来等于拿几万个看不见的节点
     //   撑爆 DOM。展开过（`state.open` 为真）之后按老样子每次重画都重建，
     //   所以搜索/排序的手感不变；差别只在于"从没打开过的面板不再花这份钱"。
-    const listHtml = cfg.table === false
+    const tableHtml = cfg.table === false
       ? ''
       : `<details class="more"${state.open ? ' open' : ''}>` +
-        `<summary>${L('ui.fullList', { n: rows.length })}</summary>` +
+        `<summary>${L('ui.fullList', { n: tableCap })}</summary>` +
         controlsHtml({
           q: state.q,
           groups,
@@ -703,23 +680,10 @@ function mountBoard(p, cfg) {
         `<div class="table-slot"${state.open ? '' : ` data-deferred`}>${state.open ? table(cfg.cols, shown, state.sort) : ''}</div>` +
         '</details>';
 
-    p.body((cfg.beforeControls ? cfg.beforeControls() : '') + cardsHtml + listHtml);
+    p.body((cfg.beforeControls ? cfg.beforeControls() : '') + listHtml + tableHtml);
 
-    // 卡片点击 → 详情层
-    const rowsForCards = shown.slice(0, limit);
-    for (const el of p.el.querySelectorAll('[data-card]')) {
-      el.addEventListener('click', () => {
-        const row = rowsForCards[Number(el.getAttribute('data-card'))];
-        if (!row) return;
-        openDetail({
-          title: cfg.card.title(row),
-          meta: cfg.card.meta ? cfg.card.meta(row) : '',
-          body: `<dl class="detail-list">${detailFromCols(cfg.cols, row)}</dl>`,
-          link: cfg.card.link ? cfg.card.link(row) : null,
-          linkLabel: L('ui.openSource'),
-        });
-      });
-    }
+    // 行本身在渲染时就带了 href（有地址的榜整行是 <a>），这里不再需要点击绑定 ——
+    // 以前的"点卡片弹详情"随详情层一起去掉了（行直达来源，少一次点击）。
 
     // 折叠区：记住开合状态，并在**首次展开时**把延后的大表建出来。
     const det = p.el.querySelector('details.more');
@@ -1843,8 +1807,8 @@ export function flattenHotList(snap, allowedKeys = null) {
 
 /**
  * 13 个中文热榜的面板成员（用户返修定的形态：**每个榜一个独立面板/路由**）。
- * 顺序 = 首页卡片顺序：先技术/科技社区，再全站热搜，最后促销榜。
- * 真值只有这一处：BOARD_IDS / 页面 / 首页卡片 / BOARD_LOADERS 都从它推导，
+ * 顺序 = 首页索引条里的跳转顺序：先技术/科技社区，再全站热搜，最后促销榜。
+ * 真值只有这一处：BOARD_IDS / 页面 / 首页索引条 / BOARD_LOADERS 都从它推导，
  * 漏一个会在 site.test.js 的对齐断言里炸出来。
  */
 export const HOT_LIST_KEYS = [
@@ -1925,6 +1889,282 @@ async function loadHotList(key, view = 'all') {
     wireOnce(p.el, 'mmy', (e) => {
       const b = e.target.closest?.('[data-mmy]');
       if (b) loadHotList(key, b.getAttribute('data-mmy'));
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/* ================================================================== */
+/* 面板 9.7：三张 2026-10-16 新增的榜                                    */
+/*  · hnTop         —— Hacker News 首页实况（构建期快照）                */
+/*  · wikiAttention —— 维基百科 AI 词条的大众关注度（构建期快照）         */
+/*  · googleTrends  —— Google 每日搜索趋势，按区域（构建期快照）          */
+/*                                                                     */
+/* 三张都走**构建期快照**，但理由各不相同（不是"懒得直连"）：             */
+/*  · hnTop：hn.algolia.com 的 CORS 实测是**通**的，浏览器能直连。仍然     */
+/*    快照，是为了与站内其它社区热度榜统一口径（一次抓取对 Algolia 最友好、 */
+/*    标注一致）。要改成直连只需删掉快照、在这里 fetch 同一个 URL。         */
+/*  · wikiAttention：wikimedia 要求一个带联系方式的 **User-Agent**，       */
+/*    而 `User-Agent` 是浏览器的 forbidden header（fetch 里设不了）——      */
+/*    无 UA 实测 403。所以浏览器直连这条路是**死的**，只能构建期抓。        */
+/*  · googleTrends：`trends.google.com/trending/rss` 响应里**没有任何         */
+/*    `access-control-*` 头**（还有 `cross-origin-resource-policy: same-site`）， */
+/*    浏览器直连必被拦。                                                */
+/* ================================================================== */
+
+const HN_TOP_SNAP_URL = new URL('./data/hn-top.json', import.meta.url).href;
+const WIKI_SNAP_URL = new URL('./data/wiki-attention.json', import.meta.url).href;
+const GOOGLE_TRENDS_SNAP_URL = new URL('./data/google-trends.json', import.meta.url).href;
+
+/**
+ * HN 快照 → 面板行。
+ *
+ * ★ 自帖（Ask/Show HN）没有外部链接，`external` 为空 —— 那时行指向 HN 讨论页。
+ * 页面上给个标签区分（"讨论"），让读者知道点过去是评论区而不是原文。
+ */
+export function flattenHnTop(snap) {
+  return (snap?.items || [])
+    .map((it) => {
+      const title = String(it?.title || '').trim();
+      if (!title) return null;
+      const external = String(it?.external || '').trim();
+      const hnUrl = String(it?.hnUrl || '').trim();
+      const url = external || hnUrl;
+      if (!url) return null;
+      const points = it?.points === null || it?.points === undefined ? null : Number(it.points);
+      const comments = it?.comments === null || it?.comments === undefined ? null : Number(it.comments);
+      return {
+        title,
+        url,
+        external,
+        hnUrl,
+        points: Number.isFinite(points) ? points : null,
+        comments: Number.isFinite(comments) ? comments : null,
+        author: String(it?.author || ''),
+        time: String(it?.time || ''),
+        rank: Number(it?.rank) || 0,
+      };
+    })
+    .filter(Boolean)
+    // 按 HN 的首页名次排（快照里已带 rank，不依赖数组顺序）
+    .sort((a, b) => a.rank - b.rank);
+}
+
+/** 面板：Hacker News 首页实况（构建期快照，一次 30 条） */
+async function loadHnTop() {
+  const p = ensurePanel(shellMeta('hnTop'));
+  try {
+    const snap = await cachedJson('hn-top', HN_TOP_SNAP_URL);
+    const fetchedAt = Date.parse(snap?.fetchedAt);
+    const rows = flattenHnTop(snap);
+    if (!rows.length) throw new Error(L('err.noNews'));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.title'),
+          field: 'title',
+          cell: (r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>`,
+        },
+        { label: L('col.hot'), num: true, field: 'points', cell: (r) => compact(r.points) ?? '—' },
+        { label: L('col.comments'), num: true, cls: 'col-2', field: 'comments', cell: (r) => compact(r.comments) ?? '—' },
+        {
+          label: L('col.source'),
+          cls: 'col-2',
+          field: 'external',
+          // 自帖没有外链 —— 这一列因此不空着，而是明说"讨论"
+          cell: (r) => `<span class="tag">${esc(r.external ? L('ui.hnExternal') : L('ui.hnDiscuss'))}</span>`,
+        },
+      ],
+      defaultSort: null, // 默认就是 HN 的首页名次，不另排（那才是"首页实况"）
+      searchFields: ['title', 'author'],
+      placeholder: L('ui.searchNews'),
+      transform: withRank,
+      note: L('st.hnSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }),
+      card: {
+        title: (r) => esc(r.title),
+        value: (r) => `<span class="v-num">${compact(r.points) ?? '—'}</span> <span class="v-unit">${L('col.hot')}</span>`,
+        meta: (r) =>
+          `<span class="tag">${icon('file')}${compact(r.comments) ?? '0'}</span>` +
+          (r.author ? `<span class="tag">${esc(r.author)}</span>` : ''),
+        link: (r) => r.url,
+      },
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/**
+ * 维基快照 → 面板行。快照按语种分块（`sources`），每块一个语种。
+ * 条目里的 `views` / `trend` 是抓取器算好的（见 `scripts/fetch-wiki-attention.mjs`）。
+ */
+export function flattenWikiAttention(snap) {
+  const out = [];
+  for (const s of snap?.sources || []) {
+    for (const it of s?.items || []) {
+      const title = String(it?.title || '').trim();
+      if (!title) continue;
+      const views = Number(it?.views);
+      const trend = it?.trend === null || it?.trend === undefined ? null : Number(it.trend);
+      out.push({
+        project: String(s.key || ''),
+        projectName: String(s.name || ''),
+        article: title,
+        // 展示用标题：下划线换空格、去掉消歧义后缀（'Claude_(语言模型)' → 'Claude'）
+        label: String(title).replaceAll('_', ' ').replace(/\s*\([^)]*\)\s*$/, '').trim(),
+        url: String(it?.url || ''),
+        views: Number.isFinite(views) ? views : null,
+        trend: Number.isFinite(trend) ? trend : null,
+        date: String(s.fetchedAt || ''),
+      });
+    }
+  }
+  // 浏览量降序（跨语种混排时，英文榜的量级远大于小语种 —— 那是真实的，
+  // 读者可以按"语种"分组收窄）
+  return out.sort((a, b) => (b.views ?? -1) - (a.views ?? -1));
+}
+
+/** 面板：维基百科 AI 词条关注度（按语种分组） */
+async function loadWikiAttention() {
+  const p = ensurePanel(shellMeta('wikiAttention'));
+  try {
+    const snap = await cachedJson('wiki-attention', WIKI_SNAP_URL);
+    const rows = flattenWikiAttention(snap);
+    if (!rows.length) throw new Error(L('err.noRows'));
+    const dates = Array.isArray(snap?.dates) ? snap.dates : [];
+    // 各语种的数据日期可能不同（某个语种昨天没数据就退了一天）—— 如实列出全部
+    const skipped = (snap?.skipped || []).map((x) => x.project).filter(Boolean);
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.title'),
+          field: 'label',
+          cell: (r) => (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a>` : esc(r.label)),
+        },
+        { label: L('col.lang'), cls: 'col-2', field: 'projectName', cell: (r) => `<span class="tag">${esc(r.projectName)}</span>` },
+        { label: L('col.views'), num: true, field: 'views', cell: (r) => compact(r.views) ?? '—' },
+        {
+          label: L('col.wikiTrend'),
+          num: true,
+          cls: 'col-2',
+          field: 'trend',
+          // 没有走势就显示 '—'（不拿 1.0 冒充"持平"：那是编出来的）
+          cell: (r) => (r.trend === null ? '—' : `${r.trend >= 1 ? '↑' : '↓'}${num(Math.abs(r.trend - 1) * 100, 0)}%`),
+        },
+      ],
+      defaultSort: { index: 3, dir: 'desc' },
+      searchFields: ['label', 'article', 'projectName'],
+      groupField: 'projectName',
+      groupLabel: L('ui.allLangs'),
+      placeholder: L('ui.searchNews'),
+      transform: withRank,
+      note:
+        L('st.wikiSnap', { time: dates.join(' / ') || '—' }) +
+        (skipped.length ? ` · ${L('st.pressSkipped', { names: skipped.join(' / ') })}` : ''),
+      card: {
+        title: (r) => esc(r.label),
+        value: (r) => `<span class="v-num">${compact(r.views) ?? '—'}</span> <span class="v-unit">${L('col.views')}</span>`,
+        meta: (r) => `<span class="tag">${esc(r.projectName)}</span>${r.trend === null ? '' : `<span class="tag">${r.trend >= 1 ? '↑' : '↓'}${num(Math.abs(r.trend - 1) * 100, 0)}%</span>`}`,
+        link: (r) => r.url,
+      },
+    });
+  } catch (e) {
+    p.status(L('st.failed', { msg: e.message }), 'err');
+    p.body('');
+  }
+}
+
+/**
+ * Google 趋势快照 → 面板行（**只取当前选中的区域**）。
+ *
+ * 与中文热榜那 13 个面板同一种模式：同一份快照、各取各的块，
+ * 不为每个区域单独抓一份。区别是这里把"选哪个区域"做成了**子视图切换片**
+ * （13 个热榜是各自独立的面板，因为它们各自是一个"榜"；而这是同一个榜的
+ * 十个区域视图，读者通常只关心自己所在的那个）。
+ */
+export function flattenGoogleTrends(snap, region) {
+  const block = (snap?.sources || []).find((s) => s.key === region);
+  if (!block) return [];
+  return (block.items || [])
+    .map((it, i) => {
+      const title = String(it?.title || '').trim();
+      if (!title) return null;
+      return {
+        title,
+        url: String(it?.url || ''),
+        // 上游只给 '2000+' / '100K+' 这种粗粒度文字 —— 保留原文，不解析成数字
+        traffic: String(it?.extra || ''),
+        newsTitle: String(it?.newsTitle || ''),
+        newsUrl: String(it?.newsUrl || ''),
+        newsSource: String(it?.newsSource || ''),
+        region,
+        rank: i + 1,
+      };
+    })
+    .filter(Boolean);
+}
+
+/** 面板：Google 每日搜索趋势（按区域切换） */
+async function loadGoogleTrends(region = 'US') {
+  const p = ensurePanel(shellMeta('googleTrends'));
+  try {
+    const snap = await cachedJson('google-trends', GOOGLE_TRENDS_SNAP_URL);
+    const rows = flattenGoogleTrends(snap, region);
+    if (!rows.length) throw new Error(L('err.noRows'));
+    const fetchedAt = Date.parse(snap?.fetchedAt);
+    const skipped = (snap?.skipped || []).map((x) => x.region).filter(Boolean);
+    // 区域切换片：顺序沿用快照里 sources 的顺序（抓取脚本 REGIONS 的顺序）
+    const views = Object.fromEntries((snap?.sources || []).map((s) => [s.key, s.name]));
+    p.status('', 'ok');
+    mountBoard(p, {
+      rows,
+      cols: [
+        { label: '#', sortable: false, cell: (r) => rankBadge(r.__rank) },
+        {
+          label: L('col.keyword'),
+          field: 'title',
+          // 没有条目级原文地址 —— 落点是"在 Google 上搜这个词"，那正是读者要做的
+          cell: (r) => (r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>` : esc(r.title)),
+        },
+        { label: L('col.hot'), field: 'traffic', cell: (r) => (r.traffic ? `<span class="tag">${esc(r.traffic)}</span>` : '—') },
+        {
+          label: L('col.news'),
+          cls: 'col-2',
+          field: 'newsTitle',
+          cell: (r) => (r.newsUrl ? `<a href="${esc(r.newsUrl)}" target="_blank" rel="noopener noreferrer">${esc(r.newsTitle || r.newsSource)}</a>` : '—'),
+        },
+      ],
+      defaultSort: null, // 默认就是 Google 的名次（热度本来也只有粗粒度，排序没意义）
+      searchFields: ['title', 'newsTitle', 'newsSource'],
+      placeholder: L('ui.searchNews'),
+      transform: withRank,
+      beforeControls: () =>
+        subBoardChips(views, region, 'geo') +
+        // ★ 说明中国大陆没有这个区域 —— 读者找不到 CN 时该有个答案，
+        //   而不是以为我们漏了（端点上 geo=CN 实测 400）
+        `<p class="chips-note">${L('ui.geoNote')}</p>`,
+      note:
+        L('st.googleSnap', { time: fmtStamp(Number.isFinite(fetchedAt) ? fetchedAt : Date.now()) }) +
+        (skipped.length ? ` · ${L('st.pressSkipped', { names: skipped.join(' / ') })}` : ''),
+      card: {
+        title: (r) => esc(r.title),
+        value: (r) => `<span class="v-num">${esc(r.traffic) || '—'}</span>`,
+        meta: (r) => (r.newsSource ? `<span class="tag">${esc(r.newsSource)}</span>` : ''),
+        link: (r) => r.url,
+      },
+    });
+    wireOnce(p.el, 'geo', (e) => {
+      const b = e.target.closest?.('[data-geo]');
+      if (b) loadGoogleTrends(b.getAttribute('data-geo'));
     });
   } catch (e) {
     p.status(L('st.failed', { msg: e.message }), 'err');
@@ -2684,7 +2924,7 @@ async function loadOrBenchmarks(view = 'intelligence') {
         title: (r) => esc(r.name),
         value: (r) => `<span class="v-num">${num(r.score, 1)}</span> <span class="v-unit">${L('col.score')}</span>`,
         // 这一榜只有"名字 + 分数"两个字段（AA 的原始数据里没有机构/日期），
-        // 所以没有可当标签的东西 —— 显式给空串，而不是省略（见 cardGrid 的说明）
+        // 所以没有可当标签的东西 —— 显式给空串，而不是省略（见 cardList 的说明）
         meta: () => '',
         link: (r) => `https://openrouter.ai/${encodeURI(r.slug)}`,
       },
@@ -2951,6 +3191,10 @@ const BOARD_LOADERS = {
   aaBench: () => loadOrBenchmarks(),
   orApps: () => loadOrApps(),
   swebench: () => loadSweBench(),
+  // 2026-10-16 新增三张榜（三张都走构建期快照，理由各不相同，见各自的注释段）
+  hnTop: () => loadHnTop(),
+  wikiAttention: () => loadWikiAttention(),
+  googleTrends: () => loadGoogleTrends(),
 };
 
 /**

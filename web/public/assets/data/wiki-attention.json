@@ -1,0 +1,206 @@
+{
+ "fetchedAt": "2026-10-16T02:23:21.447Z",
+ "dates": [
+  "2026-10-14",
+  "2026-10-15"
+ ],
+ "skipped": [],
+ "sources": [
+  {
+   "key": "en",
+   "name": "en",
+   "fetchedAt": "2026-10-14",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://en.wikipedia.org/wiki/ChatGPT",
+     "views": 56162,
+     "trend": 0.95
+    },
+    {
+     "title": "Artificial_intelligence",
+     "extra": "",
+     "url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+     "views": 24797,
+     "trend": 0.953
+    },
+    {
+     "title": "OpenAI",
+     "extra": "",
+     "url": "https://en.wikipedia.org/wiki/OpenAI",
+     "views": 8941,
+     "trend": 1.014
+    },
+    {
+     "title": "Anthropic",
+     "extra": "",
+     "url": "https://en.wikipedia.org/wiki/Anthropic",
+     "views": 7849,
+     "trend": 0.907
+    }
+   ]
+  },
+  {
+   "key": "zh",
+   "name": "zh",
+   "fetchedAt": "2026-10-14",
+   "items": [
+    {
+     "title": "Anthropic",
+     "extra": "",
+     "url": "https://zh.wikipedia.org/wiki/Anthropic",
+     "views": 786,
+     "trend": 1.047
+    },
+    {
+     "title": "Claude_(语言模型)",
+     "extra": "",
+     "url": "https://zh.wikipedia.org/wiki/Claude_(%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B)",
+     "views": 775,
+     "trend": 1.278
+    },
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://zh.wikipedia.org/wiki/ChatGPT",
+     "views": 702,
+     "trend": 1.009
+    },
+    {
+     "title": "人工智能",
+     "extra": "",
+     "url": "https://zh.wikipedia.org/wiki/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD",
+     "views": 670,
+     "trend": 1.002
+    }
+   ]
+  },
+  {
+   "key": "ja",
+   "name": "ja",
+   "fetchedAt": "2026-10-15",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://ja.wikipedia.org/wiki/ChatGPT",
+     "views": 1600,
+     "trend": 1.045
+    },
+    {
+     "title": "Anthropic",
+     "extra": "",
+     "url": "https://ja.wikipedia.org/wiki/Anthropic",
+     "views": 1567,
+     "trend": 1.679
+    }
+   ]
+  },
+  {
+   "key": "de",
+   "name": "de",
+   "fetchedAt": "2026-10-15",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://de.wikipedia.org/wiki/ChatGPT",
+     "views": 7659,
+     "trend": 0.955
+    },
+    {
+     "title": "Künstliche_Intelligenz",
+     "extra": "",
+     "url": "https://de.wikipedia.org/wiki/K%C3%BCnstliche_Intelligenz",
+     "views": 1515,
+     "trend": 0.741
+    }
+   ]
+  },
+  {
+   "key": "fr",
+   "name": "fr",
+   "fetchedAt": "2026-10-14",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://fr.wikipedia.org/wiki/ChatGPT",
+     "views": 6643,
+     "trend": 1.339
+    },
+    {
+     "title": "Intelligence_artificielle",
+     "extra": "",
+     "url": "https://fr.wikipedia.org/wiki/Intelligence_artificielle",
+     "views": 1642,
+     "trend": 1.007
+    }
+   ]
+  },
+  {
+   "key": "es",
+   "name": "es",
+   "fetchedAt": "2026-10-15",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://es.wikipedia.org/wiki/ChatGPT",
+     "views": 7440,
+     "trend": 0.9
+    },
+    {
+     "title": "Inteligencia_artificial",
+     "extra": "",
+     "url": "https://es.wikipedia.org/wiki/Inteligencia_artificial",
+     "views": 2551,
+     "trend": 0.884
+    }
+   ]
+  },
+  {
+   "key": "ru",
+   "name": "ru",
+   "fetchedAt": "2026-10-15",
+   "items": [
+    {
+     "title": "ChatGPT",
+     "extra": "",
+     "url": "https://ru.wikipedia.org/wiki/ChatGPT",
+     "views": 3000,
+     "trend": 1.044
+    },
+    {
+     "title": "Искусственный_интеллект",
+     "extra": "",
+     "url": "https://ru.wikipedia.org/wiki/%D0%98%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9_%D0%B8%D0%BD%D1%82%D0%B5%D0%BB%D0%BB%D0%B5%D0%BA%D1%82",
+     "views": 1948,
+     "trend": 0.788
+    },
+    {
+     "title": "OpenAI",
+     "extra": "",
+     "url": "https://ru.wikipedia.org/wiki/OpenAI",
+     "views": 1104,
+     "trend": 1.029
+    }
+   ]
+  },
+  {
+   "key": "ko",
+   "name": "ko",
+   "fetchedAt": "2026-10-14",
+   "items": [
+    {
+     "title": "인공지능",
+     "extra": "",
+     "url": "https://ko.wikipedia.org/wiki/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5",
+     "views": 157,
+     "trend": 1.149
+    }
+   ]
+  }
+ ]
+}

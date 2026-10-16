@@ -40,6 +40,9 @@ import { fileURLToPath } from 'node:url';
 
 import { BRAND, findUnresolvedPlaceholders, injectBrand } from '../src/site/brand.js';
 import { injectGtm } from '../src/site/gtm.js';
+// 主题引导脚本（head 里那段同步内联脚本）：正文从 assets/theme.js 的
+// bootSnippet() 取，与主题模块共用同一个 localStorage 键 —— 见该文件顶部。
+import { injectThemeBoot } from '../src/site/theme-boot.js';
 // 面板 id 与标签的真值住在 `web/public/assets/` 下 —— 浏览器只能拿到发布集合里的
 // 文件，所以它必须在浏览器够得着的地方，Node 这边隔着目录引它没问题（见该文件顶部）。
 import { injectNav, injectIndex, injectTopics } from '../src/site/nav.js';
@@ -65,12 +68,20 @@ export const SITE_FILES = [
   'assets/boards.js',
   'assets/ui.js',
   'assets/i18n.js',
+  // 主题切换（三态 + 页头按钮）。★ 它必须在发布集合里：`index.html` 里有
+  // `<script src="assets/theme.js" type="module">`，而 `findMissingAssets`
+  // 会照着这条 src 校验 —— 漏登记不是"少一个功能"，是**构建直接失败**。
+  'assets/theme.js',
   // 构建期快照（scripts/fetch-*.mjs 生成并提交；在白名单里 = 文件缺失会让
   // 构建直接失败，而不是线上悄悄 404）
   'assets/data/gh-trending.json',
   'assets/data/ai-news.json',
   'assets/data/ai-press.json',
   'assets/data/cn-hot.json',
+  // 2026-10-16 新增三张榜的快照
+  'assets/data/hn-top.json',
+  'assets/data/wiki-attention.json',
+  'assets/data/google-trends.json',
 ];
 
 /* ================================================================== */
@@ -234,6 +245,10 @@ export async function buildSite({ srcDir = path.join(ROOT, 'web', 'public'), out
     // 首页正文：粘性索引条 + 六个主题分段的骨架，都由构建期落值
     // （真值只有 `boards.js` 的面板/主题清单 + `i18n.js` 的文案各一处）
     out = injectTopics(injectIndex(out, lang), lang);
+    // 主题引导脚本（head 里的同步内联脚本）。★ 必须与 brand/gtm 同在这一串里
+    // 落值：漏了它，发布物里会留着 `{{THEME_BOOT}}` —— 下面的占位符门禁会失败，
+    // 而不是把一个字面量发给访客（这正是白名单 + 门禁的好处）。
+    out = injectThemeBoot(out);
     files[rel] = injectGtm(injectBrand(out, BRAND));
   }
 

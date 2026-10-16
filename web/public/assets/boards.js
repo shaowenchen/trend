@@ -56,6 +56,13 @@ export const BOARD_IDS = [
   'aaBench',
   'orApps',
   'swebench',
+  // ── 2026-10-16 新增三张榜 ──
+  // 顺序即同主题段内的排列（`BOARD_ORDER` 段内沿用 `BOARD_IDS`）。
+  // 都刻意放在各自主题段的**末尾**：它们是补充维度，不该把原有的榜挤下去
+  // （读者已经熟悉的次序保持不变）。
+  'hnTop',         // 资讯：HN 首页实况（与 aiNews 里那个 HN 源口径不同，见 trend.js）
+  'wikiAttention', // 平台洞察：维基百科 AI 词条的大众关注度（唯一的大众注意力口径）
+  'googleTrends',  // 平台洞察：Google 每日搜索趋势（按区域）
 ];
 
 /**
@@ -110,6 +117,12 @@ export const BOARD_TAGS = {
   // 所以来源是"聚合源"，而不是某一家媒体。
   aiNews: { topic: 'news', source: 'aggregator' },
   aiPress: { topic: 'news', source: 'aggregator' },
+  // HN 首页实况：单一来源（Hacker News 自己），所以来源就是它，
+  // 不归到 'aggregator'（那是 aiNews/aiPress 那种多源拼盘的标签）
+  hnTop: { topic: 'news', source: 'hackernews' },
+  // 大众注意力两榜：来源是各自的平台本身
+  wikiAttention: { topic: 'platform', source: 'wikipedia' },
+  googleTrends: { topic: 'platform', source: 'google' },
   // 中文热榜 —— 13 个平台的热榜，来自同一份聚合快照，但**各算一个来源**
   // （这样"点微博"筛出的就是微博那一个榜，而不是 13 个一起出）
   zhihu: { topic: 'cn-hot', source: 'zhihu' },
@@ -147,6 +160,11 @@ export const SOURCE_SLUGS = [
   'artificial-analysis',
   'swe-bench',
   'aggregator',
+  // HN 首页实况的来源（单一来源，与 'aggregator' 的多源拼盘区分开）
+  'hackernews',
+  // 大众注意力两榜的来源
+  'wikipedia',
+  'google',
   'zhihu',
   'csdn',
   'juejin',
@@ -245,6 +263,16 @@ export const BOARD_ICONS = {
   aaBench: 'trophy',
   orApps: 'cube',
   swebench: 'code',
+  // 2026-10-16 新增三张榜。★ 漏登记会**静默**回落到 'box'（骨架不炸、头像不对），
+  // 所以这三个都挑了语义明确的图标：
+  //   hnTop        —— trending（首页排名，与 weibo/toutiao 那种热榜同形）
+  //   wikiAttention—— file（百科条目；与 papers/aiNews 同一个"文档"语义）
+  //   googleTrends —— trending（搜索趋势，同上）
+  // 刻意**不用** 'globe'：那个是语言切换专用的（页头那个链接），
+  // 复用到面板头像上会让"地球"这个符号同时指两件事。
+  hnTop: 'trending',
+  wikiAttention: 'file',
+  googleTrends: 'trending',
 };
 
 /**

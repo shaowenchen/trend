@@ -6,7 +6,7 @@
 <title>{{BRAND}}</title>
 <meta name="description" content="{{BRAND}} is an AI trend board: model charts, community heat, open-model evaluation scores and coding benchmarks in one page.">
 <!--
-  Single-page site: all 34 boards live on this page, grouped into six topic
+  Single-page site: all 37 boards live on this page, grouped into six topic
   sections. There are no second-level pages any more.
 
   Same notes as the Chinese page: hand-written static file served straight by
@@ -25,6 +25,14 @@
   plain string replace, so a mention inside a comment would be expanded too.)
 -->
 <base href="./">
+<!-- ★ Theme boot: must run BEFORE the stylesheet, as a plain synchronous
+     inline script (not a module). Place it after the stylesheet and the
+     browser paints one frame in the default dark theme first — that flash is
+     exactly why the toggle was removed in the first place. The body is
+     resolved at build time (src/site/theme-boot.js → assets/theme.js
+     bootSnippet()), so the localStorage key and the valid-value rule have a
+     single source. -->
+{{THEME_BOOT}}
 <link rel="stylesheet" href="../site.css">
 <!-- Google Tag Manager: container id comes from src/site/gtm.js, resolved at build time -->
 {{GTM}}
@@ -46,9 +54,9 @@
        the dictionary" convention (panel and topic names do come from i18n.js). -->
   <h1 class="home-title">AI trend boards</h1>
 
-  <!-- Sticky index bar: topic filter (narrow to one class), jumps to all 34
+  <!-- Sticky index bar: topic filter (narrow to one class), jumps to all 37
        panels, and the refresh button. It sits before the boards and sticks to
-       the top, because with 34 panels on one page "how do I find one" comes first. -->
+       the top, because with 37 panels on one page "how do I find one" comes first. -->
   {{BOARD_INDEX}}
 
   <!-- Six topic sections (Models / Benchmarks / Ecosystem / Platform / News /
@@ -62,5 +70,6 @@
 </main>
 <script src="../assets/trend.js" type="module"></script>
 <script src="../assets/ui.js" type="module"></script>
+<script src="../assets/theme.js" type="module"></script>
 </body>
 </html>
